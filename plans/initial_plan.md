@@ -44,7 +44,7 @@ isProject: false
 - **Frontend**: React + Vite + TypeScript, `shadcn/ui` + Tailwind CSS, `@tanstack/react-query` (Suspense mode), `react-hook-form` + `zod`, `react-router-dom`. Microsoft Kiota-generated typed TypeScript API client.
 - **Orchestration**: .NET Aspire AppHost manages PostgreSQL (container), backend API, and frontend dev server as a single `dotnet run` experience.
 - **Product prefix**: `CoffeeTracker` (e.g. `CoffeeTracker.sln`, `CoffeeTracker.Api`, `CoffeeTracker.AppHost`).
-- **Repo layout**: `src/` for .NET projects (including AppHost and ServiceDefaults), `frontend/` for the React SPA, `tests/` for .NET test projects, `docs/` for spec.
+- **Repo layout**: `backend/` for .NET projects (including AppHost and ServiceDefaults), `frontend/` for the React SPA, `docs/` for spec.
 - No authentication or multi-tenancy -- single-user app.
 - Docker available for Testcontainers (integration tests) and Aspire's PostgreSQL container resource.
 - Grinder derived statistics depend on BrewLog data and will be computed in the Brew Log step, not initial Grinder CRUD.
@@ -55,7 +55,7 @@ isProject: false
 
 - **Goal**: Scaffold the full Clean Architecture .NET solution so it builds, runs, and has a passing architecture test and integration-test harness. Configure CORS.
 - **Scope**:
-  - Create `CoffeeTracker.sln` with four src projects (`CoffeeTracker.Domain`, `CoffeeTracker.Infrastructure`, `CoffeeTracker.Application`, `CoffeeTracker.Api`) and five test projects per the `dotnet-backend` skill scaffold.
+  - Create `CoffeeTracker.sln` with four backend projects (`CoffeeTracker.Domain`, `CoffeeTracker.Infrastructure`, `CoffeeTracker.Application`, `CoffeeTracker.Api`) and five test projects per the `dotnet-backend` skill scaffold.
   - Add NuGet packages: MediatR, FluentValidation, EF Core + Npgsql, Swashbuckle, xUnit, FluentAssertions, NSubstitute, AutoFixture, NetArchTest.Rules, Testcontainers.PostgreSql, Respawn.
   - Wire up `Program.cs` with DI extensions (`AddApplication`, `AddInfrastructure`), Swagger, `ExceptionHandlerMiddleware`, and CORS policy allowing all origins.
   - Create empty `ApplicationDbContext` in Infrastructure.
@@ -65,7 +65,7 @@ isProject: false
   - Add `DependencyTests` architecture test.
   - Add `.gitignore` for .NET + Node.
 - **Tests**: Architecture dependency test (`Domain_Should_Not_Reference_Infrastructure`). Integration test harness verified by a build.
-- **Verification**: `dotnet build` succeeds. `dotnet test` passes the architecture test. `dotnet run --project src/CoffeeTracker.Api` starts and Swagger UI loads at `/swagger`.
+- **Verification**: `dotnet build` succeeds. `dotnet test` passes the architecture test. `dotnet run --project backend/CoffeeTracker.Api` starts and Swagger UI loads at `/swagger`.
 - **Exit Criteria**: Solution builds, all tests green, API serves Swagger, CORS configured.
 
 ---
@@ -105,8 +105,8 @@ isProject: false
 
 - **Goal**: Add a .NET Aspire AppHost that orchestrates PostgreSQL, the backend API, and the frontend dev server so the entire stack starts with a single `dotnet run`.
 - **Scope**:
-  - Create `CoffeeTracker.ServiceDefaults` project in `src/`. Add to solution. Wire up standard Aspire service defaults (OpenTelemetry, health checks, service discovery). Reference from `CoffeeTracker.Api`.
-  - Create `CoffeeTracker.AppHost` project in `src/`. Add to solution. Reference `CoffeeTracker.Api` project.
+  - Create `CoffeeTracker.ServiceDefaults` project in `backend/`. Add to solution. Wire up standard Aspire service defaults (OpenTelemetry, health checks, service discovery). Reference from `CoffeeTracker.Api`.
+  - Create `CoffeeTracker.AppHost` project in `backend/`. Add to solution. Reference `CoffeeTracker.Api` project.
   - Configure AppHost `Program.cs`:
     - `AddPostgres("postgres").AddDatabase("coffeetrackerdb")` -- PostgreSQL as a container resource.
     - `AddProject<CoffeeTracker.Api>("api")` -- reference the API project, pass the database connection as a resource reference.
@@ -115,7 +115,7 @@ isProject: false
   - Update `CoffeeTracker.Infrastructure` `AddInfrastructure` to use `AddNpgsqlDbContext` (Aspire-style) or keep `UseNpgsql` with the connection string from configuration (Aspire injects `ConnectionStrings:coffeetrackerdb` automatically).
   - Ensure integration tests still work independently via Testcontainers (they do not use the AppHost).
 - **Tests**: Existing architecture and integration tests still pass. No new tests needed -- Aspire orchestration is verified by running the AppHost.
-- **Verification**: `dotnet run --project src/CoffeeTracker.AppHost` starts the Aspire dashboard, PostgreSQL container, backend API, and frontend dev server. Aspire dashboard shows all three resources as healthy. Swagger UI accessible via the API's endpoint. Frontend dev server accessible and shows the app shell.
+- **Verification**: `dotnet run --project backend/CoffeeTracker.AppHost` starts the Aspire dashboard, PostgreSQL container, backend API, and frontend dev server. Aspire dashboard shows all three resources as healthy. Swagger UI accessible via the API's endpoint. Frontend dev server accessible and shows the app shell.
 - **Exit Criteria**: Single `dotnet run` launches everything. All resources healthy in Aspire dashboard. Existing tests unaffected.
 
 ---
@@ -297,7 +297,7 @@ isProject: false
 
 ## Final Validation Checklist
 
-- `dotnet run --project src/CoffeeTracker.AppHost` launches all resources (PostgreSQL, API, frontend)
+- `dotnet run --project backend/CoffeeTracker.AppHost` launches all resources (PostgreSQL, API, frontend)
 - All resources healthy in Aspire dashboard
 - Backend builds with zero warnings: `dotnet build --warnaserrors`
 - All backend unit and integration tests pass: `dotnet test`
