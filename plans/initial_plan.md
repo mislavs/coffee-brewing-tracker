@@ -12,10 +12,10 @@ todos:
     content: "Step 3: Aspire AppHost -- CoffeeTracker.AppHost + ServiceDefaults, orchestrates PostgreSQL, backend API, and frontend dev server"
     status: pending
   - id: step-4-roasters
-    content: "Step 4: Roaster Library (F1) -- backend CRUD + frontend list/detail/create/edit pages"
+    content: "Step 4: Roaster Library (F1) -- backend create/read/update + frontend list/detail/create/edit pages"
     status: pending
   - id: step-5-beans
-    content: "Step 5: Flavor Notes + Bean Library (F2) -- backend CRUD with M2M + frontend pages with roaster picker, flavor note tags, search"
+    content: "Step 5: Flavor Notes + Bean Library (F2) -- backend create/read/update with M2M + frontend pages with roaster picker, flavor note tags, search"
     status: pending
   - id: step-6-equipment
     content: "Step 6: Equipment Registry (F3) -- Brewer/Grinder/Accessory backend CRUD + frontend tabbed UI with brewer association"
@@ -87,7 +87,7 @@ isProject: false
     - Install Kiota runtime packages: `@microsoft/kiota-abstractions`, `@microsoft/kiota-http-fetchlibrary`, `@microsoft/kiota-serialization-json`, `@microsoft/kiota-serialization-text`, `@microsoft/kiota-serialization-form`, `@microsoft/kiota-serialization-multipart`, `@microsoft/kiota-authentication-anonymous`.
     - Commit `frontend/openapi.json` as the checked-in OpenAPI contract. Gitignore `frontend/src/lib/api/generated/`.
     - Two npm scripts:
-      - `update-api-spec` -- fetches the latest spec from the running backend (`curl http://localhost:5000/swagger/v1/swagger.json -o openapi.json`). Only needed after API changes; requires backend running.
+      - `update-api-spec` -- runs a cross-platform Node script (`node ./scripts/update-api-spec.mjs`) that downloads Swagger JSON and writes `frontend/openapi.json`. URL resolution order: CLI `--url`, `COFFEE_TRACKER_OPENAPI_URL`, `${VITE_API_URL}/swagger/v1/swagger.json`, then fallback `http://localhost:5000/swagger/v1/swagger.json`.
       - `generate-api` -- runs `kiota generate -l typescript -d ./openapi.json -o src/lib/api/generated -n CoffeeTrackerClient`. Reads from the local checked-in spec. Does not require backend running.
     - CI pipeline runs `npm run generate-api` before `npm run build` so the client is created from the committed spec.
     - Configure `lib/config.ts` to export `VITE_API_URL` (defaults to `http://localhost:5000`) and provide a configured Kiota client instance.
@@ -110,7 +110,7 @@ isProject: false
   - Configure AppHost `Program.cs`:
     - `AddPostgres("postgres").AddDatabase("coffeetrackerdb")` -- PostgreSQL as a container resource.
     - `AddProject<CoffeeTracker.Api>("api")` -- reference the API project, pass the database connection as a resource reference.
-    - `AddViteApp("frontend", "../../frontend")` -- launch the Vite dev server, configure the HTTP endpoint reference.
+    - `AddViteApp("frontend", "../../frontend")` -- launch the Vite dev server, configure the HTTP endpoint reference, and inject `VITE_API_URL` from the API resource endpoint so frontend calls do not depend on a hard-coded port.
   - Update `CoffeeTracker.Api` `Program.cs` to call `builder.AddServiceDefaults()` and `app.MapDefaultEndpoints()`.
   - Update `CoffeeTracker.Infrastructure` `AddInfrastructure` to use `AddNpgsqlDbContext` (Aspire-style) or keep `UseNpgsql` with the connection string from configuration (Aspire injects `ConnectionStrings:coffeetrackerdb` automatically).
   - Ensure integration tests still work independently via Testcontainers (they do not use the AppHost).
@@ -122,7 +122,7 @@ isProject: false
 
 ## Step 4 -- Roaster Library (F1)
 
-- **Goal**: First full vertical slice -- Roaster CRUD from database to UI -- proving both stacks work end-to-end together.
+- **Goal**: First full vertical slice -- Roaster create/read/update from database to UI -- proving both stacks work end-to-end together.
 - **Scope**:
   - **Backend**:
     - **Domain**: `Roaster` entity (Id, Name, City, Country).
@@ -140,7 +140,7 @@ isProject: false
   - Backend unit: `CreateRoasterValidatorTests`, `UpdateRoasterValidatorTests`.
   - Backend integration: `CreateRoasterHandlerTests`, `UpdateRoasterHandlerTests`, `GetRoasterByIdHandlerTests`, `GetRoastersListHandlerTests`.
 - **Verification**: `dotnet build && dotnet test`. Frontend: `npm run build`. Run via Aspire AppHost and manually create a roaster in the UI, see it in the list, click into detail, edit it.
-- **Exit Criteria**: Full Roaster CRUD works in both API and UI. All backend tests green.
+- **Exit Criteria**: Roaster create/read/update flows work in both API and UI. All backend tests green.
 
 ---
 
@@ -152,18 +152,20 @@ isProject: false
     - **Domain**: `FlavorNote` (Id, Name). `Bean` (all spec properties except `RemainingQuantity`). `OriginType` enum. `RoastProfile` enum. `PricePerKg` derived property.
     - **Infrastructure**: `FlavorNoteConfiguration`, `BeanConfiguration` with join table. DbSets. EF migration.
     - **Application** `Features/Beans/`: `CreateBean`, `UpdateBean` commands. `GetBeanById`, `GetBeansList` (with name search) queries. `Features/FlavorNotes/`: `GetFlavorNotesList` query.
-    - **Api**: Bean CRUD endpoints, FlavorNote list endpoint.
+    - **Application** `Features/Roasters/`: update `GetRoasterById` to include associated bean summaries for roaster detail navigation.
+    - **Api**: Bean create/read/update endpoints, FlavorNote list endpoint, roaster detail contract includes associated beans.
   - **Frontend** `features/beans/`:
     - Regenerate API client.
     - `BeanListPage` -- searchable table showing name, roaster, roast profile, bag weight, price per kg. Links to detail.
     - `BeanDetailPage` -- full bean info with flavor note chips, roaster link, price per kg.
-    - `BeanFormPage` -- form with roaster dropdown (fetched from API), flavor note multi-select/tag input (autocomplete from `GetFlavorNotesList`, allows creating new), enum selects for OriginType and RoastProfile, origin countries as tag input.
+    - `BeanFormPage` -- form with roaster dropdown (fetched from API) plus inline "Create roaster" flow (dialog or inline section that calls the existing roaster create endpoint and selects the new roaster on success), flavor note multi-select/tag input (autocomplete from `GetFlavorNotesList`, allows creating new), enum selects for OriginType and RoastProfile, origin countries as tag input.
+    - Update `RoasterDetailPage` to show associated beans with links into bean detail pages.
     - Routes: `/beans`, `/beans/:id`, `/beans/new`, `/beans/:id/edit`.
 - **Tests**:
   - Backend unit: Bean validators, `PricePerKg` domain logic.
   - Backend integration: Bean and FlavorNote handlers (create with new/existing flavor notes, query with includes, search).
 - **Verification**: `dotnet build && dotnet test`. `npm run build`. Manual via Aspire: create a bean selecting a roaster and adding flavor notes, verify detail page shows all relationships and price per kg.
-- **Exit Criteria**: Bean CRUD works end-to-end with Roaster FK and FlavorNote M2M. Search works. PricePerKg computed correctly.
+- **Exit Criteria**: Bean create/read/update flows work end-to-end with Roaster FK and FlavorNote M2M. Search works. PricePerKg computed correctly.
 
 ---
 
@@ -219,16 +221,17 @@ isProject: false
 - **Goal**: Implement the core Brew Log feature with all entity references, auto-calculated brew ratio, emoji rating, searchable history, and Grinder derived statistics.
 - **Scope**:
   - **Backend**:
-    - **Domain**: `BrewLogEntry` (all spec properties). `BrewRating` enum (1-5). `BrewRatio` derived from Dose/WaterAmount.
-    - **Infrastructure**: `BrewLogEntryConfiguration` (FKs to Bean, Grinder; M2M with Accessory; Recipe FK). `BrewLogAccessory` join table. DbSet. EF migration.
+    - **Domain**: `BrewLogEntry` (all spec properties + explicit `BrewerId`/method reference so method is captured even when `RecipeId` is null). `BrewRating` enum (1-5). `BrewRatio` derived from Dose/WaterAmount.
+    - **Infrastructure**: `BrewLogEntryConfiguration` (FKs to Bean, Brewer, Grinder; M2M with Accessory; optional Recipe FK). `BrewLogAccessory` join table. DbSet. EF migration.
     - **Application** `Features/BrewLog/`: `CreateBrewLog`, `UpdateBrewLog`, `DeleteBrewLog` commands. `GetBrewLogById`, `GetBrewLogsList` (search by bean name, date range) queries.
+    - Enforce consistency rule: if `RecipeId` is provided, recipe must belong to selected `BrewerId`.
     - **Application** `Features/Grinders/Queries/GetGrinderById` -- enhance to return derived stats (Total Brews, Total Coffee Ground, Most Common Grind Setting, Grind Setting Range, Best Rated Grind Setting).
     - **Api**: BrewLog CRUD + list endpoints. Updated Grinder detail DTO.
   - **Frontend** `features/brew-log/`:
     - Regenerate API client.
-    - `BrewLogListPage` -- chronological brew history with search (bean name) and date range filter. Each row shows date, bean, method, rating emoji, ratio. Links to detail.
+    - `BrewLogListPage` -- chronological brew history with search (bean name) and date range filter. Each row shows date, bean, brewer/method, rating emoji, ratio. Links to detail.
     - `BrewLogDetailPage` -- full brew details with all resolved entity names, brew ratio, rating emoji, tasting notes, adjustment ideas. Edit/delete buttons.
-    - `BrewLogFormPage` -- multi-step or sectioned form: (1) Bean select, (2) Method: brewer auto-resolved from recipe select (filtered to brewer), grinder select, accessory multi-select (filtered to brewer), (3) Parameters: dose, water, temp, grind size, (4) Results: brew time, rating (emoji picker), tasting notes, adjustment ideas. Brew ratio auto-displayed as dose/water change. `useMutation` submit.
+    - `BrewLogFormPage` -- multi-step or sectioned form: (1) Bean select, (2) Method: explicit brewer select, then optional recipe select filtered by brewer, grinder select, accessory multi-select filtered by brewer, (3) Parameters: dose, water, temp, grind size, (4) Results: brew time, rating (emoji picker), tasting notes, adjustment ideas. Brew ratio auto-displayed as dose/water change. `useMutation` submit.
     - Emoji rating picker component: 5 emoji faces, click to select.
     - Update `GrinderDetailPage` to display derived brew statistics.
     - Routes: `/brew-log`, `/brew-log/:id`, `/brew-log/new`, `/brew-log/:id/edit`.
@@ -236,7 +239,7 @@ isProject: false
 - **Tests**:
   - Backend unit: BrewLog validators, BrewRatio calculation.
   - Backend integration: Create brew with all refs, query with includes, update, delete. Grinder stats after brews.
-- **Verification**: `dotnet build && dotnet test`. `npm run build`. Manual via Aspire: full end-to-end -- create roaster, bean, brewer, grinder, recipe, then log a brew. Verify ratio, rating, history, grinder stats all display correctly.
+- **Verification**: `dotnet build && dotnet test`. `npm run build`. Manual via Aspire: full end-to-end -- create roaster, bean, brewer, grinder, recipe, then log a brew (including a brew without recipe). Verify ratio, rating, history, brewer/method capture, and grinder stats all display correctly.
 - **Exit Criteria**: Brew Log CRUD works in API and UI. Rating with emojis. Brew ratio auto-calculated. History searchable. Grinder stats computed.
 
 ---
@@ -266,7 +269,7 @@ isProject: false
 - **Goal**: Allow starting a new brew log pre-filled from a previous brew entry, accessible from the UI.
 - **Scope**:
   - **Backend**:
-    - **Application** `Features/BrewLog/Queries/GetRepeatBrewTemplate` -- returns pre-filled DTO (Bean, Recipe, Grinder, Accessories, Dose, WaterAmount, WaterTemperature, GrindSize). Excludes brew time, rating, tasting notes, adjustment ideas.
+    - **Application** `Features/BrewLog/Queries/GetRepeatBrewTemplate` -- returns pre-filled DTO (Bean, Brewer/Method, Recipe, Grinder, Accessories, Dose, WaterAmount, WaterTemperature, GrindSize). Excludes brew time, rating, tasting notes, adjustment ideas.
     - **Api**: `GET /api/brew-logs/{id}/repeat` endpoint.
   - **Frontend**:
     - Add "Repeat Brew" button to `BrewLogDetailPage`.
@@ -286,7 +289,7 @@ isProject: false
 - **Many-to-many complexity**: Bean-FlavorNote, Accessory-Brewer, and BrewLog-Accessory join tables add mapping complexity. **Mitigation**: Front-load one M2M in Step 5 (Bean-FlavorNote) to establish the pattern before the others.
 - **Grinder derived stats performance**: Computing stats from BrewLog on every Grinder detail query could be slow with many brews. **Mitigation**: Acceptable for single-user app. Can add caching or materialized view later if needed.
 - **Remaining quantity consistency**: Computing on read avoids stale cache but adds query cost. **Mitigation**: Single SUM aggregate is fast for single-user volumes.
-- **OpenAPI client drift**: API changes require running `npm run update-api-spec` (with backend running) then `npm run generate-api`. **Mitigation**: Each feature step starts with updating the spec and regenerating. The spec file is diffable in PRs so contract changes are visible. CI always regenerates from the committed spec before building.
+- **OpenAPI client drift**: API changes require running `npm run update-api-spec` then `npm run generate-api`. **Mitigation**: `update-api-spec` is a cross-platform script with URL override (`--url` or env var), so contract refresh is not tied to shell-specific tooling or a single fixed port. The spec file is diffable in PRs so contract changes are visible. CI always regenerates from the committed spec before building.
 - **CORS during development**: Frontend and backend on different ports. **Mitigation**: CORS configured in Step 1 to allow all origins.
 - **Aspire and Testcontainers port conflicts**: Both Aspire and integration tests spin up PostgreSQL containers. **Mitigation**: They use different container instances with dynamic ports, so no conflict. Tests run independently of Aspire.
 
@@ -300,7 +303,7 @@ isProject: false
 - All backend unit and integration tests pass: `dotnet test`
 - Frontend builds: `npm run build` (in `frontend/`)
 - Frontend lints clean: `npm run lint` (in `frontend/`)
-- Every entity from the spec has full CRUD via API endpoints and UI pages
+- Every entity from the spec supports the required management actions (create/view/edit everywhere; delete where the spec explicitly requires remove/delete)
 - Roaster detail shows associated beans (F1)
 - Bean detail shows remaining quantity, price per kg, flavor notes, roaster (F2 + F6)
 - Equipment registry covers Brewers, Grinders, Accessories with associations (F3)
