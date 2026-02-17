@@ -3,8 +3,8 @@ name: Coffee Tracker Delivery Plan
 overview: Iterative delivery plan for a full-stack Coffee Brewing Tracker (ASP.NET Clean Architecture backend + React SPA frontend + .NET Aspire orchestration), sliced into 10 vertical steps that each leave the app buildable, runnable, and tested.
 todos:
   - id: step-1-backend-bootstrap
-    content: "Step 1: Backend Bootstrap -- scaffold CoffeeTracker.sln Clean Architecture solution, DI, middleware, DbContext, test harness, architecture test, CORS"
-    status: pending
+    content: "Step 1: Backend Bootstrap -- scaffold CoffeeTracker.x Clean Architecture solution, DI, middleware, DbContext, test harness, architecture test, CORS"
+    status: completed
   - id: step-2-frontend-bootstrap
     content: "Step 2: Frontend Bootstrap -- Vite + React + TypeScript scaffold, shadcn/ui, routing shell, dark mode, Kiota API client generation, layout with nav"
     status: pending
@@ -43,7 +43,7 @@ isProject: false
 - **Backend**: .NET Clean Architecture (`CoffeeTracker.Domain`, `.Infrastructure`, `.Application`, `.Api`) with CQRS via MediatR, PostgreSQL via EF Core (Npgsql).
 - **Frontend**: React + Vite + TypeScript, `shadcn/ui` + Tailwind CSS, `@tanstack/react-query` (Suspense mode), `react-hook-form` + `zod`, `react-router-dom`. Microsoft Kiota-generated typed TypeScript API client.
 - **Orchestration**: .NET Aspire AppHost manages PostgreSQL (container), backend API, and frontend dev server as a single `dotnet run` experience.
-- **Product prefix**: `CoffeeTracker` (e.g. `CoffeeTracker.sln`, `CoffeeTracker.Api`, `CoffeeTracker.AppHost`).
+- **Product prefix**: `CoffeeTracker` (e.g. `CoffeeTracker.slnx`, `CoffeeTracker.Api`, `CoffeeTracker.AppHost`).
 - **Repo layout**: `backend/` for .NET projects (including AppHost and ServiceDefaults), `frontend/` for the React SPA, `docs/` for spec.
 - No authentication or multi-tenancy -- single-user app.
 - Docker available for Testcontainers (integration tests) and Aspire's PostgreSQL container resource.
@@ -55,7 +55,7 @@ isProject: false
 
 - **Goal**: Scaffold the full Clean Architecture .NET solution so it builds, runs, and has a passing architecture test and integration-test harness. Configure CORS.
 - **Scope**:
-  - Create `CoffeeTracker.sln` with four backend projects (`CoffeeTracker.Domain`, `CoffeeTracker.Infrastructure`, `CoffeeTracker.Application`, `CoffeeTracker.Api`) and five test projects per the `dotnet-backend` skill scaffold.
+  - Create `CoffeeTracker.slnx` with four backend projects (`CoffeeTracker.Domain`, `CoffeeTracker.Infrastructure`, `CoffeeTracker.Application`, `CoffeeTracker.Api`) and five test projects per the `dotnet-backend` skill scaffold.
   - Add NuGet packages: MediatR, FluentValidation, EF Core + Npgsql, Swashbuckle, xUnit, FluentAssertions, NSubstitute, AutoFixture, NetArchTest.Rules, Testcontainers.PostgreSql, Respawn.
   - Wire up `Program.cs` with DI extensions (`AddApplication`, `AddInfrastructure`), Swagger, `ExceptionHandlerMiddleware`, and CORS policy allowing all origins.
   - Create empty `ApplicationDbContext` in Infrastructure.
