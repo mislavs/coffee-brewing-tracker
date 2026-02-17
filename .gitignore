@@ -39,3 +39,6 @@ pnpm-debug.log*
 
 # Environment files
 .env.local
+
+# Kiota generated API client
+frontend/src/lib/api/generated/

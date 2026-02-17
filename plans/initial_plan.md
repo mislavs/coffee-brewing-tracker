@@ -7,7 +7,7 @@ todos:
     status: completed
   - id: step-2-frontend-bootstrap
     content: "Step 2: Frontend Bootstrap -- Vite + React + TypeScript scaffold, shadcn/ui, routing shell, dark mode, Kiota API client generation, layout with nav"
-    status: pending
+    status: completed
   - id: step-3-aspire
     content: "Step 3: Aspire AppHost -- CoffeeTracker.AppHost + ServiceDefaults, orchestrates PostgreSQL, backend API, and frontend dev server"
     status: pending
