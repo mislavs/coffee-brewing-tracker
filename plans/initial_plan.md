@@ -10,7 +10,7 @@ todos:
     status: completed
   - id: step-3-aspire
     content: "Step 3: Aspire AppHost -- CoffeeTracker.AppHost + ServiceDefaults, orchestrates PostgreSQL, backend API, and frontend dev server"
-    status: pending
+    status: completed
   - id: step-4-roasters
     content: "Step 4: Roaster Library (F1) -- backend create/read/update + frontend list/detail/create/edit pages"
     status: pending

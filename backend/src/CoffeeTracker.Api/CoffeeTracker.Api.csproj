@@ -14,6 +14,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CoffeeTracker.Application\CoffeeTracker.Application.csproj" />
+    <ProjectReference Include="..\CoffeeTracker.ServiceDefaults\CoffeeTracker.ServiceDefaults.csproj" />
   </ItemGroup>
 
 </Project>

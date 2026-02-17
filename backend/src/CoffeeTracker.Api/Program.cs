@@ -4,6 +4,8 @@ using CoffeeTracker.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.AddServiceDefaults();
+
 builder.Services
     .AddApplication()
     .AddInfrastructure(builder.Configuration);
@@ -29,6 +31,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseCors();
 app.UseMiddleware<ExceptionHandlerMiddleware>();
+app.MapDefaultEndpoints();
 
 app.Run();
 

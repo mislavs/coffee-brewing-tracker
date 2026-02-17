@@ -9,11 +9,14 @@
 
   <ItemGroup>
     <PackageReference Include="AutoFixture" Version="*" />
-    <PackageReference Include="coverlet.collector" Version="6.0.4" />
+    <PackageReference Include="coverlet.collector" Version="8.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="FluentAssertions" Version="*" />
     <PackageReference Include="FluentValidation" Version="*" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="*" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
     <PackageReference Include="NSubstitute" Version="*" />
     <PackageReference Include="Respawn" Version="*" />
     <PackageReference Include="Testcontainers.PostgreSql" Version="*" />

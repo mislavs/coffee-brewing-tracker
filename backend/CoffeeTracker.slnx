@@ -1,9 +1,11 @@
 <Solution>
   <Folder Name="/src/">
+    <Project Path="src/CoffeeTracker.AppHost/CoffeeTracker.AppHost.csproj" />
     <Project Path="src/CoffeeTracker.Api/CoffeeTracker.Api.csproj" />
     <Project Path="src/CoffeeTracker.Application/CoffeeTracker.Application.csproj" />
     <Project Path="src/CoffeeTracker.Domain/CoffeeTracker.Domain.csproj" />
     <Project Path="src/CoffeeTracker.Infrastructure/CoffeeTracker.Infrastructure.csproj" />
+    <Project Path="src/CoffeeTracker.ServiceDefaults/CoffeeTracker.ServiceDefaults.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/CoffeeTracker.Api.Tests/CoffeeTracker.Api.Tests.csproj" />
