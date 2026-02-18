@@ -5,7 +5,8 @@ var postgres = builder.AddPostgres("postgres")
 
 var api = builder.AddProject<Projects.CoffeeTracker_Api>("api")
     .WithReference(postgres)
-    .WaitFor(postgres);
+    .WaitFor(postgres)
+    .WithHttpHealthCheck("/health");
 
 builder.AddViteApp("frontend", "../../../frontend")
     .WithReference(api)
