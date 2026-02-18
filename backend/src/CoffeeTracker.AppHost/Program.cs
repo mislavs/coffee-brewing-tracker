@@ -1,11 +1,17 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
 var postgres = builder.AddPostgres("postgres")
-    .AddDatabase("DefaultConnection");
+    .WithPgAdmin(resource => resource.WithUrlForEndpoint("http", u => u.DisplayText = "PG Admin"));
+
+var appDb = postgres.AddDatabase("coffee-brewing-db");
+
+var migrations = builder.AddProject<Projects.CoffeeTracker_MigrationService>("migrations")
+    .WithReference(appDb, "DefaultConnection")
+    .WaitFor(appDb);
 
 var api = builder.AddProject<Projects.CoffeeTracker_Api>("api")
-    .WithReference(postgres)
-    .WaitFor(postgres)
+    .WithReference(appDb)
+    .WaitFor(migrations)
     .WithHttpHealthCheck("/health");
 
 builder.AddViteApp("frontend", "../../../frontend")
