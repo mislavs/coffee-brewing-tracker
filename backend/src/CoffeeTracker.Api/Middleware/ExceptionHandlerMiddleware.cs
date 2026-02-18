@@ -7,6 +7,11 @@ namespace CoffeeTracker.Api.Middleware;
 
 public class ExceptionHandlerMiddleware(RequestDelegate next)
 {
+    private static readonly JsonSerializerOptions SerializerOptions = new()
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+    };
+
     public async Task InvokeAsync(HttpContext context)
     {
         try
@@ -64,7 +69,7 @@ public class ExceptionHandlerMiddleware(RequestDelegate next)
     {
         context.Response.StatusCode = (int)statusCode;
         context.Response.ContentType = "application/json";
-        var json = JsonSerializer.Serialize(response);
+        var json = JsonSerializer.Serialize(response, SerializerOptions);
         return context.Response.WriteAsync(json);
     }
 

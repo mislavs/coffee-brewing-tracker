@@ -1,4 +1,5 @@
 using CoffeeTracker.Api.Middleware;
+using CoffeeTracker.Api.Endpoints;
 using CoffeeTracker.Application;
 using CoffeeTracker.Infrastructure;
 
@@ -32,6 +33,7 @@ if (app.Environment.IsDevelopment())
 app.UseCors();
 app.UseMiddleware<ExceptionHandlerMiddleware>();
 app.MapDefaultEndpoints();
+app.MapRoasterEndpoints();
 
 app.Run();
 

@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using CoffeeTracker.Infrastructure.Persistence;
+using MediatR;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 namespace CoffeeTracker.Application.Tests;
@@ -11,6 +13,20 @@ public class IntegrationTest(IntegrationTestFactory factory) : IAsyncLifetime
     private readonly Func<Task> _resetDatabase = factory.ResetDatabase;
 
     protected ApplicationDbContext DbContext => factory.DbContext;
+
+    protected async Task<TResponse> Send<TResponse>(IRequest<TResponse> request)
+    {
+        using var scope = factory.Services.CreateScope();
+        var sender = scope.ServiceProvider.GetRequiredService<ISender>();
+        return await sender.Send(request);
+    }
+
+    protected async Task Send(IRequest request)
+    {
+        using var scope = factory.Services.CreateScope();
+        var sender = scope.ServiceProvider.GetRequiredService<ISender>();
+        await sender.Send(request);
+    }
 
     protected async Task Insert<T>(T entity) where T : class
     {

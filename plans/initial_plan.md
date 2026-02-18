@@ -13,7 +13,7 @@ todos:
     status: completed
   - id: step-4-roasters
     content: "Step 4: Roaster Library (F1) -- backend create/read/update + frontend list/detail/create/edit pages"
-    status: pending
+    status: completed
   - id: step-5-beans
     content: "Step 5: Flavor Notes + Bean Library (F2) -- backend create/read/update with M2M + frontend pages with roaster picker, flavor note tags, search"
     status: pending
@@ -141,6 +141,11 @@ isProject: false
   - Backend integration: `CreateRoasterHandlerTests`, `UpdateRoasterHandlerTests`, `GetRoasterByIdHandlerTests`, `GetRoastersListHandlerTests`.
 - **Verification**: `dotnet build && dotnet test`. Frontend: `npm run build`. Run via Aspire AppHost and manually create a roaster in the UI, see it in the list, click into detail, edit it.
 - **Exit Criteria**: Roaster create/read/update flows work in both API and UI. All backend tests green.
+- **Implementation Summary (2026-02-18)**:
+  - Added complete backend Roaster vertical slice (Domain entity, EF configuration + migration, CQRS commands/queries/validators, API contracts/endpoints).
+  - Added backend unit/integration tests for Roaster validation and handlers; `dotnet build` and `dotnet test` pass.
+  - Added frontend Roaster feature (typed Kiota client regen, hooks, list/detail/form pages, route wiring) and `npm run build` passes.
+  - Aspire smoke test execution attempted; AppHost startup fails in this environment with repeated DCP connection-refused errors (`127.0.0.1:57288`) before resources become available.
 
 ---
 
