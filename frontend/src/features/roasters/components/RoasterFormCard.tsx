@@ -25,6 +25,7 @@ type RoasterFormCardProps = {
   onSubmit: (values: RoasterFormValues) => Promise<void>
   isSubmitting: boolean
   cancelHref: string
+  onCancel?: () => void
 }
 
 export function RoasterFormCard({
@@ -35,6 +36,7 @@ export function RoasterFormCard({
   onSubmit,
   isSubmitting,
   cancelHref,
+  onCancel,
 }: RoasterFormCardProps) {
   const form = useForm<RoasterFormValues>({
     resolver: zodResolver(roasterFormSchema),
@@ -106,9 +108,15 @@ export function RoasterFormCard({
               <Button type="submit" disabled={isSubmitting}>
                 {isSubmitting ? 'Saving...' : submitLabel}
               </Button>
-              <Button type="button" variant="outline" asChild>
-                <Link to={cancelHref}>Cancel</Link>
-              </Button>
+              {onCancel ? (
+                <Button type="button" variant="outline" onClick={onCancel}>
+                  Cancel
+                </Button>
+              ) : (
+                <Button type="button" variant="outline" asChild>
+                  <Link to={cancelHref}>Cancel</Link>
+                </Button>
+              )}
             </div>
           </CardFooter>
         </form>

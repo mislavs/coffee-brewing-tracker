@@ -1,42 +1,9 @@
 import type { UseFormSetError } from 'react-hook-form'
 import type { RoasterFormValues } from '@/features/roasters/roasterFormSchema'
-
-type ValidationPayload = {
-  message?: string
-  Message?: string
-  errors?: Record<string, string[]>
-  Errors?: Record<string, string[]>
-}
-
-function extractValidationPayload(error: unknown): ValidationPayload | null {
-  if (!error || typeof error !== 'object') {
-    return null
-  }
-
-  const errorRecord = error as Record<string, unknown>
-
-  const fromResponseBody = errorRecord.responseBody
-  if (fromResponseBody && typeof fromResponseBody === 'object') {
-    return fromResponseBody as ValidationPayload
-  }
-
-  if (typeof errorRecord.message === 'string') {
-    try {
-      return JSON.parse(errorRecord.message) as ValidationPayload
-    } catch {
-      return null
-    }
-  }
-
-  if (
-    (errorRecord.errors && typeof errorRecord.errors === 'object') ||
-    (errorRecord.Errors && typeof errorRecord.Errors === 'object')
-  ) {
-    return errorRecord as ValidationPayload
-  }
-
-  return null
-}
+import {
+  extractValidationPayload,
+  normalizeApiFieldName,
+} from '@/lib/mapApiValidationErrors'
 
 export function applyRoasterFormServerErrors(
   error: unknown,
@@ -53,8 +20,7 @@ export function applyRoasterFormServerErrors(
   const validationErrors = payload.errors ?? payload.Errors
   if (validationErrors) {
     for (const [fieldName, messages] of Object.entries(validationErrors)) {
-      const normalizedFieldName =
-        fieldName.charAt(0).toLowerCase() + fieldName.slice(1)
+      const normalizedFieldName = normalizeApiFieldName(fieldName)
 
       if (
         normalizedFieldName === 'name' ||

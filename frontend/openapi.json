@@ -5,6 +5,209 @@
     "version": "1.0"
   },
   "paths": {
+    "/api/beans": {
+      "get": {
+        "tags": [
+          "Beans"
+        ],
+        "operationId": "GetBeans",
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BeanSummaryDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Beans"
+        ],
+        "operationId": "CreateBean",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateBeanRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateBeanResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/beans/{id}": {
+      "get": {
+        "tags": [
+          "Beans"
+        ],
+        "operationId": "GetBeanById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BeanDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Beans"
+        ],
+        "operationId": "UpdateBean",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateBeanRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/countries": {
+      "get": {
+        "tags": [
+          "Countries"
+        ],
+        "operationId": "GetCountries",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CountryDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/countries/{countryId}/beans": {
+      "get": {
+        "tags": [
+          "Countries"
+        ],
+        "operationId": "GetCountryBeans",
+        "parameters": [
+          {
+            "name": "countryId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BeanSummaryDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/flavor-notes": {
+      "get": {
+        "tags": [
+          "FlavorNotes"
+        ],
+        "operationId": "GetFlavorNotes",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FlavorNoteDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/roasters": {
       "get": {
         "tags": [
@@ -122,6 +325,195 @@
   },
   "components": {
     "schemas": {
+      "BeanDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "roasterId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "roasterName": {
+            "type": "string",
+            "nullable": true
+          },
+          "originType": {
+            "$ref": "#/components/schemas/OriginType"
+          },
+          "originCountries": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "variety": {
+            "type": "string",
+            "nullable": true
+          },
+          "processingMethod": {
+            "type": "string",
+            "nullable": true
+          },
+          "roastProfile": {
+            "$ref": "#/components/schemas/RoastProfile"
+          },
+          "roastDate": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "altitude": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "bagWeight": {
+            "type": "number",
+            "format": "double"
+          },
+          "price": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "pricePerKg": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "flavorNotes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FlavorNoteDto"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "BeanSummaryDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "roasterName": {
+            "type": "string",
+            "nullable": true
+          },
+          "roastProfile": {
+            "$ref": "#/components/schemas/RoastProfile"
+          },
+          "bagWeight": {
+            "type": "number",
+            "format": "double"
+          },
+          "pricePerKg": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CountryDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CreateBeanRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "roasterId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "originType": {
+            "$ref": "#/components/schemas/OriginType"
+          },
+          "originCountries": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "variety": {
+            "type": "string",
+            "nullable": true
+          },
+          "processingMethod": {
+            "type": "string",
+            "nullable": true
+          },
+          "roastProfile": {
+            "$ref": "#/components/schemas/RoastProfile"
+          },
+          "roastDate": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "altitude": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "bagWeight": {
+            "type": "number",
+            "format": "double"
+          },
+          "price": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "flavorNoteNames": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CreateBeanResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "additionalProperties": false
+      },
       "CreateRoasterRequest": {
         "type": "object",
         "properties": {
@@ -150,6 +542,52 @@
         },
         "additionalProperties": false
       },
+      "FlavorNoteDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OriginType": {
+        "enum": [
+          0,
+          1
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
+      "RoastProfile": {
+        "enum": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
+      "RoasterBeanSummaryDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "RoasterDto": {
         "type": "object",
         "properties": {
@@ -167,6 +605,13 @@
           },
           "country": {
             "type": "string",
+            "nullable": true
+          },
+          "beans": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RoasterBeanSummaryDto"
+            },
             "nullable": true
           }
         },
@@ -194,6 +639,67 @@
         },
         "additionalProperties": false
       },
+      "UpdateBeanRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "roasterId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "originType": {
+            "$ref": "#/components/schemas/OriginType"
+          },
+          "originCountries": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "variety": {
+            "type": "string",
+            "nullable": true
+          },
+          "processingMethod": {
+            "type": "string",
+            "nullable": true
+          },
+          "roastProfile": {
+            "$ref": "#/components/schemas/RoastProfile"
+          },
+          "roastDate": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "altitude": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "bagWeight": {
+            "type": "number",
+            "format": "double"
+          },
+          "price": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "flavorNoteNames": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "UpdateRoasterRequest": {
         "type": "object",
         "properties": {
@@ -215,6 +721,15 @@
     }
   },
   "tags": [
+    {
+      "name": "Beans"
+    },
+    {
+      "name": "Countries"
+    },
+    {
+      "name": "FlavorNotes"
+    },
     {
       "name": "Roasters"
     }

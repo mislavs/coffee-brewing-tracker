@@ -9,8 +9,8 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { tryParseGuid } from '@/features/roasters/guid'
 import { useRoaster } from '@/features/roasters/hooks/useRoaster'
+import { tryParseGuid } from '@/lib/guid'
 
 function RoasterDetailContent({ roasterId }: { roasterId: Guid }) {
   const { data: roaster } = useRoaster(roasterId)
@@ -27,6 +27,26 @@ function RoasterDetailContent({ roasterId }: { roasterId: Guid }) {
         </div>
         <div>
           <span className="font-medium">Country:</span> {roaster.country || '—'}
+        </div>
+        <div className="space-y-1 pt-2">
+          <p className="font-medium">Beans</p>
+          {roaster.beans && roaster.beans.length > 0 ? (
+            <ul className="list-inside list-disc">
+              {roaster.beans.map((bean) => (
+                <li key={bean.id ?? bean.name ?? 'bean'}>
+                  {bean.id ? (
+                    <Link to={`/beans/${bean.id}`} className="hover:underline">
+                      {bean.name ?? 'Unnamed bean'}
+                    </Link>
+                  ) : (
+                    (bean.name ?? 'Unnamed bean')
+                  )}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-muted-foreground">No beans yet.</p>
+          )}
         </div>
       </CardContent>
       <CardFooter className="flex items-center gap-2">

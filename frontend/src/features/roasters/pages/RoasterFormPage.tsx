@@ -1,10 +1,10 @@
 import type { Guid } from '@microsoft/kiota-abstractions'
 import { Navigate, useNavigate, useParams } from 'react-router-dom'
 import { RoasterFormCard } from '@/features/roasters/components/RoasterFormCard'
-import { tryParseGuid } from '@/features/roasters/guid'
 import { useCreateRoaster } from '@/features/roasters/hooks/useCreateRoaster'
 import { useRoaster } from '@/features/roasters/hooks/useRoaster'
 import { useUpdateRoaster } from '@/features/roasters/hooks/useUpdateRoaster'
+import { tryParseGuid } from '@/lib/guid'
 import { normalizeOptional } from '@/features/roasters/roasterFormSchema'
 
 function CreateRoasterForm() {
