@@ -7,6 +7,9 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     : DbContext(options)
 {
     public DbSet<Roaster> Roasters => Set<Roaster>();
+    public DbSet<Bean> Beans => Set<Bean>();
+    public DbSet<FlavorNote> FlavorNotes => Set<FlavorNote>();
+    public DbSet<Country> Countries => Set<Country>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

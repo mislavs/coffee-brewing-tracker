@@ -20,7 +20,11 @@ public sealed class GetRoasterByIdHandler(ApplicationDbContext dbContext)
                 entity.Id,
                 entity.Name,
                 entity.City,
-                entity.Country))
+                entity.Country,
+                entity.Beans
+                    .OrderBy(bean => bean.Name)
+                    .Select(bean => new RoasterBeanSummaryDto(bean.Id, bean.Name))
+                    .ToList()))
             .FirstOrDefaultAsync(cancellationToken);
 
         return roaster ?? throw new NotFoundException($"Roaster '{request.Id}' was not found.");

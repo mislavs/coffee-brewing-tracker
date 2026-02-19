@@ -10,7 +10,7 @@ var migrations = builder.AddProject<Projects.CoffeeTracker_MigrationService>("mi
     .WaitFor(appDb);
 
 var api = builder.AddProject<Projects.CoffeeTracker_Api>("api")
-    .WithReference(appDb)
+    .WithReference(appDb, "DefaultConnection")
     .WaitFor(migrations)
     .WithHttpHealthCheck("/health");
 

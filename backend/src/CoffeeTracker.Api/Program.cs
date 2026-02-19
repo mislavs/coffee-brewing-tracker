@@ -34,6 +34,9 @@ app.UseCors();
 app.UseMiddleware<ExceptionHandlerMiddleware>();
 app.MapDefaultEndpoints();
 app.MapRoasterEndpoints();
+app.MapBeanEndpoints();
+app.MapCountryEndpoints();
+app.MapFlavorNoteEndpoints();
 
 app.Run();
 
