@@ -47,7 +47,7 @@ export function BeanListPage() {
     return () => clearTimeout(timeoutId)
   }, [searchDraft, setSearchParams])
 
-  const { data: beans } = useBeans(search)
+  const { data: beans = [], isPending } = useBeans(search)
 
   return (
     <Card>
@@ -86,7 +86,13 @@ export function BeanListPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {beans.length === 0 ? (
+            {isPending && beans.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={5} className="text-muted-foreground">
+                  Loading beans...
+                </TableCell>
+              </TableRow>
+            ) : beans.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={5} className="text-muted-foreground">
                   No beans found. Create your first bean to get started.

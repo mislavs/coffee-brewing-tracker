@@ -18,7 +18,7 @@ import {
 import { useRoasters } from '@/features/roasters/hooks/useRoasters'
 
 export function RoasterListPage() {
-  const { data: roasters } = useRoasters()
+  const { data: roasters = [], isPending } = useRoasters()
 
   return (
     <Card>
@@ -43,7 +43,13 @@ export function RoasterListPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {roasters.length === 0 ? (
+            {isPending && roasters.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={3} className="text-muted-foreground">
+                  Loading roasters...
+                </TableCell>
+              </TableRow>
+            ) : roasters.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={3} className="text-muted-foreground">
                   No roasters yet. Add your first roaster to get started.

@@ -1,21 +1,57 @@
-import { Suspense } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
 import { ThemeToggle } from '@/components/ThemeToggle'
-import { Skeleton } from '@/components/ui/skeleton'
+import { beanQueryKeys } from '@/features/beans/queryKeys'
+import { roasterQueryKeys } from '@/features/roasters/queryKeys'
+import { apiClient } from '@/lib/api-client'
 import { featureRoutes } from '@/lib/navigation'
+import { queryClient } from '@/lib/queryClient'
+import {
+  preloadBeanFeatureRoutes,
+  preloadRoasterFeatureRoutes,
+} from '@/lib/routePreload'
 import { cn } from '@/lib/utils'
 
-function RouteSkeleton() {
-  return (
-    <div className="space-y-4">
-      <Skeleton className="h-8 w-56" />
-      <Skeleton className="h-4 w-full max-w-xl" />
-      <Skeleton className="h-52 w-full rounded-xl" />
-    </div>
-  )
-}
-
 export function AppLayout() {
+  const hasPrefetchedRoasters = useRef(false)
+  const hasPrefetchedBeans = useRef(false)
+
+  const prefetchFeature = useCallback((featurePath: string) => {
+    if (featurePath === 'roasters') {
+      if (hasPrefetchedRoasters.current) {
+        return
+      }
+
+      hasPrefetchedRoasters.current = true
+      preloadRoasterFeatureRoutes()
+      void queryClient.prefetchQuery({
+        queryKey: roasterQueryKeys.all,
+        queryFn: async () => (await apiClient.api.roasters.get()) ?? [],
+        staleTime: 2 * 60_000,
+      })
+      return
+    }
+
+    if (featurePath === 'beans') {
+      if (hasPrefetchedBeans.current) {
+        return
+      }
+
+      hasPrefetchedBeans.current = true
+      preloadBeanFeatureRoutes()
+      void queryClient.prefetchQuery({
+        queryKey: beanQueryKeys.list(''),
+        queryFn: async () => (await apiClient.api.beans.get()) ?? [],
+        staleTime: 2 * 60_000,
+      })
+    }
+  }, [])
+
+  useEffect(() => {
+    prefetchFeature('roasters')
+    prefetchFeature('beans')
+  }, [prefetchFeature])
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="border-b">
@@ -33,6 +69,8 @@ export function AppLayout() {
               <NavLink
                 key={route.href}
                 to={route.href}
+                onMouseEnter={() => prefetchFeature(route.path)}
+                onFocus={() => prefetchFeature(route.path)}
                 className={({ isActive }) =>
                   cn(
                     'rounded-md px-3 py-2 text-sm transition-colors',
@@ -48,9 +86,7 @@ export function AppLayout() {
           </nav>
         </aside>
         <main className="rounded-lg border bg-card p-6">
-          <Suspense fallback={<RouteSkeleton />}>
-            <Outlet />
-          </Suspense>
+          <Outlet />
         </main>
       </div>
     </div>

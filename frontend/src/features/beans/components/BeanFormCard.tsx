@@ -109,7 +109,7 @@ export function BeanFormCard({
     resolver: zodResolver(beanFormSchema),
     defaultValues: initialValues,
   })
-  const { data: roasters } = useRoasters()
+  const { data: roasters = [] } = useRoasters()
   const { data: countries } = useCountries()
   const { data: flavorNotes } = useFlavorNotes()
   const { mutateAsync: createRoaster, isPending: isCreatingRoaster } =
