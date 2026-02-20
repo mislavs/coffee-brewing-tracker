@@ -1,7 +1,5 @@
-using System;
 using CoffeeTracker.Domain.Entities;
 using FluentAssertions;
-using Xunit;
 
 namespace CoffeeTracker.Domain.Tests.Entities;
 

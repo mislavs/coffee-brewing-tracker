@@ -1,8 +1,6 @@
-using System;
 using CoffeeTracker.Domain.Entities;
 using CoffeeTracker.Domain.Enums;
 using FluentAssertions;
-using Xunit;
 
 namespace CoffeeTracker.Domain.Tests.Entities;
 
