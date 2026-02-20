@@ -2,7 +2,7 @@ import {
   originTypeLabels,
   roastProfileLabels,
   toDateInputValue,
-} from '@/features/beans/beanFormSchema'
+} from '@/features/beans/beanShared'
 
 export function formatOriginType(value: number | null | undefined) {
   if (value === null || value === undefined) {

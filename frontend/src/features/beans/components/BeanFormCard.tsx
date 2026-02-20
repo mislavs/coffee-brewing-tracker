@@ -30,9 +30,11 @@ import {
   beanFormSchema,
   type BeanFormInput,
   type BeanFormValues,
+} from '@/features/beans/beanFormSchema'
+import {
   originTypeLabels,
   roastProfileLabels,
-} from '@/features/beans/beanFormSchema'
+} from '@/features/beans/beanShared'
 import { useCountries } from '@/features/beans/hooks/useCountries'
 import { useFlavorNotes } from '@/features/beans/hooks/useFlavorNotes'
 import { applyBeanFormServerErrors } from '@/features/beans/mapApiValidationErrors'

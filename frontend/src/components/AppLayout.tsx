@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from 'react'
+import { useCallback, useRef } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { beanQueryKeys } from '@/features/beans/queryKeys'
@@ -81,12 +81,6 @@ export function AppLayout() {
     }
   }, [])
 
-  useEffect(() => {
-    prefetchFeature('roasters')
-    prefetchFeature('beans')
-    prefetchFeature('equipment')
-  }, [prefetchFeature])
-
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="border-b">
@@ -101,6 +95,7 @@ export function AppLayout() {
                 to={route.href}
                 onMouseEnter={() => prefetchFeature(route.path)}
                 onFocus={() => prefetchFeature(route.path)}
+                onTouchStart={() => prefetchFeature(route.path)}
                 className={({ isActive }) =>
                   cn(
                     'rounded-md px-3 py-2 text-sm transition-colors',

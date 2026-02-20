@@ -9,6 +9,5 @@ export function useRoasters() {
     queryFn: async (): Promise<RoasterSummaryDto[]> =>
       (await apiClient.api.roasters.get()) ?? [],
     staleTime: 2 * 60_000,
-    refetchOnMount: false,
   })
 }

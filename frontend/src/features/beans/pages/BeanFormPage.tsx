@@ -3,10 +3,10 @@ import { Navigate, useNavigate, useParams } from 'react-router-dom'
 import { BeanFormCard } from '@/features/beans/components/BeanFormCard'
 import {
   normalizeDistinctNameList,
-  toDateInputValue,
   toOptionalDateOnly,
   type BeanFormValues,
 } from '@/features/beans/beanFormSchema'
+import { toDateInputValue } from '@/features/beans/beanShared'
 import { useBean } from '@/features/beans/hooks/useBean'
 import { useCreateBean } from '@/features/beans/hooks/useCreateBean'
 import { useUpdateBean } from '@/features/beans/hooks/useUpdateBean'

@@ -18,6 +18,5 @@ export function useBeans(search?: string) {
       })) ?? [],
     placeholderData: keepPreviousData,
     staleTime: 2 * 60_000,
-    refetchOnMount: false,
   })
 }
