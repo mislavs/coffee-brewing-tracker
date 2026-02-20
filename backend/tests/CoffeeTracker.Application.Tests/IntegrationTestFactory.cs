@@ -23,7 +23,7 @@ public class IntegrationTestFactory : WebApplicationFactory<Program>, IAsyncLife
         await _respawner.ResetAsync(_connection);
     }
 
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
         await _container.StartAsync();
 
@@ -45,7 +45,7 @@ public class IntegrationTestFactory : WebApplicationFactory<Program>, IAsyncLife
             });
     }
 
-    public new async Task DisposeAsync()
+    public new async ValueTask DisposeAsync()
     {
         await _connection.CloseAsync();
         await _container.DisposeAsync();

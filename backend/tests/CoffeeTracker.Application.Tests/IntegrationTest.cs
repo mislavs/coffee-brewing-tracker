@@ -36,13 +36,13 @@ public class IntegrationTest(IntegrationTestFactory factory) : IAsyncLifetime
         await DbContext.SaveChangesAsync();
     }
 
-    public Task InitializeAsync()
+    public ValueTask InitializeAsync()
     {
-        return Task.CompletedTask;
+        return ValueTask.CompletedTask;
     }
 
-    public Task DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
-        return _resetDatabase();
+        await _resetDatabase();
     }
 }
