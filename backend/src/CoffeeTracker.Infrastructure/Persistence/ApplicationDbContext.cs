@@ -8,6 +8,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 {
     public DbSet<Accessory> Accessories => Set<Accessory>();
     public DbSet<Brewer> Brewers => Set<Brewer>();
+    public DbSet<Grinder> Grinders => Set<Grinder>();
     public DbSet<Roaster> Roasters => Set<Roaster>();
     public DbSet<Bean> Beans => Set<Bean>();
     public DbSet<FlavorNote> FlavorNotes => Set<FlavorNote>();

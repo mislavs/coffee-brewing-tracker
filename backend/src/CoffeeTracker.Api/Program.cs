@@ -35,6 +35,7 @@ app.UseMiddleware<ExceptionHandlerMiddleware>();
 app.MapDefaultEndpoints();
 app.MapAccessoryEndpoints();
 app.MapBrewerEndpoints();
+app.MapGrinderEndpoints();
 app.MapRoasterEndpoints();
 app.MapBeanEndpoints();
 app.MapCountryEndpoints();
