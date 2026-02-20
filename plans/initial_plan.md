@@ -16,10 +16,10 @@ todos:
     status: completed
   - id: step-5-beans
     content: "Step 5: Flavor Notes + Bean Library (F2) -- backend create/read/update with M2M + frontend pages with roaster picker, flavor note tags, search"
-    status: pending
+    status: completed
   - id: step-6-equipment
     content: "Step 6: Equipment Registry (F3) -- Brewer/Grinder/Accessory backend CRUD + frontend tabbed UI with brewer association"
-    status: pending
+    status: completed
   - id: step-7-recipes
     content: "Step 7: Recipe Library (F4) -- backend CRUD with brewer filter + frontend pages with method filter"
     status: pending
