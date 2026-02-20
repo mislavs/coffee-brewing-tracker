@@ -7,6 +7,7 @@ import { PlaceholderPage } from '@/components/PlaceholderPage'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Toaster } from '@/components/ui/sonner'
 import { BeanListPage } from '@/features/beans/pages/BeanListPage'
+import { BeanFormPage } from '@/features/beans/pages/BeanFormPage'
 import { RoasterListPage } from '@/features/roasters/pages/RoasterListPage'
 import { defaultFeatureRoute, featureRoutes } from '@/lib/navigation'
 import { queryClient } from '@/lib/queryClient'
@@ -14,7 +15,6 @@ import {
   loadAccessoryDetailPage,
   loadAccessoryFormPage,
   loadBeanDetailPage,
-  loadBeanFormPage,
   loadBrewerDetailPage,
   loadBrewerFormPage,
   loadEquipmentPage,
@@ -37,11 +37,6 @@ const RoasterFormPage = lazy(() =>
 const BeanDetailPage = lazy(() =>
   loadBeanDetailPage().then((m) => ({
     default: m.BeanDetailPage,
-  })),
-)
-const BeanFormPage = lazy(() =>
-  loadBeanFormPage().then((m) => ({
-    default: m.BeanFormPage,
   })),
 )
 const EquipmentPage = lazy(() =>
@@ -138,14 +133,7 @@ function App() {
             }
           />
           <Route path="beans" element={<BeanListPage />} />
-          <Route
-            path="beans/new"
-            element={
-              <Suspense fallback={<RouteFallback />}>
-                <BeanFormPage />
-              </Suspense>
-            }
-          />
+          <Route path="beans/new" element={<BeanFormPage />} />
           <Route
             path="beans/:id"
             element={

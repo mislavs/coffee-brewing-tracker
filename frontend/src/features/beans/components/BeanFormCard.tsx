@@ -112,8 +112,8 @@ export function BeanFormCard({
     defaultValues: initialValues,
   })
   const { data: roasters = [] } = useRoasters()
-  const { data: countries } = useCountries()
-  const { data: flavorNotes } = useFlavorNotes()
+  const { data: countries = [] } = useCountries()
+  const { data: flavorNotes = [] } = useFlavorNotes()
   const { mutateAsync: createRoaster, isPending: isCreatingRoaster } =
     useCreateRoaster()
 
