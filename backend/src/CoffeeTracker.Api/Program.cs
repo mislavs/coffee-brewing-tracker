@@ -1,4 +1,4 @@
-using CoffeeTracker.Api.Middleware;
+using CoffeeTracker.Api.ExceptionHandlers;
 using CoffeeTracker.Api.Endpoints;
 using CoffeeTracker.Application;
 using CoffeeTracker.Infrastructure;
@@ -13,6 +13,8 @@ builder.Services
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
 
 builder.Services.AddCors(options =>
 {
@@ -31,7 +33,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors();
-app.UseMiddleware<ExceptionHandlerMiddleware>();
+app.UseExceptionHandler();
 app.MapDefaultEndpoints();
 app.MapAccessoryEndpoints();
 app.MapBrewerEndpoints();
