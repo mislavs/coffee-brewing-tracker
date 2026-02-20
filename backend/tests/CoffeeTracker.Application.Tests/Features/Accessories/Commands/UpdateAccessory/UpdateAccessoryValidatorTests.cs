@@ -1,17 +1,17 @@
-using CoffeeTracker.Application.Features.Brewers.Commands;
+using CoffeeTracker.Application.Features.Accessories.Commands;
 using FluentValidation.TestHelper;
 
-namespace CoffeeTracker.Application.Tests.Features.Brewers.Commands.UpdateBrewer;
+namespace CoffeeTracker.Application.Tests.Features.Accessories.Commands.UpdateAccessory;
 
-public class UpdateBrewerValidatorTests
+public class UpdateAccessoryValidatorTests
 {
-    private readonly UpdateBrewerValidator _sut = new();
+    private readonly UpdateAccessoryValidator _sut = new();
 
     [Fact]
     public void Validate_WhenNameIsEmpty_ShouldHaveValidationError()
     {
         // Arrange
-        var command = new UpdateBrewerCommand(Guid.NewGuid(), string.Empty);
+        var command = new UpdateAccessoryCommand(Guid.NewGuid(), string.Empty, null);
 
         // Act
         var result = _sut.TestValidate(command);
@@ -24,7 +24,7 @@ public class UpdateBrewerValidatorTests
     public void Validate_WhenNameIsProvided_ShouldNotHaveValidationError()
     {
         // Arrange
-        var command = new UpdateBrewerCommand(Guid.NewGuid(), "Kawa");
+        var command = new UpdateAccessoryCommand(Guid.NewGuid(), "Paper Filters", null);
 
         // Act
         var result = _sut.TestValidate(command);
@@ -37,7 +37,7 @@ public class UpdateBrewerValidatorTests
     public void Validate_WhenNameExceedsMaxLength_ShouldHaveValidationError()
     {
         // Arrange
-        var command = new UpdateBrewerCommand(Guid.NewGuid(), new string('A', 201));
+        var command = new UpdateAccessoryCommand(Guid.NewGuid(), new string('A', 201), null);
 
         // Act
         var result = _sut.TestValidate(command);
@@ -50,7 +50,7 @@ public class UpdateBrewerValidatorTests
     public void Validate_WhenIdIsEmpty_ShouldHaveValidationError()
     {
         // Arrange
-        var command = new UpdateBrewerCommand(Guid.Empty, "Kawa");
+        var command = new UpdateAccessoryCommand(Guid.Empty, "Paper Filters", null);
 
         // Act
         var result = _sut.TestValidate(command);

@@ -33,6 +33,7 @@ if (app.Environment.IsDevelopment())
 app.UseCors();
 app.UseMiddleware<ExceptionHandlerMiddleware>();
 app.MapDefaultEndpoints();
+app.MapAccessoryEndpoints();
 app.MapBrewerEndpoints();
 app.MapRoasterEndpoints();
 app.MapBeanEndpoints();

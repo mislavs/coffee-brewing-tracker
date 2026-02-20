@@ -1,8 +1,6 @@
-using System;
 using CoffeeTracker.Application.Features.Beans.Commands;
 using CoffeeTracker.Domain.Enums;
 using FluentValidation.TestHelper;
-using Xunit;
 
 namespace CoffeeTracker.Application.Tests.Features.Beans.Commands.UpdateBean;
 

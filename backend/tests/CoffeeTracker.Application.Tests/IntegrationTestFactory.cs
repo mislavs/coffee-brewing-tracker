@@ -1,4 +1,3 @@
-using System;
 using CoffeeTracker.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -6,9 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Respawn;
 using System.Data.Common;
-using System.Threading.Tasks;
 using Testcontainers.PostgreSql;
-using Xunit;
 
 namespace CoffeeTracker.Application.Tests;
 

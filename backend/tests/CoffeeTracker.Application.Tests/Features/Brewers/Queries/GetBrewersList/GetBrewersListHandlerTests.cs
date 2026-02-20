@@ -1,8 +1,6 @@
-using System.Threading.Tasks;
 using CoffeeTracker.Application.Features.Brewers.Queries;
 using CoffeeTracker.Domain.Entities;
 using FluentAssertions;
-using Xunit;
 
 namespace CoffeeTracker.Application.Tests.Features.Brewers.Queries.GetBrewersList;
 

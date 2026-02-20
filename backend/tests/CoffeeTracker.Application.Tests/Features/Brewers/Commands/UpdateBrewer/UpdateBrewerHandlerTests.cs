@@ -1,11 +1,8 @@
-using System;
-using System.Threading.Tasks;
 using CoffeeTracker.Application.Features.Brewers.Commands;
 using CoffeeTracker.Domain.Entities;
 using CoffeeTracker.Domain.Exceptions;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
-using Xunit;
 
 namespace CoffeeTracker.Application.Tests.Features.Brewers.Commands.UpdateBrewer;
 

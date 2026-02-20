@@ -1,10 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using CoffeeTracker.Infrastructure.Persistence;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
-using Xunit;
 
 namespace CoffeeTracker.Application.Tests;
 

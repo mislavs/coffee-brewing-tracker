@@ -6,6 +6,7 @@ namespace CoffeeTracker.Infrastructure.Persistence;
 public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
     : DbContext(options)
 {
+    public DbSet<Accessory> Accessories => Set<Accessory>();
     public DbSet<Brewer> Brewers => Set<Brewer>();
     public DbSet<Roaster> Roasters => Set<Roaster>();
     public DbSet<Bean> Beans => Set<Bean>();

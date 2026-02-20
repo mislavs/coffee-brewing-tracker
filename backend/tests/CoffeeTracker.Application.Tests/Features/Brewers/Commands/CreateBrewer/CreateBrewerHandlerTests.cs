@@ -1,8 +1,6 @@
-using System.Threading.Tasks;
 using CoffeeTracker.Application.Features.Brewers.Commands;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
-using Xunit;
 
 namespace CoffeeTracker.Application.Tests.Features.Brewers.Commands.CreateBrewer;
 

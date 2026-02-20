@@ -1,11 +1,8 @@
-using System;
-using System.Threading.Tasks;
 using CoffeeTracker.Application.Features.Roasters.Commands;
 using CoffeeTracker.Domain.Entities;
 using CoffeeTracker.Domain.Exceptions;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
-using Xunit;
 
 namespace CoffeeTracker.Application.Tests.Features.Roasters.Commands.UpdateRoaster;
 

@@ -1,6 +1,5 @@
 using CoffeeTracker.Application.Features.Roasters.Commands;
 using FluentValidation.TestHelper;
-using Xunit;
 
 namespace CoffeeTracker.Application.Tests.Features.Roasters.Commands.CreateRoaster;
 

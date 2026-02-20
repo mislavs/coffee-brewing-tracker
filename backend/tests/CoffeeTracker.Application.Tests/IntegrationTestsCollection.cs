@@ -1,5 +1,3 @@
-using Xunit;
-
 namespace CoffeeTracker.Application.Tests;
 
 [CollectionDefinition(nameof(IntegrationTestsCollection))]

@@ -1,12 +1,8 @@
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 using CoffeeTracker.Application.Features.Beans.Queries;
 using CoffeeTracker.Domain.Entities;
 using CoffeeTracker.Domain.Enums;
 using CoffeeTracker.Domain.Exceptions;
 using FluentAssertions;
-using Xunit;
 
 namespace CoffeeTracker.Application.Tests.Features.Beans.Queries.GetBeanById;
 

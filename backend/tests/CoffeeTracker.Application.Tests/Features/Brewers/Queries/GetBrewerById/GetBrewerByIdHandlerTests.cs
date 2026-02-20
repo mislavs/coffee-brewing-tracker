@@ -1,10 +1,7 @@
-using System;
-using System.Threading.Tasks;
 using CoffeeTracker.Application.Features.Brewers.Queries;
 using CoffeeTracker.Domain.Entities;
 using CoffeeTracker.Domain.Exceptions;
 using FluentAssertions;
-using Xunit;
 
 namespace CoffeeTracker.Application.Tests.Features.Brewers.Queries.GetBrewerById;
 
@@ -25,6 +22,7 @@ public class GetBrewerByIdHandlerTests(IntegrationTestFactory factory) : Integra
         // Assert
         result.Id.Should().Be(brewer.Id);
         result.Name.Should().Be("Kawa Brewers");
+        result.Accessories.Should().BeEmpty();
     }
 
     [Fact]

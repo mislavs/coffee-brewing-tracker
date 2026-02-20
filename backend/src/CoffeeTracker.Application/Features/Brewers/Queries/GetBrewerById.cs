@@ -1,4 +1,5 @@
 using CoffeeTracker.Application.Features.Brewers.Dtos;
+using CoffeeTracker.Application.Features.Accessories.Dtos;
 using CoffeeTracker.Domain.Exceptions;
 using CoffeeTracker.Infrastructure.Persistence;
 using MediatR;
@@ -16,7 +17,13 @@ public sealed class GetBrewerByIdHandler(ApplicationDbContext dbContext)
         var brewer = await dbContext.Brewers
             .AsNoTracking()
             .Where(entity => entity.Id == request.Id)
-            .Select(entity => new BrewerDto(entity.Id, entity.Name))
+            .Select(entity => new BrewerDto(
+                entity.Id,
+                entity.Name,
+                entity.Accessories
+                    .OrderBy(accessory => accessory.Name)
+                    .Select(accessory => new AccessorySummaryDto(accessory.Id, accessory.Name))
+                    .ToList()))
             .FirstOrDefaultAsync(cancellationToken);
 
         return brewer ?? throw new NotFoundException($"Brewer '{request.Id}' was not found.");
