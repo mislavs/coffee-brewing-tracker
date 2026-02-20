@@ -17,7 +17,7 @@ export function applyRoasterFormServerErrors(
     return
   }
 
-  const validationErrors = payload.errors ?? payload.Errors
+  const validationErrors = payload.errors
   if (validationErrors) {
     for (const [fieldName, messages] of Object.entries(validationErrors)) {
       const normalizedFieldName = normalizeApiFieldName(fieldName)
@@ -34,7 +34,7 @@ export function applyRoasterFormServerErrors(
     }
   }
 
-  const message = payload.message ?? payload.Message
+  const message = payload.title
   if (message) {
     setError('root.serverError', { message })
   }

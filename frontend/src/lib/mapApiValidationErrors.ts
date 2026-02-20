@@ -1,8 +1,6 @@
 export type ValidationPayload = {
-  message?: string
-  Message?: string
+  title?: string
   errors?: Record<string, string[]>
-  Errors?: Record<string, string[]>
 }
 
 export function extractValidationPayload(error: unknown): ValidationPayload | null {
@@ -17,17 +15,9 @@ export function extractValidationPayload(error: unknown): ValidationPayload | nu
     return fromResponseBody as ValidationPayload
   }
 
-  if (typeof errorRecord.message === 'string') {
-    try {
-      return JSON.parse(errorRecord.message) as ValidationPayload
-    } catch {
-      return null
-    }
-  }
-
   if (
-    (errorRecord.errors && typeof errorRecord.errors === 'object') ||
-    (errorRecord.Errors && typeof errorRecord.Errors === 'object')
+    (errorRecord.title && typeof errorRecord.title === 'string') ||
+    (errorRecord.errors && typeof errorRecord.errors === 'object')
   ) {
     return errorRecord as ValidationPayload
   }

@@ -32,7 +32,7 @@ export function applyBrewerFormServerErrors(
     return
   }
 
-  const validationErrors = payload.errors ?? payload.Errors
+  const validationErrors = payload.errors
   if (validationErrors) {
     for (const [fieldName, messages] of Object.entries(validationErrors)) {
       const normalizedFieldName = normalizeApiFieldName(fieldName)
@@ -45,7 +45,7 @@ export function applyBrewerFormServerErrors(
     }
   }
 
-  const message = payload.message ?? payload.Message
+  const message = payload.title
   if (message) {
     setError('root.serverError', { message })
   }
@@ -63,7 +63,7 @@ export function applyGrinderFormServerErrors(
     return
   }
 
-  const validationErrors = payload.errors ?? payload.Errors
+  const validationErrors = payload.errors
   if (validationErrors) {
     for (const [fieldName, messages] of Object.entries(validationErrors)) {
       const normalizedFieldName = normalizeApiFieldName(fieldName)
@@ -76,7 +76,7 @@ export function applyGrinderFormServerErrors(
     }
   }
 
-  const message = payload.message ?? payload.Message
+  const message = payload.title
   if (message) {
     setError('root.serverError', { message })
   }
@@ -94,7 +94,7 @@ export function applyAccessoryFormServerErrors(
     return
   }
 
-  const validationErrors = payload.errors ?? payload.Errors
+  const validationErrors = payload.errors
   if (validationErrors) {
     for (const [fieldName, messages] of Object.entries(validationErrors)) {
       const normalizedFieldName = normalizeApiFieldName(fieldName)
@@ -111,7 +111,7 @@ export function applyAccessoryFormServerErrors(
     }
   }
 
-  const message = payload.message ?? payload.Message
+  const message = payload.title
   if (message) {
     setError('root.serverError', { message })
   }
