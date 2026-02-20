@@ -11,8 +11,15 @@ import { RoasterListPage } from '@/features/roasters/pages/RoasterListPage'
 import { defaultFeatureRoute, featureRoutes } from '@/lib/navigation'
 import { queryClient } from '@/lib/queryClient'
 import {
+  loadAccessoryDetailPage,
+  loadAccessoryFormPage,
   loadBeanDetailPage,
   loadBeanFormPage,
+  loadBrewerDetailPage,
+  loadBrewerFormPage,
+  loadEquipmentPage,
+  loadGrinderDetailPage,
+  loadGrinderFormPage,
   loadRoasterDetailPage,
   loadRoasterFormPage,
 } from '@/lib/routePreload'
@@ -37,8 +44,46 @@ const BeanFormPage = lazy(() =>
     default: m.BeanFormPage,
   })),
 )
+const EquipmentPage = lazy(() =>
+  loadEquipmentPage().then((m) => ({
+    default: m.EquipmentPage,
+  })),
+)
+const BrewerDetailPage = lazy(() =>
+  loadBrewerDetailPage().then((m) => ({
+    default: m.BrewerDetailPage,
+  })),
+)
+const BrewerFormPage = lazy(() =>
+  loadBrewerFormPage().then((m) => ({
+    default: m.BrewerFormPage,
+  })),
+)
+const GrinderDetailPage = lazy(() =>
+  loadGrinderDetailPage().then((m) => ({
+    default: m.GrinderDetailPage,
+  })),
+)
+const GrinderFormPage = lazy(() =>
+  loadGrinderFormPage().then((m) => ({
+    default: m.GrinderFormPage,
+  })),
+)
+const AccessoryDetailPage = lazy(() =>
+  loadAccessoryDetailPage().then((m) => ({
+    default: m.AccessoryDetailPage,
+  })),
+)
+const AccessoryFormPage = lazy(() =>
+  loadAccessoryFormPage().then((m) => ({
+    default: m.AccessoryFormPage,
+  })),
+)
 const placeholderFeatureRoutes = featureRoutes.filter(
-  (route) => route.path !== 'roasters' && route.path !== 'beans',
+  (route) =>
+    route.path !== 'roasters' &&
+    route.path !== 'beans' &&
+    route.path !== 'equipment',
 )
 
 function RouteFallback() {
@@ -114,6 +159,86 @@ function App() {
             element={
               <Suspense fallback={<RouteFallback />}>
                 <BeanFormPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="equipment"
+            element={
+              <Suspense fallback={<RouteFallback />}>
+                <EquipmentPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="equipment/brewers/new"
+            element={
+              <Suspense fallback={<RouteFallback />}>
+                <BrewerFormPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="equipment/brewers/:id"
+            element={
+              <Suspense fallback={<RouteFallback />}>
+                <BrewerDetailPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="equipment/brewers/:id/edit"
+            element={
+              <Suspense fallback={<RouteFallback />}>
+                <BrewerFormPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="equipment/grinders/new"
+            element={
+              <Suspense fallback={<RouteFallback />}>
+                <GrinderFormPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="equipment/grinders/:id"
+            element={
+              <Suspense fallback={<RouteFallback />}>
+                <GrinderDetailPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="equipment/grinders/:id/edit"
+            element={
+              <Suspense fallback={<RouteFallback />}>
+                <GrinderFormPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="equipment/accessories/new"
+            element={
+              <Suspense fallback={<RouteFallback />}>
+                <AccessoryFormPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="equipment/accessories/:id"
+            element={
+              <Suspense fallback={<RouteFallback />}>
+                <AccessoryDetailPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="equipment/accessories/:id/edit"
+            element={
+              <Suspense fallback={<RouteFallback />}>
+                <AccessoryFormPage />
               </Suspense>
             }
           />

@@ -2,12 +2,18 @@ import { useCallback, useEffect, useRef } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { beanQueryKeys } from '@/features/beans/queryKeys'
+import {
+  accessoryQueryKeys,
+  brewerQueryKeys,
+  grinderQueryKeys,
+} from '@/features/equipment/queryKeys'
 import { roasterQueryKeys } from '@/features/roasters/queryKeys'
 import { apiClient } from '@/lib/api-client'
 import { featureRoutes } from '@/lib/navigation'
 import { queryClient } from '@/lib/queryClient'
 import {
   preloadBeanFeatureRoutes,
+  preloadEquipmentFeatureRoutes,
   preloadRoasterFeatureRoutes,
 } from '@/lib/routePreload'
 import { cn } from '@/lib/utils'
@@ -15,6 +21,7 @@ import { cn } from '@/lib/utils'
 export function AppLayout() {
   const hasPrefetchedRoasters = useRef(false)
   const hasPrefetchedBeans = useRef(false)
+  const hasPrefetchedEquipment = useRef(false)
 
   const prefetchFeature = useCallback((featurePath: string) => {
     if (featurePath === 'roasters') {
@@ -44,27 +51,50 @@ export function AppLayout() {
         queryFn: async () => (await apiClient.api.beans.get()) ?? [],
         staleTime: 2 * 60_000,
       })
+      return
+    }
+
+    if (featurePath === 'equipment') {
+      if (hasPrefetchedEquipment.current) {
+        return
+      }
+
+      hasPrefetchedEquipment.current = true
+      preloadEquipmentFeatureRoutes()
+      void Promise.all([
+        queryClient.prefetchQuery({
+          queryKey: brewerQueryKeys.all,
+          queryFn: async () => (await apiClient.api.brewers.get()) ?? [],
+          staleTime: 2 * 60_000,
+        }),
+        queryClient.prefetchQuery({
+          queryKey: grinderQueryKeys.all,
+          queryFn: async () => (await apiClient.api.grinders.get()) ?? [],
+          staleTime: 2 * 60_000,
+        }),
+        queryClient.prefetchQuery({
+          queryKey: accessoryQueryKeys.all,
+          queryFn: async () => (await apiClient.api.accessories.get()) ?? [],
+          staleTime: 2 * 60_000,
+        }),
+      ])
     }
   }, [])
 
   useEffect(() => {
     prefetchFeature('roasters')
     prefetchFeature('beans')
+    prefetchFeature('equipment')
   }, [prefetchFeature])
 
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="border-b">
-        <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-3 px-4 py-3 sm:px-6 lg:px-8">
           <div className="text-sm font-semibold tracking-wide">
             Coffee Brewing Tracker
           </div>
-          <ThemeToggle />
-        </div>
-      </header>
-      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-6 px-4 py-6 sm:px-6 lg:grid-cols-[220px_1fr] lg:px-8">
-        <aside className="rounded-lg border bg-card p-3">
-          <nav className="flex flex-col gap-1">
+          <nav className="flex flex-1 flex-wrap gap-1">
             {featureRoutes.map((route) => (
               <NavLink
                 key={route.href}
@@ -84,7 +114,10 @@ export function AppLayout() {
               </NavLink>
             ))}
           </nav>
-        </aside>
+          <ThemeToggle />
+        </div>
+      </header>
+      <div className="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8">
         <main className="rounded-lg border bg-card p-6">
           <Outlet />
         </main>
