@@ -22,7 +22,7 @@ todos:
     status: completed
   - id: step-7-recipes
     content: "Step 7: Recipe Library (F4) -- backend CRUD with brewer filter + frontend pages with method filter"
-    status: pending
+    status: completed
   - id: step-8-brewlog
     content: "Step 8: Brew Log + Rating (F5/F8) -- backend CRUD with all FKs + frontend log form, emoji rating, brew history, grinder stats"
     status: pending
