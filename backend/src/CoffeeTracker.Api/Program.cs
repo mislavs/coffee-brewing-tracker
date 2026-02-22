@@ -42,6 +42,7 @@ app.MapRoasterEndpoints();
 app.MapBeanEndpoints();
 app.MapCountryEndpoints();
 app.MapFlavorNoteEndpoints();
+app.MapRecipeEndpoints();
 
 app.Run();
 
