@@ -1,0 +1,51 @@
+using CoffeeTracker.Application.Features.BrewLog.Dtos;
+using CoffeeTracker.Infrastructure.Persistence;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
+
+namespace CoffeeTracker.Application.Features.BrewLog.Queries;
+
+public sealed record GetBrewLogsListQuery(string? Search, DateTime? DateFrom, DateTime? DateTo)
+    : IRequest<IReadOnlyList<BrewLogSummaryDto>>;
+
+public sealed class GetBrewLogsListHandler(ApplicationDbContext dbContext)
+    : IRequestHandler<GetBrewLogsListQuery, IReadOnlyList<BrewLogSummaryDto>>
+{
+    public async Task<IReadOnlyList<BrewLogSummaryDto>> Handle(
+        GetBrewLogsListQuery request,
+        CancellationToken cancellationToken)
+    {
+        var query = dbContext.BrewLogEntries
+            .AsNoTracking()
+            .AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(request.Search))
+        {
+            var searchTerm = request.Search.Trim();
+            query = query.Where(entity => EF.Functions.ILike(entity.Bean.Name, $"%{searchTerm}%"));
+        }
+
+        if (request.DateFrom.HasValue)
+        {
+            query = query.Where(entity => entity.BrewedAt >= request.DateFrom.Value);
+        }
+
+        if (request.DateTo.HasValue)
+        {
+            query = query.Where(entity => entity.BrewedAt <= request.DateTo.Value);
+        }
+
+        return await query
+            .OrderByDescending(entity => entity.BrewedAt)
+            .Select(entity => new BrewLogSummaryDto(
+                entity.Id,
+                entity.BrewedAt,
+                entity.Bean.Name,
+                entity.Brewer.Name,
+                entity.Rating.HasValue ? (int?)entity.Rating.Value : null,
+                entity.Dose > 0m && entity.WaterAmount > 0m
+                    ? entity.WaterAmount / entity.Dose
+                    : null))
+            .ToListAsync(cancellationToken);
+    }
+}

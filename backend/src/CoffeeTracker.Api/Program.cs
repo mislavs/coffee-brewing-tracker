@@ -43,6 +43,7 @@ app.MapBeanEndpoints();
 app.MapCountryEndpoints();
 app.MapFlavorNoteEndpoints();
 app.MapRecipeEndpoints();
+app.MapBrewLogEndpoints();
 
 app.Run();
 

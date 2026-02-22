@@ -14,6 +14,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<FlavorNote> FlavorNotes => Set<FlavorNote>();
     public DbSet<Country> Countries => Set<Country>();
     public DbSet<Recipe> Recipes => Set<Recipe>();
+    public DbSet<BrewLogEntry> BrewLogEntries => Set<BrewLogEntry>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
