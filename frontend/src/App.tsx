@@ -8,6 +8,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Toaster } from '@/components/ui/sonner'
 import { BeanListPage } from '@/features/beans/pages/BeanListPage'
 import { BeanFormPage } from '@/features/beans/pages/BeanFormPage'
+import { RecipeListPage } from '@/features/recipes/pages/RecipeListPage'
 import { RoasterListPage } from '@/features/roasters/pages/RoasterListPage'
 import { defaultFeatureRoute, featureRoutes } from '@/lib/navigation'
 import { queryClient } from '@/lib/queryClient'
@@ -20,6 +21,8 @@ import {
   loadEquipmentPage,
   loadGrinderDetailPage,
   loadGrinderFormPage,
+  loadRecipeDetailPage,
+  loadRecipeFormPage,
   loadRoasterDetailPage,
   loadRoasterFormPage,
 } from '@/lib/routePreload'
@@ -74,11 +77,22 @@ const AccessoryFormPage = lazy(() =>
     default: m.AccessoryFormPage,
   })),
 )
+const RecipeDetailPage = lazy(() =>
+  loadRecipeDetailPage().then((m) => ({
+    default: m.RecipeDetailPage,
+  })),
+)
+const RecipeFormPage = lazy(() =>
+  loadRecipeFormPage().then((m) => ({
+    default: m.RecipeFormPage,
+  })),
+)
 const placeholderFeatureRoutes = featureRoutes.filter(
   (route) =>
     route.path !== 'roasters' &&
     route.path !== 'beans' &&
-    route.path !== 'equipment',
+    route.path !== 'equipment' &&
+    route.path !== 'recipes',
 )
 
 function RouteFallback() {
@@ -147,6 +161,31 @@ function App() {
             element={
               <Suspense fallback={<RouteFallback />}>
                 <BeanFormPage />
+              </Suspense>
+            }
+          />
+          <Route path="recipes" element={<RecipeListPage />} />
+          <Route
+            path="recipes/new"
+            element={
+              <Suspense fallback={<RouteFallback />}>
+                <RecipeFormPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="recipes/:id"
+            element={
+              <Suspense fallback={<RouteFallback />}>
+                <RecipeDetailPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="recipes/:id/edit"
+            element={
+              <Suspense fallback={<RouteFallback />}>
+                <RecipeFormPage />
               </Suspense>
             }
           />

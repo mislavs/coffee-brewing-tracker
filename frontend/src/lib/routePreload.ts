@@ -9,6 +9,12 @@ export const loadBeanDetailPage = () =>
 
 export const loadBeanFormPage = () => import('@/features/beans/pages/BeanFormPage')
 
+export const loadRecipeDetailPage = () =>
+  import('@/features/recipes/pages/RecipeDetailPage')
+
+export const loadRecipeFormPage = () =>
+  import('@/features/recipes/pages/RecipeFormPage')
+
 export const loadEquipmentPage = () =>
   import('@/features/equipment/pages/EquipmentPage')
 
@@ -36,6 +42,10 @@ export function preloadRoasterFeatureRoutes() {
 
 export function preloadBeanFeatureRoutes() {
   void Promise.all([loadBeanDetailPage(), loadBeanFormPage()])
+}
+
+export function preloadRecipeFeatureRoutes() {
+  void Promise.all([loadRecipeDetailPage(), loadRecipeFormPage()])
 }
 
 export function preloadEquipmentFeatureRoutes() {

@@ -7,6 +7,7 @@ import {
   brewerQueryKeys,
   grinderQueryKeys,
 } from '@/features/equipment/queryKeys'
+import { recipeQueryKeys } from '@/features/recipes/queryKeys'
 import { roasterQueryKeys } from '@/features/roasters/queryKeys'
 import { apiClient } from '@/lib/api-client'
 import { featureRoutes } from '@/lib/navigation'
@@ -14,6 +15,7 @@ import { queryClient } from '@/lib/queryClient'
 import {
   preloadBeanFeatureRoutes,
   preloadEquipmentFeatureRoutes,
+  preloadRecipeFeatureRoutes,
   preloadRoasterFeatureRoutes,
 } from '@/lib/routePreload'
 import { cn } from '@/lib/utils'
@@ -21,6 +23,7 @@ import { cn } from '@/lib/utils'
 export function AppLayout() {
   const hasPrefetchedRoasters = useRef(false)
   const hasPrefetchedBeans = useRef(false)
+  const hasPrefetchedRecipes = useRef(false)
   const hasPrefetchedEquipment = useRef(false)
 
   const prefetchFeature = useCallback((featurePath: string) => {
@@ -78,6 +81,21 @@ export function AppLayout() {
           staleTime: 2 * 60_000,
         }),
       ])
+      return
+    }
+
+    if (featurePath === 'recipes') {
+      if (hasPrefetchedRecipes.current) {
+        return
+      }
+
+      hasPrefetchedRecipes.current = true
+      preloadRecipeFeatureRoutes()
+      void queryClient.prefetchQuery({
+        queryKey: recipeQueryKeys.all(),
+        queryFn: async () => (await apiClient.api.recipes.get()) ?? [],
+        staleTime: 2 * 60_000,
+      })
     }
   }, [])
 
