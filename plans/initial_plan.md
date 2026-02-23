@@ -25,7 +25,7 @@ todos:
     status: completed
   - id: step-8-brewlog
     content: "Step 8: Brew Log + Rating (F5/F8) -- backend CRUD with all FKs + frontend log form, emoji rating, brew history, grinder stats"
-    status: pending
+    status: completed
   - id: step-9-remaining-qty
     content: "Step 9: Auto Remaining Bean Quantity (F6) -- backend compute-on-read + frontend bean detail progress bar"
     status: pending
