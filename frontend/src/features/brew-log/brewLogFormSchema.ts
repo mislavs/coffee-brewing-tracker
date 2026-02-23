@@ -54,16 +54,11 @@ export const brewLogFormSchema = z.object({
     .trim()
     .min(1, 'Grinder is required.')
     .regex(guidPattern, 'Choose a valid grinder.'),
-  recipeId: z.preprocess(
-    (value) => {
-      if (value === '' || value === null || value === undefined) {
-        return undefined
-      }
-
-      return value
-    },
-    z.string().trim().regex(guidPattern, 'Choose a valid recipe.').optional(),
-  ),
+  recipeId: z
+    .string()
+    .trim()
+    .min(1, 'Recipe is required.')
+    .regex(guidPattern, 'Choose a valid recipe.'),
   dose: requiredPositiveNumberSchema('Dose must be greater than 0.'),
   waterAmount: requiredPositiveNumberSchema(
     'Water amount must be greater than 0.',
@@ -134,7 +129,7 @@ export function normalizeBrewLogFormValues(
     beanId: values.beanId as Guid,
     brewerId: values.brewerId as Guid,
     grinderId: values.grinderId as Guid,
-    recipeId: values.recipeId ? (values.recipeId as Guid) : undefined,
+    recipeId: values.recipeId as Guid,
     accessoryIds:
       values.accessoryIds.length > 0
         ? values.accessoryIds.map((id) => id as Guid)

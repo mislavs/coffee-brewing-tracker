@@ -16,7 +16,7 @@ export function useResetRecipeOnBrewerChange(
 
   useEffect(() => {
     if (previousBrewerIdRef.current !== brewerId) {
-      form.setValue('recipeId', undefined, {
+      form.setValue('recipeId', '', {
         shouldDirty: true,
         shouldValidate: true,
       })

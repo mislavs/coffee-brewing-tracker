@@ -24,8 +24,6 @@ import {
   type IdNameOption,
 } from '@/features/brew-log/components/brewLogFormShared'
 
-const noRecipeValue = '__no_recipe__'
-
 type BrewLogForm = UseFormReturn<BrewLogFormInput, undefined, BrewLogFormValues>
 
 type BeanAndEquipmentSectionProps = {
@@ -107,28 +105,21 @@ export function BeanAndEquipmentSection({
 
         <div className="space-y-2">
           <label htmlFor="recipeId" className="text-sm font-medium">
-            Recipe (optional)
+            Recipe
           </label>
           <Controller
             control={form.control}
             name="recipeId"
             render={({ field }) => (
               <Select
-                value={
-                  typeof field.value === 'string' && field.value
-                    ? field.value
-                    : noRecipeValue
-                }
-                onValueChange={(nextValue) =>
-                  field.onChange(nextValue === noRecipeValue ? undefined : nextValue)
-                }
+                value={field.value || undefined}
+                onValueChange={field.onChange}
                 disabled={!hasSelectedBrewer}
               >
                 <SelectTrigger id="recipeId" className="w-full">
-                  <SelectValue placeholder="No recipe" />
+                  <SelectValue placeholder="Select a recipe" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value={noRecipeValue}>No recipe</SelectItem>
                   {recipeOptions.map((recipe) => (
                     <SelectItem key={recipe.id} value={recipe.id}>
                       {recipe.name}
