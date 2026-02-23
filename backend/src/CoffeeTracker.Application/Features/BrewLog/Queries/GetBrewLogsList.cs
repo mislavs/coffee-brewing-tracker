@@ -41,11 +41,15 @@ public sealed class GetBrewLogsListHandler(ApplicationDbContext dbContext)
                 entity.Id,
                 entity.BrewedAt,
                 entity.Bean.Name,
+                entity.Bean.Roaster.Name,
                 entity.Brewer.Name,
-                entity.Rating.HasValue ? (int?)entity.Rating.Value : null,
-                entity.Dose > 0m && entity.WaterAmount > 0m
-                    ? entity.WaterAmount / entity.Dose
-                    : null))
+                entity.Recipe != null ? entity.Recipe.Name : null,
+                entity.Dose,
+                entity.WaterAmount,
+                entity.Grinder.Name,
+                entity.GrindSize,
+                entity.BrewTimeSeconds,
+                entity.Rating.HasValue ? (int?)entity.Rating.Value : null))
             .ToListAsync(cancellationToken);
     }
 }

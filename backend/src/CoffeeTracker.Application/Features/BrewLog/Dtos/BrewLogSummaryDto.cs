@@ -4,6 +4,12 @@ public sealed record BrewLogSummaryDto(
     Guid Id,
     DateTime BrewedAt,
     string BeanName,
+    string? RoasterName,
     string BrewerName,
-    int? Rating,
-    decimal? BrewRatio);
+    string? RecipeName,
+    decimal Dose,
+    decimal WaterAmount,
+    string GrinderName,
+    string? GrindSize,
+    int? BrewTimeSeconds,
+    int? Rating);

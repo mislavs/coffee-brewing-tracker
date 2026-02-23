@@ -1332,18 +1332,42 @@
             "type": "string",
             "nullable": true
           },
+          "roasterName": {
+            "type": "string",
+            "nullable": true
+          },
           "brewerName": {
             "type": "string",
+            "nullable": true
+          },
+          "recipeName": {
+            "type": "string",
+            "nullable": true
+          },
+          "dose": {
+            "type": "number",
+            "format": "double"
+          },
+          "waterAmount": {
+            "type": "number",
+            "format": "double"
+          },
+          "grinderName": {
+            "type": "string",
+            "nullable": true
+          },
+          "grindSize": {
+            "type": "string",
+            "nullable": true
+          },
+          "brewTimeSeconds": {
+            "type": "integer",
+            "format": "int32",
             "nullable": true
           },
           "rating": {
             "type": "integer",
             "format": "int32",
-            "nullable": true
-          },
-          "brewRatio": {
-            "type": "number",
-            "format": "double",
             "nullable": true
           }
         },
