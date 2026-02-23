@@ -24,18 +24,11 @@ function CreateRecipeForm() {
         description: '',
       }}
       onSubmit={async (values) => {
-        const response = await mutateAsync({
+        await mutateAsync({
           name: values.name.trim(),
           brewerId: values.brewerId as Guid,
           description: normalizeOptional(values.description),
         })
-
-        const createdId = response?.id
-        if (createdId) {
-          navigate(`/recipes/${createdId}`)
-          return
-        }
-
         navigate('/recipes')
       }}
     />

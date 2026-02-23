@@ -60,14 +60,7 @@ function CreateBeanForm() {
         flavorNoteNames: [],
       }}
       onSubmit={async (values) => {
-        const response = await mutateAsync(toBeanRequest(values))
-
-        const createdId = response?.id
-        if (createdId) {
-          navigate(`/beans/${createdId}`)
-          return
-        }
-
+        await mutateAsync(toBeanRequest(values))
         navigate('/beans')
       }}
     />

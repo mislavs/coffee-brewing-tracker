@@ -67,14 +67,7 @@ function CreateBrewLogForm() {
       isSubmitting={isPending}
       initialValues={createInitialValues()}
       onSubmit={async (values) => {
-        const response = await mutateAsync(normalizeBrewLogFormValues(values))
-
-        const createdId = response?.id
-        if (createdId) {
-          navigate(`/brew-log/${createdId}`)
-          return
-        }
-
+        await mutateAsync(normalizeBrewLogFormValues(values))
         navigate('/brew-log')
       }}
     />

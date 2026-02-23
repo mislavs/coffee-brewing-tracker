@@ -34,14 +34,7 @@ function CreateAccessoryForm() {
         brewerIds: [],
       }}
       onSubmit={async (values) => {
-        const response = await mutateAsync(toAccessoryRequest(values))
-
-        const createdId = response?.id
-        if (createdId) {
-          navigate(`/equipment/accessories/${createdId}`)
-          return
-        }
-
+        await mutateAsync(toAccessoryRequest(values))
         navigate('/equipment?tab=accessories')
       }}
     />

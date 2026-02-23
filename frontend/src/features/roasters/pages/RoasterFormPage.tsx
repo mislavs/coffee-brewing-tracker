@@ -24,18 +24,11 @@ function CreateRoasterForm() {
         country: '',
       }}
       onSubmit={async (values) => {
-        const response = await mutateAsync({
+        await mutateAsync({
           name: values.name.trim(),
           city: normalizeOptional(values.city),
           country: normalizeOptional(values.country),
         })
-
-        const createdId = response?.id
-        if (createdId) {
-          navigate(`/roasters/${createdId}`)
-          return
-        }
-
         navigate('/roasters')
       }}
     />

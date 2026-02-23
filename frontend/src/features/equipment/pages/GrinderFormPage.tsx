@@ -21,16 +21,9 @@ function CreateGrinderForm() {
         name: '',
       }}
       onSubmit={async (values) => {
-        const response = await mutateAsync({
+        await mutateAsync({
           name: values.name.trim(),
         })
-
-        const createdId = response?.id
-        if (createdId) {
-          navigate(`/equipment/grinders/${createdId}`)
-          return
-        }
-
         navigate('/equipment?tab=grinders')
       }}
     />

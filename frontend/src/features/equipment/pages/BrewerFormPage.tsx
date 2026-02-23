@@ -21,16 +21,9 @@ function CreateBrewerForm() {
         name: '',
       }}
       onSubmit={async (values) => {
-        const response = await mutateAsync({
+        await mutateAsync({
           name: values.name.trim(),
         })
-
-        const createdId = response?.id
-        if (createdId) {
-          navigate(`/equipment/brewers/${createdId}`)
-          return
-        }
-
         navigate('/equipment?tab=brewers')
       }}
     />
