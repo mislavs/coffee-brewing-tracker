@@ -14,14 +14,34 @@ public sealed class GetRoastersListHandler(ApplicationDbContext dbContext)
         GetRoastersListQuery request,
         CancellationToken cancellationToken)
     {
-        return await dbContext.Roasters
+        var roasters = await dbContext.Roasters
             .AsNoTracking()
             .OrderBy(entity => entity.Name)
+            .Select(entity => new
+            {
+                entity.Id,
+                entity.Name,
+                entity.City,
+                entity.Country,
+                BeanCount = entity.Beans.Count(),
+                AvgPricePerKg = entity.Beans
+                    .Where(bean => bean.Price.HasValue && bean.BagWeight > 0)
+                    .Select(bean => (decimal?)(bean.Price!.Value / (bean.BagWeight / 1000m)))
+                    .Average(),
+                HasLogo = entity.LogoData != null
+            })
+            .ToListAsync(cancellationToken);
+
+        return roasters
             .Select(entity => new RoasterSummaryDto(
                 entity.Id,
                 entity.Name,
                 entity.City,
-                entity.Country))
-            .ToListAsync(cancellationToken);
+                entity.Country,
+                entity.BeanCount,
+                entity.AvgPricePerKg,
+                entity.HasLogo,
+                entity.HasLogo ? $"/api/roasters/{entity.Id}/logo" : null))
+            .ToList();
     }
 }

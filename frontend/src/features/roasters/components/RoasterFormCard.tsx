@@ -1,6 +1,8 @@
+import { useEffect, useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { Link } from 'react-router-dom'
+import { ImageUpload } from '@/components/ImageUpload'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -22,10 +24,16 @@ type RoasterFormCardProps = {
   description: string
   submitLabel: string
   initialValues: RoasterFormValues
-  onSubmit: (values: RoasterFormValues) => Promise<void>
+  onSubmit: (values: RoasterFormValues, logo: RoasterLogoSubmission) => Promise<void>
   isSubmitting: boolean
   cancelHref: string
+  existingLogoUrl?: string | null
   onCancel?: () => void
+}
+
+export type RoasterLogoSubmission = {
+  file: File | null
+  removeExistingLogo: boolean
 }
 
 export function RoasterFormCard({
@@ -36,22 +44,48 @@ export function RoasterFormCard({
   onSubmit,
   isSubmitting,
   cancelHref,
+  existingLogoUrl,
   onCancel,
 }: RoasterFormCardProps) {
   const form = useForm<RoasterFormValues>({
     resolver: zodResolver(roasterFormSchema),
     defaultValues: initialValues,
   })
+  const [selectedLogoFile, setSelectedLogoFile] = useState<File | null>(null)
+  const [selectedLogoPreviewUrl, setSelectedLogoPreviewUrl] = useState<string | null>(
+    null,
+  )
+  const [removeExistingLogo, setRemoveExistingLogo] = useState(false)
+
+  useEffect(() => {
+    if (!selectedLogoFile) {
+      setSelectedLogoPreviewUrl(null)
+      return
+    }
+
+    const objectUrl = URL.createObjectURL(selectedLogoFile)
+    setSelectedLogoPreviewUrl(objectUrl)
+
+    return () => {
+      URL.revokeObjectURL(objectUrl)
+    }
+  }, [selectedLogoFile])
 
   const submitForm = form.handleSubmit(async (values) => {
     form.clearErrors('root.serverError')
 
     try {
-      await onSubmit(values)
+      await onSubmit(values, {
+        file: selectedLogoFile,
+        removeExistingLogo: removeExistingLogo && !selectedLogoFile,
+      })
     } catch (error) {
       applyRoasterFormServerErrors(error, form.setError)
     }
   })
+
+  const effectiveLogoPreviewUrl =
+    selectedLogoPreviewUrl ?? (removeExistingLogo ? null : existingLogoUrl ?? null)
 
   return (
     <Card>
@@ -96,6 +130,29 @@ export function RoasterFormCard({
               </p>
             )}
           </div>
+
+          <ImageUpload
+            id="logo"
+            label="Logo"
+            previewUrl={effectiveLogoPreviewUrl}
+            onFileSelected={(file) => {
+              setSelectedLogoFile(file)
+              if (file) {
+                setRemoveExistingLogo(false)
+              }
+            }}
+            onRemove={() => {
+              if (selectedLogoFile) {
+                setSelectedLogoFile(null)
+                return
+              }
+
+              if (existingLogoUrl) {
+                setRemoveExistingLogo(true)
+              }
+            }}
+            disabled={isSubmitting}
+          />
 
           {form.formState.errors.root?.serverError && (
             <p className="text-sm text-destructive">

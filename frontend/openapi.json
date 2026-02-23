@@ -970,6 +970,94 @@
           }
         }
       }
+    },
+    "/api/roasters/{id}/logo": {
+      "put": {
+        "tags": [
+          "Roasters"
+        ],
+        "operationId": "UploadRoasterLogo",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              },
+              "encoding": {
+                "file": {
+                  "style": "form"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Roasters"
+        ],
+        "operationId": "GetRoasterLogo",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Roasters"
+        ],
+        "operationId": "DeleteRoasterLogo",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1756,6 +1844,39 @@
               "$ref": "#/components/schemas/RoasterBeanSummaryDto"
             },
             "nullable": true
+          },
+          "beanCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "avgPricePerKg": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "totalPurchasedWeightGrams": {
+            "type": "number",
+            "format": "double"
+          },
+          "topRoastProfile": {
+            "type": "string",
+            "nullable": true
+          },
+          "brewCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "avgBrewRating": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "hasLogo": {
+            "type": "boolean"
+          },
+          "logoUrl": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -1776,6 +1897,22 @@
             "nullable": true
           },
           "country": {
+            "type": "string",
+            "nullable": true
+          },
+          "beanCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "avgPricePerKg": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "hasLogo": {
+            "type": "boolean"
+          },
+          "logoUrl": {
             "type": "string",
             "nullable": true
           }

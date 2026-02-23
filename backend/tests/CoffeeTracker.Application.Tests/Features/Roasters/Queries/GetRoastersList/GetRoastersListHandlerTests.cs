@@ -28,5 +28,9 @@ public class GetRoastersListHandlerTests(IntegrationTestFactory factory) : Integ
         result.Select(entry => entry.Name)
             .Should()
             .ContainInOrder("Alpha Roasters", "Beta Roasters", "Zulu Roasters");
+        result.Should().OnlyContain(entry => entry.BeanCount == 0);
+        result.Should().OnlyContain(entry => entry.AvgPricePerKg == null);
+        result.Should().OnlyContain(entry => !entry.HasLogo);
+        result.Should().OnlyContain(entry => entry.LogoUrl == null);
     }
 }

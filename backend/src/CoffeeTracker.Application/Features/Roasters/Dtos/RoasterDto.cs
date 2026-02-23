@@ -5,6 +5,14 @@ public sealed record RoasterDto(
     string Name,
     string? City,
     string? Country,
-    IReadOnlyList<RoasterBeanSummaryDto> Beans);
+    IReadOnlyList<RoasterBeanSummaryDto> Beans,
+    int BeanCount,
+    decimal? AvgPricePerKg,
+    decimal TotalPurchasedWeightGrams,
+    string? TopRoastProfile,
+    int BrewCount,
+    decimal? AvgBrewRating,
+    bool HasLogo,
+    string? LogoUrl);
 
 public sealed record RoasterBeanSummaryDto(Guid Id, string Name);

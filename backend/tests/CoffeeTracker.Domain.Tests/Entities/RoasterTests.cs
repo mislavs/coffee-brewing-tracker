@@ -80,4 +80,48 @@ public class RoasterTests
         act.Should().Throw<ArgumentException>()
             .WithParameterName("name");
     }
+
+    [Fact]
+    public void SetLogo_WhenValuesAreValid_SetsLogoProperties()
+    {
+        // Arrange
+        var roaster = Roaster.Create("Kawa", "Warsaw", "Poland");
+        var data = new byte[] { 1, 2, 3 };
+
+        // Act
+        roaster.SetLogo("logo.png", data);
+
+        // Assert
+        roaster.LogoFileName.Should().Be("logo.png");
+        roaster.LogoData.Should().Equal(1, 2, 3);
+    }
+
+    [Fact]
+    public void SetLogo_WhenDataIsEmpty_ThrowsArgumentException()
+    {
+        // Arrange
+        var roaster = Roaster.Create("Kawa", "Warsaw", "Poland");
+
+        // Act
+        Action act = () => roaster.SetLogo("logo.png", []);
+
+        // Assert
+        act.Should().Throw<ArgumentException>()
+            .WithParameterName("data");
+    }
+
+    [Fact]
+    public void RemoveLogo_WhenLogoExists_ClearsLogoProperties()
+    {
+        // Arrange
+        var roaster = Roaster.Create("Kawa", "Warsaw", "Poland");
+        roaster.SetLogo("logo.png", [1, 2, 3]);
+
+        // Act
+        roaster.RemoveLogo();
+
+        // Assert
+        roaster.LogoFileName.Should().BeNull();
+        roaster.LogoData.Should().BeNull();
+    }
 }

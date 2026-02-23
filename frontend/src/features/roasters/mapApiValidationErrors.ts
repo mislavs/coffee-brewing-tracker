@@ -18,6 +18,7 @@ export function applyRoasterFormServerErrors(
   }
 
   const validationErrors = payload.errors
+  let firstUnhandledValidationMessage: string | undefined
   if (validationErrors) {
     for (const [fieldName, messages] of Object.entries(validationErrors)) {
       const normalizedFieldName = normalizeApiFieldName(fieldName)
@@ -30,11 +31,13 @@ export function applyRoasterFormServerErrors(
         setError(normalizedFieldName, {
           message: messages[0] ?? 'Invalid value.',
         })
+      } else if (!firstUnhandledValidationMessage) {
+        firstUnhandledValidationMessage = messages[0]
       }
     }
   }
 
-  const message = payload.title
+  const message = firstUnhandledValidationMessage ?? payload.title
   if (message) {
     setError('root.serverError', { message })
   }

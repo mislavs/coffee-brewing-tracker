@@ -26,10 +26,18 @@ public class GetRoasterByIdHandlerTests(IntegrationTestFactory factory) : Integr
         result.City.Should().Be("Warsaw");
         result.Country.Should().Be("Poland");
         result.Beans.Should().BeEmpty();
+        result.BeanCount.Should().Be(0);
+        result.AvgPricePerKg.Should().BeNull();
+        result.TotalPurchasedWeightGrams.Should().Be(0);
+        result.TopRoastProfile.Should().BeNull();
+        result.BrewCount.Should().Be(0);
+        result.AvgBrewRating.Should().BeNull();
+        result.HasLogo.Should().BeFalse();
+        result.LogoUrl.Should().BeNull();
     }
 
     [Fact]
-    public async Task Handle_WhenRoasterHasBeans_ReturnsBeanSummaries()
+    public async Task Handle_WhenRoasterHasBeans_ReturnsBeanSummariesAndStats()
     {
         // Arrange
         var roaster = Roaster.Create("Kawa", "Warsaw", "Poland");
@@ -62,7 +70,31 @@ public class GetRoasterByIdHandlerTests(IntegrationTestFactory factory) : Integr
             null,
             250m,
             40m);
+        var beanC = Bean.Create(
+            "Middle Bean",
+            roaster.Id,
+            OriginType.SingleOrigin,
+            [ethiopia],
+            null,
+            null,
+            RoastProfile.Espresso,
+            null,
+            null,
+            300m,
+            60m);
         await InsertMany([beanA, beanB]);
+        await Insert(beanC);
+
+        var grinder = Grinder.Create("K Plus");
+        var brewer = Brewer.Create("V60");
+        await Insert(grinder);
+        await Insert(brewer);
+
+        await InsertMany(
+        [
+            BrewLogEntry.Create(beanA.Id, brewer.Id, grinder.Id, null, 18m, 300m, null, "10", null, BrewRating.Good, null, null, DateTime.UtcNow.AddDays(-2)),
+            BrewLogEntry.Create(beanB.Id, brewer.Id, grinder.Id, null, 19m, 320m, null, "11", null, BrewRating.Excellent, null, null, DateTime.UtcNow.AddDays(-1))
+        ]);
 
         var query = new GetRoasterByIdQuery(roaster.Id);
 
@@ -70,10 +102,18 @@ public class GetRoasterByIdHandlerTests(IntegrationTestFactory factory) : Integr
         var result = await Send(query);
 
         // Assert
-        result.Beans.Should().HaveCount(2);
+        result.Beans.Should().HaveCount(3);
         result.Beans.Select(entry => entry.Name)
             .Should()
-            .ContainInOrder("Alpha Bean", "Zulu Bean");
+            .ContainInOrder("Alpha Bean", "Middle Bean", "Zulu Bean");
+        result.BeanCount.Should().Be(3);
+        result.AvgPricePerKg.Should().BeApproximately(173.333m, 0.001m);
+        result.TotalPurchasedWeightGrams.Should().Be(800m);
+        result.TopRoastProfile.Should().Be("Filter");
+        result.BrewCount.Should().Be(2);
+        result.AvgBrewRating.Should().Be(4.5m);
+        result.HasLogo.Should().BeFalse();
+        result.LogoUrl.Should().BeNull();
     }
 
     [Fact]

@@ -2,6 +2,8 @@ using CoffeeTracker.Api.Contracts;
 using CoffeeTracker.Application.Features.Roasters.Commands;
 using CoffeeTracker.Application.Features.Roasters.Dtos;
 using CoffeeTracker.Application.Features.Roasters.Queries;
+using FluentValidation;
+using FluentValidation.Results;
 using MediatR;
 using Microsoft.AspNetCore.Http.HttpResults;
 
@@ -25,6 +27,16 @@ public static class RoasterEndpoints
 
         group.MapPut("/{id:guid}", UpdateRoaster)
             .WithName("UpdateRoaster");
+
+        group.MapPut("/{id:guid}/logo", UploadRoasterLogo)
+            .DisableAntiforgery()
+            .WithName("UploadRoasterLogo");
+
+        group.MapGet("/{id:guid}/logo", GetRoasterLogo)
+            .WithName("GetRoasterLogo");
+
+        group.MapDelete("/{id:guid}/logo", DeleteRoasterLogo)
+            .WithName("DeleteRoasterLogo");
 
         return app;
     }
@@ -77,5 +89,53 @@ public static class RoasterEndpoints
             cancellationToken);
 
         return TypedResults.Ok();
+    }
+
+    private static async Task<NoContent> UploadRoasterLogo(
+        Guid id,
+        IFormFile? file,
+        ISender sender,
+        CancellationToken cancellationToken)
+    {
+        if (file is null)
+        {
+            throw BuildValidationException("file", "Logo image is required.");
+        }
+
+        await using var stream = new MemoryStream();
+        await file.CopyToAsync(stream, cancellationToken);
+
+        await sender.Send(
+            new UploadRoasterLogoCommand(id, file.FileName, file.ContentType, stream.ToArray()),
+            cancellationToken);
+
+        return TypedResults.NoContent();
+    }
+
+    private static async Task<IResult> GetRoasterLogo(
+        Guid id,
+        ISender sender,
+        HttpContext context,
+        CancellationToken cancellationToken)
+    {
+        var logo = await sender.Send(new GetRoasterLogoQuery(id), cancellationToken);
+
+        context.Response.Headers.CacheControl = "public,max-age=86400";
+        return Results.File(logo.Data, logo.ContentType, logo.FileName);
+    }
+
+    private static async Task<NoContent> DeleteRoasterLogo(
+        Guid id,
+        ISender sender,
+        CancellationToken cancellationToken)
+    {
+        await sender.Send(new DeleteRoasterLogoCommand(id), cancellationToken);
+        return TypedResults.NoContent();
+    }
+
+    private static ValidationException BuildValidationException(string propertyName, string errorMessage)
+    {
+        return new ValidationException(
+            [new ValidationFailure(propertyName, errorMessage)]);
     }
 }

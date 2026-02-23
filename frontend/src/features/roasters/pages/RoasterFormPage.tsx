@@ -2,14 +2,19 @@ import type { Guid } from '@microsoft/kiota-abstractions'
 import { Navigate, useNavigate, useParams } from 'react-router-dom'
 import { RoasterFormCard } from '@/features/roasters/components/RoasterFormCard'
 import { useCreateRoaster } from '@/features/roasters/hooks/useCreateRoaster'
+import { useDeleteRoasterLogo } from '@/features/roasters/hooks/useDeleteRoasterLogo'
 import { useRoaster } from '@/features/roasters/hooks/useRoaster'
+import { useUploadRoasterLogo } from '@/features/roasters/hooks/useUploadRoasterLogo'
 import { useUpdateRoaster } from '@/features/roasters/hooks/useUpdateRoaster'
 import { tryParseGuid } from '@/lib/guid'
 import { normalizeOptional } from '@/features/roasters/roasterFormSchema'
+import { resolveRoasterLogoUrl } from '@/features/roasters/roasterPresentation'
 
 function CreateRoasterForm() {
   const navigate = useNavigate()
   const { mutateAsync, isPending } = useCreateRoaster()
+  const { mutateAsync: uploadLogo, isPending: isUploadingLogo } =
+    useUploadRoasterLogo()
 
   return (
     <RoasterFormCard
@@ -17,18 +22,27 @@ function CreateRoasterForm() {
       description="Add a new coffee roaster."
       submitLabel="Create"
       cancelHref="/roasters"
-      isSubmitting={isPending}
+      isSubmitting={isPending || isUploadingLogo}
       initialValues={{
         name: '',
         city: '',
         country: '',
       }}
-      onSubmit={async (values) => {
-        await mutateAsync({
+      onSubmit={async (values, logo) => {
+        const response = await mutateAsync({
           name: values.name.trim(),
           city: normalizeOptional(values.city),
           country: normalizeOptional(values.country),
         })
+
+        if (logo.file && !response?.id) {
+          throw new Error('Roaster created but logo upload could not be completed.')
+        }
+
+        if (logo.file && response?.id) {
+          await uploadLogo({ id: response.id, file: logo.file })
+        }
+
         navigate('/roasters')
       }}
     />
@@ -39,6 +53,10 @@ function EditRoasterForm({ roasterId }: { roasterId: Guid }) {
   const navigate = useNavigate()
   const { data: roaster } = useRoaster(roasterId)
   const { mutateAsync, isPending } = useUpdateRoaster()
+  const { mutateAsync: uploadLogo, isPending: isUploadingLogo } =
+    useUploadRoasterLogo()
+  const { mutateAsync: deleteLogo, isPending: isDeletingLogo } =
+    useDeleteRoasterLogo()
 
   return (
     <RoasterFormCard
@@ -46,13 +64,14 @@ function EditRoasterForm({ roasterId }: { roasterId: Guid }) {
       description="Update roaster information."
       submitLabel="Save"
       cancelHref={`/roasters/${roasterId}`}
-      isSubmitting={isPending}
+      isSubmitting={isPending || isUploadingLogo || isDeletingLogo}
+      existingLogoUrl={resolveRoasterLogoUrl(roaster.logoUrl)}
       initialValues={{
         name: roaster.name ?? '',
         city: roaster.city ?? '',
         country: roaster.country ?? '',
       }}
-      onSubmit={async (values) => {
+      onSubmit={async (values, logo) => {
         await mutateAsync({
           id: roasterId,
           request: {
@@ -61,6 +80,12 @@ function EditRoasterForm({ roasterId }: { roasterId: Guid }) {
             country: normalizeOptional(values.country),
           },
         })
+
+        if (logo.file) {
+          await uploadLogo({ id: roasterId, file: logo.file })
+        } else if (logo.removeExistingLogo) {
+          await deleteLogo({ id: roasterId })
+        }
 
         navigate(`/roasters/${roasterId}`)
       }}
