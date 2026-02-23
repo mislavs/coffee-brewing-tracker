@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
 import { Controller, useWatch, type UseFormReturn } from 'react-hook-form'
+import { DateTimePicker } from '@/components/ui/date-time-picker'
 import { Input } from '@/components/ui/input'
 import {
   Select,
@@ -23,7 +23,6 @@ import {
   textareaFieldClassName,
   type IdNameOption,
 } from '@/features/brew-log/components/brewLogFormShared'
-import { toDisplayDateTime, toIsoDateTime } from '@/lib/date'
 
 const noRecipeValue = '__no_recipe__'
 
@@ -357,42 +356,6 @@ export function ResultsSection({ form }: FormSectionProps) {
 
 export function BrewedAtSection({ form }: FormSectionProps) {
   const watchedBrewedAt = useWatch({ control: form.control, name: 'brewedAt' })
-  const [brewedAtDraft, setBrewedAtDraft] = useState(
-    toDisplayDateTime(typeof watchedBrewedAt === 'string' ? watchedBrewedAt : undefined),
-  )
-
-  useEffect(() => {
-    setBrewedAtDraft(
-      toDisplayDateTime(typeof watchedBrewedAt === 'string' ? watchedBrewedAt : undefined),
-    )
-  }, [watchedBrewedAt])
-
-  const commitBrewedAt = (draftValue: string) => {
-    const normalized = draftValue.trim()
-    if (!normalized) {
-      form.setError('brewedAt', {
-        type: 'manual',
-        message: 'Brew date is required.',
-      })
-      return
-    }
-
-    const isoDateTime = toIsoDateTime(normalized)
-    if (!isoDateTime) {
-      form.setError('brewedAt', {
-        type: 'manual',
-        message: 'Use format dd.mm.yyyy hh:mm.',
-      })
-      return
-    }
-
-    form.clearErrors('brewedAt')
-    form.setValue('brewedAt', isoDateTime, {
-      shouldDirty: true,
-      shouldValidate: true,
-    })
-    setBrewedAtDraft(toDisplayDateTime(isoDateTime))
-  }
 
   return (
     <section className="space-y-4">
@@ -400,18 +363,33 @@ export function BrewedAtSection({ form }: FormSectionProps) {
         <label htmlFor="brewedAt" className="text-sm font-medium">
           Brewed at
         </label>
-        <Input
+        <DateTimePicker
           id="brewedAt"
-          type="text"
-          inputMode="text"
-          placeholder="dd.mm.yyyy hh:mm"
-          value={brewedAtDraft}
-          onChange={(event) => setBrewedAtDraft(event.target.value)}
-          onBlur={() => commitBrewedAt(brewedAtDraft)}
-          onKeyDown={(event) => {
-            if (event.key === 'Enter') {
-              commitBrewedAt(brewedAtDraft)
+          value={typeof watchedBrewedAt === 'string' ? watchedBrewedAt : undefined}
+          onChange={(nextValue) => {
+            if (!nextValue) {
+              form.setValue('brewedAt', '', {
+                shouldDirty: true,
+                shouldValidate: true,
+              })
+              form.setError('brewedAt', {
+                type: 'manual',
+                message: 'Brew date is required.',
+              })
+              return
             }
+
+            form.clearErrors('brewedAt')
+            form.setValue('brewedAt', nextValue, {
+              shouldDirty: true,
+              shouldValidate: true,
+            })
+          }}
+          onInvalidInput={() => {
+            form.setError('brewedAt', {
+              type: 'manual',
+              message: 'Use format dd.mm.yyyy hh:mm.',
+            })
           }}
         />
         <FieldErrorText message={form.formState.errors.brewedAt?.message} />

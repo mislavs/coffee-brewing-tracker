@@ -27,6 +27,7 @@ packages/
 .idea/
 .vscode/
 .codex/
+.aspire/
 .playwright-cli/
 *.swp
 *.tmp

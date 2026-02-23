@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Controller, useForm, useWatch } from 'react-hook-form'
 import { Link } from 'react-router-dom'
@@ -18,6 +18,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { DatePicker } from '@/components/ui/date-picker'
 import { Input } from '@/components/ui/input'
 import {
   Select,
@@ -46,7 +47,6 @@ import {
   normalizeOptional,
   type RoasterFormValues,
 } from '@/features/roasters/roasterFormSchema'
-import { toDisplayDate, toIsoDate } from '@/lib/date'
 
 const createRoasterValue = '__create_roaster__'
 
@@ -120,15 +120,6 @@ export function BeanFormCard({
 
   const [isCreateRoasterOpen, setIsCreateRoasterOpen] = useState(false)
   const watchedRoastDate = useWatch({ control: form.control, name: 'roastDate' })
-  const [roastDateDraft, setRoastDateDraft] = useState(
-    toDisplayDate(typeof watchedRoastDate === 'string' ? watchedRoastDate : undefined),
-  )
-
-  useEffect(() => {
-    setRoastDateDraft(
-      toDisplayDate(typeof watchedRoastDate === 'string' ? watchedRoastDate : undefined),
-    )
-  }, [watchedRoastDate])
 
   const roasterOptions = useMemo(
     () =>
@@ -187,35 +178,6 @@ export function BeanFormCard({
       shouldValidate: true,
     })
     setIsCreateRoasterOpen(false)
-  }
-
-  const commitRoastDate = (draftValue: string) => {
-    const normalized = draftValue.trim()
-    if (!normalized) {
-      form.clearErrors('roastDate')
-      form.setValue('roastDate', undefined, {
-        shouldDirty: true,
-        shouldValidate: true,
-      })
-      setRoastDateDraft('')
-      return
-    }
-
-    const isoDate = toIsoDate(normalized)
-    if (!isoDate) {
-      form.setError('roastDate', {
-        type: 'manual',
-        message: 'Use format dd.mm.yyyy.',
-      })
-      return
-    }
-
-    form.clearErrors('roastDate')
-    form.setValue('roastDate', isoDate, {
-      shouldDirty: true,
-      shouldValidate: true,
-    })
-    setRoastDateDraft(toDisplayDate(isoDate))
   }
 
   return (
@@ -401,18 +363,21 @@ export function BeanFormCard({
                 <label htmlFor="roastDate" className="text-sm font-medium">
                   Roast Date
                 </label>
-                <Input
+                <DatePicker
                   id="roastDate"
-                  type="text"
-                  inputMode="numeric"
-                  placeholder="dd.mm.yyyy"
-                  value={roastDateDraft}
-                  onChange={(event) => setRoastDateDraft(event.target.value)}
-                  onBlur={() => commitRoastDate(roastDateDraft)}
-                  onKeyDown={(event) => {
-                    if (event.key === 'Enter') {
-                      commitRoastDate(roastDateDraft)
-                    }
+                  value={typeof watchedRoastDate === 'string' ? watchedRoastDate : undefined}
+                  onChange={(nextValue) => {
+                    form.clearErrors('roastDate')
+                    form.setValue('roastDate', nextValue, {
+                      shouldDirty: true,
+                      shouldValidate: true,
+                    })
+                  }}
+                  onInvalidInput={() => {
+                    form.setError('roastDate', {
+                      type: 'manual',
+                      message: 'Use format dd.mm.yyyy.',
+                    })
                   }}
                 />
                 <FieldErrorText message={form.formState.errors.roastDate?.message} />

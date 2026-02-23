@@ -8,6 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
+import { DatePicker } from '@/components/ui/date-picker'
 import { Input } from '@/components/ui/input'
 import {
   Table,
@@ -18,7 +19,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { useBrewLogs } from '@/features/brew-log/hooks/useBrewLogs'
-import { formatDate, toDisplayDate, toIsoDate } from '@/lib/date'
+import { formatDate } from '@/lib/date'
 
 function getRatingEmoji(rating: number | null | undefined) {
   switch (rating) {
@@ -51,20 +52,10 @@ export function BrewLogListPage() {
   const dateFrom = searchParams.get('dateFrom') ?? ''
   const dateTo = searchParams.get('dateTo') ?? ''
   const [searchDraft, setSearchDraft] = useState(search)
-  const [dateFromDraft, setDateFromDraft] = useState(toDisplayDate(dateFrom))
-  const [dateToDraft, setDateToDraft] = useState(toDisplayDate(dateTo))
 
   useEffect(() => {
     setSearchDraft(search)
   }, [search])
-
-  useEffect(() => {
-    setDateFromDraft(toDisplayDate(dateFrom))
-  }, [dateFrom])
-
-  useEffect(() => {
-    setDateToDraft(toDisplayDate(dateTo))
-  }, [dateTo])
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -87,16 +78,9 @@ export function BrewLogListPage() {
     return () => clearTimeout(timeoutId)
   }, [searchDraft, setSearchParams])
 
-  const commitDateFilter = (name: 'dateFrom' | 'dateTo', draftValue: string) => {
-    const normalized = draftValue.trim()
-    const nextIsoDate = toIsoDate(normalized)
-
+  const setDateFilter = (name: 'dateFrom' | 'dateTo', nextIsoDate: string | undefined) => {
     setSearchParams(
       (previous) => {
-        if (normalized && !nextIsoDate) {
-          return previous
-        }
-
         const next = new URLSearchParams(previous)
         if (nextIsoDate) {
           next.set(name, nextIsoDate)
@@ -141,19 +125,10 @@ export function BrewLogListPage() {
             <label htmlFor="brew-log-date-from" className="text-sm font-medium">
               Date from
             </label>
-            <Input
+            <DatePicker
               id="brew-log-date-from"
-              type="text"
-              inputMode="numeric"
-              placeholder="dd.mm.yyyy"
-              value={dateFromDraft}
-              onChange={(event) => setDateFromDraft(event.target.value)}
-              onBlur={() => commitDateFilter('dateFrom', dateFromDraft)}
-              onKeyDown={(event) => {
-                if (event.key === 'Enter') {
-                  commitDateFilter('dateFrom', dateFromDraft)
-                }
-              }}
+              value={dateFrom || undefined}
+              onChange={(nextValue) => setDateFilter('dateFrom', nextValue)}
             />
           </div>
 
@@ -161,19 +136,10 @@ export function BrewLogListPage() {
             <label htmlFor="brew-log-date-to" className="text-sm font-medium">
               Date to
             </label>
-            <Input
+            <DatePicker
               id="brew-log-date-to"
-              type="text"
-              inputMode="numeric"
-              placeholder="dd.mm.yyyy"
-              value={dateToDraft}
-              onChange={(event) => setDateToDraft(event.target.value)}
-              onBlur={() => commitDateFilter('dateTo', dateToDraft)}
-              onKeyDown={(event) => {
-                if (event.key === 'Enter') {
-                  commitDateFilter('dateTo', dateToDraft)
-                }
-              }}
+              value={dateTo || undefined}
+              onChange={(nextValue) => setDateFilter('dateTo', nextValue)}
             />
           </div>
         </div>
