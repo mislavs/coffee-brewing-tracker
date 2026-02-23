@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { Guid } from '@microsoft/kiota-abstractions'
-import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
+import { Link, Navigate, useNavigate } from 'react-router-dom'
+import { DeleteConfirmationDialog } from '@/components/DeleteConfirmationDialog'
 import { DetailField } from '@/components/DetailField'
 import { Button } from '@/components/ui/button'
 import {
@@ -11,10 +12,9 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { DeleteRecipeDialog } from '@/features/recipes/components/DeleteRecipeDialog'
 import { useDeleteRecipe } from '@/features/recipes/hooks/useDeleteRecipe'
 import { useRecipe } from '@/features/recipes/hooks/useRecipe'
-import { tryParseGuid } from '@/lib/guid'
+import { useEntityFormId } from '@/lib/useEntityFormId'
 
 function RecipeDetailContent({ recipeId }: { recipeId: Guid }) {
   const navigate = useNavigate()
@@ -73,23 +73,22 @@ function RecipeDetailContent({ recipeId }: { recipeId: Guid }) {
         </CardFooter>
       </Card>
 
-      <DeleteRecipeDialog
+      <DeleteConfirmationDialog
         open={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}
         onConfirm={confirmDelete}
         isPending={isDeleting}
+        entityName="recipe"
       />
     </>
   )
 }
 
 export function RecipeDetailPage() {
-  const { id } = useParams<{ id: string }>()
-  const recipeId = tryParseGuid(id)
-
-  if (!recipeId) {
+  const entityId = useEntityFormId()
+  if (entityId.mode !== 'edit') {
     return <Navigate to="/recipes" replace />
   }
 
-  return <RecipeDetailContent recipeId={recipeId} />
+  return <RecipeDetailContent recipeId={entityId.id} />
 }

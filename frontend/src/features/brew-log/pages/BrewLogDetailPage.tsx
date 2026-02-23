@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import type { Guid } from '@microsoft/kiota-abstractions'
-import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
+import { Link, Navigate, useNavigate } from 'react-router-dom'
+import { DeleteConfirmationDialog } from '@/components/DeleteConfirmationDialog'
 import { DetailField } from '@/components/DetailField'
 import { Button } from '@/components/ui/button'
 import {
@@ -11,46 +12,15 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { DeleteBrewLogDialog } from '@/features/brew-log/components/DeleteBrewLogDialog'
+import {
+  formatBrewTime,
+  formatRatio,
+  getRatingDisplay,
+} from '@/features/brew-log/formatters'
 import { useBrewLog } from '@/features/brew-log/hooks/useBrewLog'
 import { useDeleteBrewLog } from '@/features/brew-log/hooks/useDeleteBrewLog'
 import { formatDateTime } from '@/lib/date'
-import { tryParseGuid } from '@/lib/guid'
-
-function formatRatio(value: number | null | undefined) {
-  if (value === null || value === undefined || !Number.isFinite(value) || value <= 0) {
-    return '—'
-  }
-
-  return `1:${value.toFixed(1)}`
-}
-
-function formatBrewTime(value: number | null | undefined) {
-  if (value === null || value === undefined || value < 0) {
-    return '—'
-  }
-
-  const minutes = Math.floor(value / 60)
-  const seconds = value % 60
-  return `${minutes}:${String(seconds).padStart(2, '0')}`
-}
-
-function getRatingDisplay(rating: number | null | undefined) {
-  switch (rating) {
-    case 1:
-      return '😞'
-    case 2:
-      return '🙁'
-    case 3:
-      return '😐'
-    case 4:
-      return '🙂'
-    case 5:
-      return '🤩'
-    default:
-      return '—'
-  }
-}
+import { useEntityFormId } from '@/lib/useEntityFormId'
 
 function BrewLogDetailContent({ brewLogId }: { brewLogId: Guid }) {
   const navigate = useNavigate()
@@ -173,23 +143,22 @@ function BrewLogDetailContent({ brewLogId }: { brewLogId: Guid }) {
         </CardFooter>
       </Card>
 
-      <DeleteBrewLogDialog
+      <DeleteConfirmationDialog
         open={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}
         onConfirm={confirmDelete}
         isPending={isDeleting}
+        entityName="brew log"
       />
     </>
   )
 }
 
 export function BrewLogDetailPage() {
-  const { id } = useParams<{ id: string }>()
-  const brewLogId = tryParseGuid(id)
-
-  if (!brewLogId) {
+  const entityId = useEntityFormId()
+  if (entityId.mode !== 'edit') {
     return <Navigate to="/brew-log" replace />
   }
 
-  return <BrewLogDetailContent brewLogId={brewLogId} />
+  return <BrewLogDetailContent brewLogId={entityId.id} />
 }

@@ -1,5 +1,6 @@
 import type { Guid } from '@microsoft/kiota-abstractions'
-import { Link, Navigate, useParams } from 'react-router-dom'
+import { Link, Navigate } from 'react-router-dom'
+import { DetailField } from '@/components/DetailField'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -11,7 +12,7 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { useAccessory } from '@/features/equipment/hooks/useAccessory'
-import { tryParseGuid } from '@/lib/guid'
+import { useEntityFormId } from '@/lib/useEntityFormId'
 
 function AccessoryDetailContent({ accessoryId }: { accessoryId: Guid }) {
   const { data: accessory } = useAccessory(accessoryId)
@@ -28,9 +29,8 @@ function AccessoryDetailContent({ accessoryId }: { accessoryId: Guid }) {
         <CardTitle>{accessory.name ?? 'Unnamed accessory'}</CardTitle>
         <CardDescription>Accessory details</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-3 text-sm">
-        <div className="space-y-2">
-          <p className="font-medium text-muted-foreground">Compatible brewers</p>
+      <CardContent className="space-y-2 text-sm">
+        <DetailField label="Compatible Brewers" stacked>
           {compatibleBrewers.length > 0 ? (
             <div className="flex flex-wrap gap-2">
               {compatibleBrewers.map((brewer) => (
@@ -51,7 +51,7 @@ function AccessoryDetailContent({ accessoryId }: { accessoryId: Guid }) {
           ) : (
             <p className="text-muted-foreground">No compatible brewers selected.</p>
           )}
-        </div>
+        </DetailField>
       </CardContent>
       <CardFooter className="flex items-center gap-2">
         <Button asChild>
@@ -66,12 +66,10 @@ function AccessoryDetailContent({ accessoryId }: { accessoryId: Guid }) {
 }
 
 export function AccessoryDetailPage() {
-  const { id } = useParams<{ id: string }>()
-  const accessoryId = tryParseGuid(id)
-
-  if (!accessoryId) {
+  const entityId = useEntityFormId()
+  if (entityId.mode !== 'edit') {
     return <Navigate to="/equipment" replace />
   }
 
-  return <AccessoryDetailContent accessoryId={accessoryId} />
+  return <AccessoryDetailContent accessoryId={entityId.id} />
 }

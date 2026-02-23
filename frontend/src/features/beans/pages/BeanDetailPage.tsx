@@ -1,11 +1,12 @@
 import type { Guid } from '@microsoft/kiota-abstractions'
-import { Link, Navigate, useParams } from 'react-router-dom'
+import { Link, Navigate } from 'react-router-dom'
 import { DetailField } from '@/components/DetailField'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
   Card,
   CardContent,
+  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
@@ -20,7 +21,7 @@ import {
   formatRoastProfile,
 } from '@/features/beans/formatters'
 import { useBean } from '@/features/beans/hooks/useBean'
-import { tryParseGuid } from '@/lib/guid'
+import { useEntityFormId } from '@/lib/useEntityFormId'
 
 function BeanDetailContent({ beanId }: { beanId: Guid }) {
   const { data: bean } = useBean(beanId)
@@ -36,8 +37,9 @@ function BeanDetailContent({ beanId }: { beanId: Guid }) {
     <Card>
       <CardHeader>
         <CardTitle>{bean.name ?? 'Unnamed bean'}</CardTitle>
+        <CardDescription>Bean details</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4 text-sm">
+      <CardContent className="space-y-2 text-sm">
         <div className="grid gap-2 sm:grid-cols-2">
           <DetailField label="Roaster">
             {bean.roasterId ? (
@@ -120,12 +122,10 @@ function BeanDetailContent({ beanId }: { beanId: Guid }) {
 }
 
 export function BeanDetailPage() {
-  const { id } = useParams<{ id: string }>()
-  const beanId = tryParseGuid(id)
-
-  if (!beanId) {
+  const entityId = useEntityFormId()
+  if (entityId.mode !== 'edit') {
     return <Navigate to="/beans" replace />
   }
 
-  return <BeanDetailContent beanId={beanId} />
+  return <BeanDetailContent beanId={entityId.id} />
 }

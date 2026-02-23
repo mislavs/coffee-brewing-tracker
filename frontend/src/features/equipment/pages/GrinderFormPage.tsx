@@ -1,10 +1,10 @@
 import type { Guid } from '@microsoft/kiota-abstractions'
-import { Navigate, useNavigate, useParams } from 'react-router-dom'
+import { Navigate, useNavigate } from 'react-router-dom'
 import { GrinderFormCard } from '@/features/equipment/components/GrinderFormCard'
 import { useCreateGrinder } from '@/features/equipment/hooks/useCreateGrinder'
 import { useGrinder } from '@/features/equipment/hooks/useGrinder'
 import { useUpdateGrinder } from '@/features/equipment/hooks/useUpdateGrinder'
-import { tryParseGuid } from '@/lib/guid'
+import { useEntityFormId } from '@/lib/useEntityFormId'
 
 function CreateGrinderForm() {
   const navigate = useNavigate()
@@ -60,16 +60,13 @@ function EditGrinderForm({ grinderId }: { grinderId: Guid }) {
 }
 
 export function GrinderFormPage() {
-  const { id } = useParams<{ id: string }>()
-  const grinderId = tryParseGuid(id)
-
-  if (!id || !grinderId) {
-    if (id) {
-      return <Navigate to="/equipment?tab=grinders" replace />
-    }
-
+  const formId = useEntityFormId()
+  if (formId.mode === 'invalid') {
+    return <Navigate to="/equipment?tab=grinders" replace />
+  }
+  if (formId.mode === 'create') {
     return <CreateGrinderForm />
   }
 
-  return <EditGrinderForm grinderId={grinderId} />
+  return <EditGrinderForm grinderId={formId.id} />
 }

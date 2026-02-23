@@ -1,5 +1,5 @@
 import type { Guid } from '@microsoft/kiota-abstractions'
-import { Link, Navigate, useParams } from 'react-router-dom'
+import { Link, Navigate } from 'react-router-dom'
 import { DetailField } from '@/components/DetailField'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -19,7 +19,7 @@ import {
   getInitials,
   resolveRoasterLogoUrl,
 } from '@/features/roasters/roasterPresentation'
-import { tryParseGuid } from '@/lib/guid'
+import { useEntityFormId } from '@/lib/useEntityFormId'
 
 function RoasterDetailContent({ roasterId }: { roasterId: Guid }) {
   const { data: roaster } = useRoaster(roasterId)
@@ -42,7 +42,7 @@ function RoasterDetailContent({ roasterId }: { roasterId: Guid }) {
         <CardTitle>{name}</CardTitle>
         <CardDescription>Roaster details</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4 text-sm">
+      <CardContent className="space-y-2 text-sm">
         <DetailField label="City">{roaster.city || '—'}</DetailField>
         <DetailField label="Country">{roaster.country || '—'}</DetailField>
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
@@ -102,14 +102,12 @@ function RoasterDetailContent({ roasterId }: { roasterId: Guid }) {
 }
 
 export function RoasterDetailPage() {
-  const { id } = useParams<{ id: string }>()
-  const roasterId = tryParseGuid(id)
-
-  if (!roasterId) {
+  const entityId = useEntityFormId()
+  if (entityId.mode !== 'edit') {
     return <Navigate to="/roasters" replace />
   }
 
-  return <RoasterDetailContent roasterId={roasterId} />
+  return <RoasterDetailContent roasterId={entityId.id} />
 }
 
 function StatCard({ label, value }: { label: string; value: string }) {

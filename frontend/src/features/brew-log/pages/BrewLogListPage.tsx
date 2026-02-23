@@ -18,33 +18,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { formatRatio, getRatingDisplay } from '@/features/brew-log/formatters'
 import { useBrewLogs } from '@/features/brew-log/hooks/useBrewLogs'
 import { formatDate } from '@/lib/date'
-
-function getRatingEmoji(rating: number | null | undefined) {
-  switch (rating) {
-    case 1:
-      return '😞'
-    case 2:
-      return '🙁'
-    case 3:
-      return '😐'
-    case 4:
-      return '🙂'
-    case 5:
-      return '🤩'
-    default:
-      return '—'
-  }
-}
-
-function formatRatio(value: number | null | undefined) {
-  if (value === null || value === undefined || !Number.isFinite(value) || value <= 0) {
-    return '—'
-  }
-
-  return `1:${value.toFixed(1)}`
-}
 
 export function BrewLogListPage() {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -164,7 +140,7 @@ export function BrewLogListPage() {
             ) : brewLogs.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={5} className="text-muted-foreground">
-                  No brew logs found. Log your first brew to get started.
+                  No brew logs yet. Add your first brew to get started.
                 </TableCell>
               </TableRow>
             ) : (
@@ -183,7 +159,7 @@ export function BrewLogListPage() {
                     )}
                   </TableCell>
                   <TableCell>{brewLog.brewerName || '—'}</TableCell>
-                  <TableCell>{getRatingEmoji(brewLog.rating)}</TableCell>
+                  <TableCell>{getRatingDisplay(brewLog.rating)}</TableCell>
                   <TableCell>{formatRatio(brewLog.brewRatio)}</TableCell>
                 </TableRow>
               ))

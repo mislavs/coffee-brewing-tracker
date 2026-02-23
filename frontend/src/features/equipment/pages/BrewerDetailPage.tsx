@@ -1,5 +1,6 @@
 import type { Guid } from '@microsoft/kiota-abstractions'
-import { Link, Navigate, useParams } from 'react-router-dom'
+import { Link, Navigate } from 'react-router-dom'
+import { DetailField } from '@/components/DetailField'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -10,7 +11,7 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { useBrewer } from '@/features/equipment/hooks/useBrewer'
-import { tryParseGuid } from '@/lib/guid'
+import { useEntityFormId } from '@/lib/useEntityFormId'
 
 function BrewerDetailContent({ brewerId }: { brewerId: Guid }) {
   const { data: brewer } = useBrewer(brewerId)
@@ -28,8 +29,7 @@ function BrewerDetailContent({ brewerId }: { brewerId: Guid }) {
         <CardDescription>Brewer details</CardDescription>
       </CardHeader>
       <CardContent className="space-y-2 text-sm">
-        <div className="space-y-1 pt-2">
-          <p className="font-medium text-muted-foreground">Accessories</p>
+        <DetailField label="Accessories" stacked>
           {accessories.length > 0 ? (
             <ul className="list-inside list-disc">
               {accessories.map((accessory) => (
@@ -50,7 +50,7 @@ function BrewerDetailContent({ brewerId }: { brewerId: Guid }) {
           ) : (
             <p className="text-muted-foreground">No accessories yet.</p>
           )}
-        </div>
+        </DetailField>
       </CardContent>
       <CardFooter className="flex items-center gap-2">
         <Button asChild>
@@ -65,12 +65,10 @@ function BrewerDetailContent({ brewerId }: { brewerId: Guid }) {
 }
 
 export function BrewerDetailPage() {
-  const { id } = useParams<{ id: string }>()
-  const brewerId = tryParseGuid(id)
-
-  if (!brewerId) {
+  const entityId = useEntityFormId()
+  if (entityId.mode !== 'edit') {
     return <Navigate to="/equipment" replace />
   }
 
-  return <BrewerDetailContent brewerId={brewerId} />
+  return <BrewerDetailContent brewerId={entityId.id} />
 }

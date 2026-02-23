@@ -1,11 +1,11 @@
 import type { Guid } from '@microsoft/kiota-abstractions'
-import { Navigate, useNavigate, useParams } from 'react-router-dom'
+import { Navigate, useNavigate } from 'react-router-dom'
 import { AccessoryFormCard } from '@/features/equipment/components/AccessoryFormCard'
 import type { AccessoryFormValues } from '@/features/equipment/accessoryFormSchema'
 import { useAccessory } from '@/features/equipment/hooks/useAccessory'
 import { useCreateAccessory } from '@/features/equipment/hooks/useCreateAccessory'
 import { useUpdateAccessory } from '@/features/equipment/hooks/useUpdateAccessory'
-import { tryParseGuid } from '@/lib/guid'
+import { useEntityFormId } from '@/lib/useEntityFormId'
 
 function toAccessoryRequest(values: AccessoryFormValues) {
   const normalizedBrewerIds = Array.from(
@@ -78,16 +78,13 @@ function EditAccessoryForm({ accessoryId }: { accessoryId: Guid }) {
 }
 
 export function AccessoryFormPage() {
-  const { id } = useParams<{ id: string }>()
-  const accessoryId = tryParseGuid(id)
-
-  if (!id || !accessoryId) {
-    if (id) {
-      return <Navigate to="/equipment?tab=accessories" replace />
-    }
-
+  const formId = useEntityFormId()
+  if (formId.mode === 'invalid') {
+    return <Navigate to="/equipment?tab=accessories" replace />
+  }
+  if (formId.mode === 'create') {
     return <CreateAccessoryForm />
   }
 
-  return <EditAccessoryForm accessoryId={accessoryId} />
+  return <EditAccessoryForm accessoryId={formId.id} />
 }

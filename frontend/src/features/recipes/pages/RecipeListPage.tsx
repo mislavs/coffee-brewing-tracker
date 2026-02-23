@@ -118,7 +118,7 @@ export function RecipeListPage() {
             ) : recipes.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={3} className="text-muted-foreground">
-                  No recipes found. Create your first recipe to get started.
+                  No recipes yet. Add your first recipe to get started.
                 </TableCell>
               </TableRow>
             ) : (

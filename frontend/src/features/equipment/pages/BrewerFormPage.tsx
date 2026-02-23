@@ -1,10 +1,10 @@
 import type { Guid } from '@microsoft/kiota-abstractions'
-import { Navigate, useNavigate, useParams } from 'react-router-dom'
+import { Navigate, useNavigate } from 'react-router-dom'
 import { BrewerFormCard } from '@/features/equipment/components/BrewerFormCard'
 import { useBrewer } from '@/features/equipment/hooks/useBrewer'
 import { useCreateBrewer } from '@/features/equipment/hooks/useCreateBrewer'
 import { useUpdateBrewer } from '@/features/equipment/hooks/useUpdateBrewer'
-import { tryParseGuid } from '@/lib/guid'
+import { useEntityFormId } from '@/lib/useEntityFormId'
 
 function CreateBrewerForm() {
   const navigate = useNavigate()
@@ -60,16 +60,13 @@ function EditBrewerForm({ brewerId }: { brewerId: Guid }) {
 }
 
 export function BrewerFormPage() {
-  const { id } = useParams<{ id: string }>()
-  const brewerId = tryParseGuid(id)
-
-  if (!id || !brewerId) {
-    if (id) {
-      return <Navigate to="/equipment?tab=brewers" replace />
-    }
-
+  const formId = useEntityFormId()
+  if (formId.mode === 'invalid') {
+    return <Navigate to="/equipment?tab=brewers" replace />
+  }
+  if (formId.mode === 'create') {
     return <CreateBrewerForm />
   }
 
-  return <EditBrewerForm brewerId={brewerId} />
+  return <EditBrewerForm brewerId={formId.id} />
 }

@@ -9,27 +9,27 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 
-type DeleteRecipeDialogProps = {
+type DeleteConfirmationDialogProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
   onConfirm: () => Promise<void> | void
   isPending: boolean
+  entityName: string
 }
 
-export function DeleteRecipeDialog({
+export function DeleteConfirmationDialog({
   open,
   onOpenChange,
   onConfirm,
   isPending,
-}: DeleteRecipeDialogProps) {
+  entityName,
+}: DeleteConfirmationDialogProps) {
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete recipe?</AlertDialogTitle>
-          <AlertDialogDescription>
-            This action cannot be undone.
-          </AlertDialogDescription>
+          <AlertDialogTitle>{`Delete ${entityName}?`}</AlertDialogTitle>
+          <AlertDialogDescription>This action cannot be undone.</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel disabled={isPending}>Cancel</AlertDialogCancel>

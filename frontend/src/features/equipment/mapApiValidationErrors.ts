@@ -2,10 +2,7 @@ import type { UseFormSetError } from 'react-hook-form'
 import type { AccessoryFormValues } from '@/features/equipment/accessoryFormSchema'
 import type { BrewerFormValues } from '@/features/equipment/brewerFormSchema'
 import type { GrinderFormValues } from '@/features/equipment/grinderFormSchema'
-import {
-  extractValidationPayload,
-  normalizeApiFieldName,
-} from '@/lib/mapApiValidationErrors'
+import { applyFormServerErrors } from '@/lib/mapApiValidationErrors'
 
 const brewerFieldNames: Record<string, keyof BrewerFormValues> = {
   name: 'name',
@@ -24,95 +21,32 @@ export function applyBrewerFormServerErrors(
   error: unknown,
   setError: UseFormSetError<BrewerFormValues>,
 ) {
-  const payload = extractValidationPayload(error)
-  if (!payload) {
-    setError('root.serverError', {
-      message: 'Unable to save brewer. Please try again.',
-    })
-    return
-  }
-
-  const validationErrors = payload.errors
-  if (validationErrors) {
-    for (const [fieldName, messages] of Object.entries(validationErrors)) {
-      const normalizedFieldName = normalizeApiFieldName(fieldName)
-      const mappedField = brewerFieldNames[normalizedFieldName]
-      if (!mappedField) {
-        continue
-      }
-
-      setError(mappedField, { message: messages[0] ?? 'Invalid value.' })
-    }
-  }
-
-  const message = payload.title
-  if (message) {
-    setError('root.serverError', { message })
-  }
+  applyFormServerErrors(error, setError, {
+    entityName: 'brewer',
+    fieldMap: brewerFieldNames,
+  })
 }
 
 export function applyGrinderFormServerErrors(
   error: unknown,
   setError: UseFormSetError<GrinderFormValues>,
 ) {
-  const payload = extractValidationPayload(error)
-  if (!payload) {
-    setError('root.serverError', {
-      message: 'Unable to save grinder. Please try again.',
-    })
-    return
-  }
-
-  const validationErrors = payload.errors
-  if (validationErrors) {
-    for (const [fieldName, messages] of Object.entries(validationErrors)) {
-      const normalizedFieldName = normalizeApiFieldName(fieldName)
-      const mappedField = grinderFieldNames[normalizedFieldName]
-      if (!mappedField) {
-        continue
-      }
-
-      setError(mappedField, { message: messages[0] ?? 'Invalid value.' })
-    }
-  }
-
-  const message = payload.title
-  if (message) {
-    setError('root.serverError', { message })
-  }
+  applyFormServerErrors(error, setError, {
+    entityName: 'grinder',
+    fieldMap: grinderFieldNames,
+  })
 }
 
 export function applyAccessoryFormServerErrors(
   error: unknown,
   setError: UseFormSetError<AccessoryFormValues>,
 ) {
-  const payload = extractValidationPayload(error)
-  if (!payload) {
-    setError('root.serverError', {
-      message: 'Unable to save accessory. Please try again.',
-    })
-    return
-  }
-
-  const validationErrors = payload.errors
-  if (validationErrors) {
-    for (const [fieldName, messages] of Object.entries(validationErrors)) {
-      const normalizedFieldName = normalizeApiFieldName(fieldName)
-      const mappedField =
-        accessoryFieldNames[normalizedFieldName] ??
-        (normalizedFieldName.startsWith('brewerIds')
-          ? accessoryFieldNames.brewerIds
-          : undefined)
-      if (!mappedField) {
-        continue
-      }
-
-      setError(mappedField, { message: messages[0] ?? 'Invalid value.' })
-    }
-  }
-
-  const message = payload.title
-  if (message) {
-    setError('root.serverError', { message })
-  }
+  applyFormServerErrors(error, setError, {
+    entityName: 'accessory',
+    resolveField: (normalizedFieldName) =>
+      accessoryFieldNames[normalizedFieldName] ??
+      (normalizedFieldName.startsWith('brewerIds')
+        ? accessoryFieldNames.brewerIds
+        : undefined),
+  })
 }

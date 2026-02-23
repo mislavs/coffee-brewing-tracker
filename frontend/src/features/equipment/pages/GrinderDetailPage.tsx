@@ -1,5 +1,5 @@
 import type { Guid } from '@microsoft/kiota-abstractions'
-import { Link, Navigate, useParams } from 'react-router-dom'
+import { Link, Navigate } from 'react-router-dom'
 import { DetailField } from '@/components/DetailField'
 import { Button } from '@/components/ui/button'
 import {
@@ -11,7 +11,7 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { useGrinder } from '@/features/equipment/hooks/useGrinder'
-import { tryParseGuid } from '@/lib/guid'
+import { useEntityFormId } from '@/lib/useEntityFormId'
 
 function GrinderDetailContent({ grinderId }: { grinderId: Guid }) {
   const { data: grinder } = useGrinder(grinderId)
@@ -58,12 +58,10 @@ function GrinderDetailContent({ grinderId }: { grinderId: Guid }) {
 }
 
 export function GrinderDetailPage() {
-  const { id } = useParams<{ id: string }>()
-  const grinderId = tryParseGuid(id)
-
-  if (!grinderId) {
+  const entityId = useEntityFormId()
+  if (entityId.mode !== 'edit') {
     return <Navigate to="/equipment" replace />
   }
 
-  return <GrinderDetailContent grinderId={grinderId} />
+  return <GrinderDetailContent grinderId={entityId.id} />
 }

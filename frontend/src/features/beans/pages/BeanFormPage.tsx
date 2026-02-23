@@ -1,5 +1,5 @@
 import type { Guid } from '@microsoft/kiota-abstractions'
-import { Navigate, useNavigate, useParams } from 'react-router-dom'
+import { Navigate, useNavigate } from 'react-router-dom'
 import { BeanFormCard } from '@/features/beans/components/BeanFormCard'
 import {
   normalizeDistinctNameList,
@@ -10,7 +10,7 @@ import { toDateInputValue } from '@/features/beans/beanShared'
 import { useBean } from '@/features/beans/hooks/useBean'
 import { useCreateBean } from '@/features/beans/hooks/useCreateBean'
 import { useUpdateBean } from '@/features/beans/hooks/useUpdateBean'
-import { tryParseGuid } from '@/lib/guid'
+import { useEntityFormId } from '@/lib/useEntityFormId'
 
 function toBeanRequest(values: BeanFormValues) {
   const normalizedOriginCountries = normalizeDistinctNameList(values.originCountries)
@@ -109,16 +109,13 @@ function EditBeanForm({ beanId }: { beanId: Guid }) {
 }
 
 export function BeanFormPage() {
-  const { id } = useParams<{ id: string }>()
-  const beanId = tryParseGuid(id)
-
-  if (!id || !beanId) {
-    if (id) {
-      return <Navigate to="/beans" replace />
-    }
-
+  const formId = useEntityFormId()
+  if (formId.mode === 'invalid') {
+    return <Navigate to="/beans" replace />
+  }
+  if (formId.mode === 'create') {
     return <CreateBeanForm />
   }
 
-  return <EditBeanForm beanId={beanId} />
+  return <EditBeanForm beanId={formId.id} />
 }

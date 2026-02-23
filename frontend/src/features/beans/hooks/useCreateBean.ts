@@ -1,5 +1,3 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
 import type { CreateBeanRequest } from '@/lib/api/generated/models/index.js'
 import { apiClient } from '@/lib/api-client'
 import {
@@ -7,18 +5,12 @@ import {
   countryQueryKeys,
   flavorNoteQueryKeys,
 } from '@/features/beans/queryKeys'
+import { useEntityMutation } from '@/lib/useEntityMutation'
 
 export function useCreateBean() {
-  const queryClient = useQueryClient()
-
-  return useMutation({
-    mutationFn: async (request: CreateBeanRequest) =>
-      apiClient.api.beans.post(request),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: beanQueryKeys.all })
-      queryClient.invalidateQueries({ queryKey: countryQueryKeys.all })
-      queryClient.invalidateQueries({ queryKey: flavorNoteQueryKeys.all })
-      toast.success('Bean created.')
-    },
+  return useEntityMutation<CreateBeanRequest>({
+    mutationFn: (request) => apiClient.api.beans.post(request),
+    invalidateKeys: [beanQueryKeys.all, countryQueryKeys.all, flavorNoteQueryKeys.all],
+    successMessage: 'Bean created.',
   })
 }

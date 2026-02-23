@@ -71,7 +71,7 @@ export function BeanListPage() {
           <p className="text-muted-foreground">Loading beans...</p>
         ) : beans.length === 0 ? (
           <p className="text-muted-foreground">
-            No beans found. Create your first bean to get started.
+            No beans yet. Add your first bean to get started.
           </p>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">

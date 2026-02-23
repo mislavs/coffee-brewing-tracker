@@ -1,14 +1,14 @@
 import type { Guid } from '@microsoft/kiota-abstractions'
-import { Navigate, useNavigate, useParams } from 'react-router-dom'
+import { Navigate, useNavigate } from 'react-router-dom'
 import { RoasterFormCard } from '@/features/roasters/components/RoasterFormCard'
 import { useCreateRoaster } from '@/features/roasters/hooks/useCreateRoaster'
 import { useDeleteRoasterLogo } from '@/features/roasters/hooks/useDeleteRoasterLogo'
 import { useRoaster } from '@/features/roasters/hooks/useRoaster'
 import { useUploadRoasterLogo } from '@/features/roasters/hooks/useUploadRoasterLogo'
 import { useUpdateRoaster } from '@/features/roasters/hooks/useUpdateRoaster'
-import { tryParseGuid } from '@/lib/guid'
 import { normalizeOptional } from '@/features/roasters/roasterFormSchema'
 import { resolveRoasterLogoUrl } from '@/features/roasters/roasterPresentation'
+import { useEntityFormId } from '@/lib/useEntityFormId'
 
 function CreateRoasterForm() {
   const navigate = useNavigate()
@@ -94,16 +94,13 @@ function EditRoasterForm({ roasterId }: { roasterId: Guid }) {
 }
 
 export function RoasterFormPage() {
-  const { id } = useParams<{ id: string }>()
-  const roasterId = tryParseGuid(id)
-
-  if (!id || !roasterId) {
-    if (id) {
-      return <Navigate to="/roasters" replace />
-    }
-
+  const formId = useEntityFormId()
+  if (formId.mode === 'invalid') {
+    return <Navigate to="/roasters" replace />
+  }
+  if (formId.mode === 'create') {
     return <CreateRoasterForm />
   }
 
-  return <EditRoasterForm roasterId={roasterId} />
+  return <EditRoasterForm roasterId={formId.id} />
 }

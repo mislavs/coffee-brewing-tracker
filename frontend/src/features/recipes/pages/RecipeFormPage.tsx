@@ -1,11 +1,11 @@
 import type { Guid } from '@microsoft/kiota-abstractions'
-import { Navigate, useNavigate, useParams } from 'react-router-dom'
+import { Navigate, useNavigate } from 'react-router-dom'
 import { RecipeFormCard } from '@/features/recipes/components/RecipeFormCard'
 import { useCreateRecipe } from '@/features/recipes/hooks/useCreateRecipe'
 import { useRecipe } from '@/features/recipes/hooks/useRecipe'
 import { useUpdateRecipe } from '@/features/recipes/hooks/useUpdateRecipe'
 import { normalizeOptional } from '@/features/recipes/recipeFormSchema'
-import { tryParseGuid } from '@/lib/guid'
+import { useEntityFormId } from '@/lib/useEntityFormId'
 
 function CreateRecipeForm() {
   const navigate = useNavigate()
@@ -69,16 +69,13 @@ function EditRecipeForm({ recipeId }: { recipeId: Guid }) {
 }
 
 export function RecipeFormPage() {
-  const { id } = useParams<{ id: string }>()
-  const recipeId = tryParseGuid(id)
-
-  if (!id || !recipeId) {
-    if (id) {
-      return <Navigate to="/recipes" replace />
-    }
-
+  const formId = useEntityFormId()
+  if (formId.mode === 'invalid') {
+    return <Navigate to="/recipes" replace />
+  }
+  if (formId.mode === 'create') {
     return <CreateRecipeForm />
   }
 
-  return <EditRecipeForm recipeId={recipeId} />
+  return <EditRecipeForm recipeId={formId.id} />
 }

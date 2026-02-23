@@ -1,5 +1,5 @@
 import type { Guid } from '@microsoft/kiota-abstractions'
-import { Navigate, useNavigate, useParams } from 'react-router-dom'
+import { Navigate, useNavigate } from 'react-router-dom'
 import {
   normalizeBrewLogFormValues,
   type BrewLogFormValues,
@@ -8,7 +8,7 @@ import { BrewLogFormCard } from '@/features/brew-log/components/BrewLogFormCardC
 import { useBrewLog } from '@/features/brew-log/hooks/useBrewLog'
 import { useCreateBrewLog } from '@/features/brew-log/hooks/useCreateBrewLog'
 import { useUpdateBrewLog } from '@/features/brew-log/hooks/useUpdateBrewLog'
-import { tryParseGuid } from '@/lib/guid'
+import { useEntityFormId } from '@/lib/useEntityFormId'
 
 function toDateTimeLocalValue(value: Date | null | undefined) {
   const parsed = value instanceof Date ? value : value ? new Date(value) : null
@@ -118,16 +118,13 @@ function EditBrewLogForm({ brewLogId }: { brewLogId: Guid }) {
 }
 
 export function BrewLogFormPage() {
-  const { id } = useParams<{ id: string }>()
-  const brewLogId = tryParseGuid(id)
-
-  if (!id || !brewLogId) {
-    if (id) {
-      return <Navigate to="/brew-log" replace />
-    }
-
+  const formId = useEntityFormId()
+  if (formId.mode === 'invalid') {
+    return <Navigate to="/brew-log" replace />
+  }
+  if (formId.mode === 'create') {
     return <CreateBrewLogForm />
   }
 
-  return <EditBrewLogForm brewLogId={brewLogId} />
+  return <EditBrewLogForm brewLogId={formId.id} />
 }

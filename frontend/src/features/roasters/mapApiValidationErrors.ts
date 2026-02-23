@@ -1,40 +1,29 @@
 import type { UseFormSetError } from 'react-hook-form'
 import type { RoasterFormValues } from '@/features/roasters/roasterFormSchema'
-import {
-  extractValidationPayload,
-  normalizeApiFieldName,
-} from '@/lib/mapApiValidationErrors'
+import { applyFormServerErrors } from '@/lib/mapApiValidationErrors'
+
+const roasterFieldNames: Record<string, keyof RoasterFormValues> = {
+  name: 'name',
+  city: 'city',
+  country: 'country',
+}
 
 export function applyRoasterFormServerErrors(
   error: unknown,
   setError: UseFormSetError<RoasterFormValues>,
 ) {
-  const payload = extractValidationPayload(error)
+  const { payload, firstUnhandledValidationMessage } = applyFormServerErrors(
+    error,
+    setError,
+    {
+      entityName: 'roaster',
+      fieldMap: roasterFieldNames,
+      applyTitleToRoot: false,
+    },
+  )
+
   if (!payload) {
-    setError('root.serverError', {
-      message: 'Unable to save roaster. Please try again.',
-    })
     return
-  }
-
-  const validationErrors = payload.errors
-  let firstUnhandledValidationMessage: string | undefined
-  if (validationErrors) {
-    for (const [fieldName, messages] of Object.entries(validationErrors)) {
-      const normalizedFieldName = normalizeApiFieldName(fieldName)
-
-      if (
-        normalizedFieldName === 'name' ||
-        normalizedFieldName === 'city' ||
-        normalizedFieldName === 'country'
-      ) {
-        setError(normalizedFieldName, {
-          message: messages[0] ?? 'Invalid value.',
-        })
-      } else if (!firstUnhandledValidationMessage) {
-        firstUnhandledValidationMessage = messages[0]
-      }
-    }
   }
 
   const message = firstUnhandledValidationMessage ?? payload.title
