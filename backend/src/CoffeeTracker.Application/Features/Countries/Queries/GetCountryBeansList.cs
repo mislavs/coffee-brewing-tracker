@@ -28,7 +28,7 @@ public sealed class GetCountryBeansListHandler(ApplicationDbContext dbContext)
             .AsNoTracking()
             .Where(entity => entity.OriginCountries.Any(country => country.Id == request.CountryId))
             .OrderBy(entity => entity.Name)
-            .Select(BeanSummaryProjection.ToDto)
+            .Select(BeanSummaryProjection.ToDto(dbContext))
             .ToListAsync(cancellationToken);
     }
 }

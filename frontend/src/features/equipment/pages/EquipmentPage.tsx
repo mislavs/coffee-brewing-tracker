@@ -185,15 +185,10 @@ function AccessoryList() {
               </TableRow>
             ) : (
               accessories.map((accessory) => {
-                const compatibleBrewers = (
-                  accessory as {
-                    compatibleBrewers?: { name?: string | null }[] | null
-                  }
-                ).compatibleBrewers
-                const compatibleBrewerNames =
-                  compatibleBrewers
-                    ?.map((brewer) => brewer.name?.trim() ?? '')
-                    .filter((name) => name.length > 0) ?? []
+                const brewerNames =
+                  accessory.compatibleBrewers
+                    ?.map((b) => b.name?.trim() ?? '')
+                    .filter((n) => n.length > 0) ?? []
 
                 return (
                   <TableRow key={accessory.id ?? accessory.name ?? 'accessory'}>
@@ -210,8 +205,8 @@ function AccessoryList() {
                       )}
                     </TableCell>
                     <TableCell>
-                      {compatibleBrewerNames.length > 0
-                        ? compatibleBrewerNames.join(', ')
+                      {brewerNames.length > 0
+                        ? brewerNames.join(', ')
                         : '—'}
                     </TableCell>
                   </TableRow>

@@ -26,6 +26,11 @@ public sealed class GetBeanByIdHandler(ApplicationDbContext dbContext)
             throw new NotFoundException($"Bean '{request.Id}' was not found.");
         }
 
+        var totalDose = await dbContext.BrewLogEntries
+            .AsNoTracking()
+            .Where(entry => entry.BeanId == request.Id)
+            .SumAsync(entry => (decimal?)entry.Dose, cancellationToken) ?? 0m;
+
         return new BeanDto(
             bean.Id,
             bean.Name,
@@ -44,6 +49,7 @@ public sealed class GetBeanByIdHandler(ApplicationDbContext dbContext)
             bean.FlavorNotes
                 .OrderBy(entity => entity.Name)
                 .Select(entity => new FlavorNoteDto(entity.Id, entity.Name))
-                .ToList());
+                .ToList(),
+            bean.BagWeight - totalDose);
     }
 }

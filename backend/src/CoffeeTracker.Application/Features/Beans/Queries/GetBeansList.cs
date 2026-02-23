@@ -26,7 +26,7 @@ public sealed class GetBeansListHandler(ApplicationDbContext dbContext)
 
         return await query
             .OrderBy(entity => entity.Name)
-            .Select(BeanSummaryProjection.ToDto)
+            .Select(BeanSummaryProjection.ToDto(dbContext))
             .ToListAsync(cancellationToken);
     }
 }

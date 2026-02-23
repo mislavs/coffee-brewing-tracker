@@ -19,7 +19,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/AccessorySummaryDto"
+                    "$ref": "#/components/schemas/AccessoryDto"
                   }
                 }
               }
@@ -1079,6 +1079,10 @@
               "$ref": "#/components/schemas/FlavorNoteDto"
             },
             "nullable": true
+          },
+          "remainingQuantity": {
+            "type": "number",
+            "format": "double"
           }
         },
         "additionalProperties": false
@@ -1109,6 +1113,10 @@
             "type": "number",
             "format": "double",
             "nullable": true
+          },
+          "remainingQuantity": {
+            "type": "number",
+            "format": "double"
           }
         },
         "additionalProperties": false

@@ -10,6 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
+import { Progress } from '@/components/ui/progress'
 import {
   formatDecimal,
   formatOriginType,
@@ -22,6 +23,13 @@ import { tryParseGuid } from '@/lib/guid'
 
 function BeanDetailContent({ beanId }: { beanId: Guid }) {
   const { data: bean } = useBean(beanId)
+  const bagWeight = bean.bagWeight ?? 0
+  const remainingQuantity = bean.remainingQuantity ?? bagWeight
+  const clampedRemainingQuantity = Math.max(remainingQuantity, 0)
+  const isLowStock = bagWeight > 0 && clampedRemainingQuantity / bagWeight < 0.2
+  const remainingPercentage = bagWeight > 0
+    ? Math.min(100, (clampedRemainingQuantity / bagWeight) * 100)
+    : 0
 
   return (
     <Card>
@@ -78,6 +86,14 @@ function BeanDetailContent({ beanId }: { beanId: Guid }) {
         <div>
           <span className="font-medium">Processing Method:</span>{' '}
           {bean.processingMethod || '—'}
+        </div>
+
+        <div className="space-y-2">
+          <p className="font-medium">Remaining Quantity</p>
+          <p className={isLowStock ? 'font-medium text-destructive' : 'text-muted-foreground'}>
+            {formatDecimal(clampedRemainingQuantity)} g / {formatDecimal(bean.bagWeight)} g
+          </p>
+          <Progress value={remainingPercentage} />
         </div>
 
         <div className="space-y-2">

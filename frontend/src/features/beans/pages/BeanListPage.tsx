@@ -17,7 +17,11 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { formatPricePerKg, formatRoastProfile } from '@/features/beans/formatters'
+import {
+  formatDecimal,
+  formatPricePerKg,
+  formatRoastProfile,
+} from '@/features/beans/formatters'
 import { useBeans } from '@/features/beans/hooks/useBeans'
 
 export function BeanListPage() {
@@ -82,19 +86,20 @@ export function BeanListPage() {
               <TableHead>Roaster</TableHead>
               <TableHead>Roast Profile</TableHead>
               <TableHead>Bag Weight (g)</TableHead>
+              <TableHead>Remaining (g)</TableHead>
               <TableHead>Price / kg</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {isPending && beans.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="text-muted-foreground">
+                <TableCell colSpan={6} className="text-muted-foreground">
                   Loading beans...
                 </TableCell>
               </TableRow>
             ) : beans.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="text-muted-foreground">
+                <TableCell colSpan={6} className="text-muted-foreground">
                   No beans found. Create your first bean to get started.
                 </TableCell>
               </TableRow>
@@ -118,6 +123,16 @@ export function BeanListPage() {
                   <TableCell>{bean.roasterName || '—'}</TableCell>
                   <TableCell>{formatRoastProfile(bean.roastProfile)}</TableCell>
                   <TableCell>{bean.bagWeight ?? '—'}</TableCell>
+                  <TableCell
+                    className={
+                      bean.bagWeight && bean.remainingQuantity !== null && bean.remainingQuantity !== undefined
+                      && bean.remainingQuantity / bean.bagWeight < 0.2
+                        ? 'text-destructive'
+                        : undefined
+                    }
+                  >
+                    {formatDecimal(bean.remainingQuantity)}
+                  </TableCell>
                   <TableCell>{formatPricePerKg(bean.pricePerKg)}</TableCell>
                 </TableRow>
               ))

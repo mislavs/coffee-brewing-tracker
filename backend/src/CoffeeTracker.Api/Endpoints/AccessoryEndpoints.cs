@@ -29,7 +29,7 @@ public static class AccessoryEndpoints
         return app;
     }
 
-    private static async Task<Ok<IReadOnlyList<AccessorySummaryDto>>> GetAccessories(
+    private static async Task<Ok<IReadOnlyList<AccessoryDto>>> GetAccessories(
         ISender sender,
         CancellationToken cancellationToken)
     {

@@ -48,6 +48,7 @@ public class GetBeanByIdHandlerTests(IntegrationTestFactory factory) : Integrati
         result.RoasterName.Should().Be("Kawa");
         result.OriginCountries.Should().ContainSingle("Kenya");
         result.PricePerKg.Should().Be(160m);
+        result.RemainingQuantity.Should().Be(250m);
         result.FlavorNotes.Select(entity => entity.Name)
             .Should()
             .Contain(["Citrus", "Chocolate"]);

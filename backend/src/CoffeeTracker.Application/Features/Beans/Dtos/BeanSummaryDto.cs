@@ -8,4 +8,5 @@ public sealed record BeanSummaryDto(
     string RoasterName,
     RoastProfile RoastProfile,
     decimal BagWeight,
-    decimal? PricePerKg);
+    decimal? PricePerKg,
+    decimal RemainingQuantity);

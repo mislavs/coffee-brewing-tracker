@@ -39,7 +39,7 @@ export function formatPricePerKg(value: number | null | undefined) {
     return '—'
   }
 
-  return `${formatDecimal(value, 2)} / kg`
+  return `€${formatDecimal(value, 2)} / kg`
 }
 
 export function formatRoastDate(value: unknown) {

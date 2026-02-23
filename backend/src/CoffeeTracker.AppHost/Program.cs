@@ -1,7 +1,9 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
-var postgres = builder.AddPostgres("postgres")
-    .WithPgAdmin(resource => resource.WithUrlForEndpoint("http", u => u.DisplayText = "PG Admin"));
+var postgres = builder.AddPostgres("postgres-db")
+    .WithDataVolume()
+    .WithPgAdmin(resource => resource.WithUrlForEndpoint("http", u => u.DisplayText = "PG Admin"))
+    .WithLifetime(ContainerLifetime.Persistent);
 
 var appDb = postgres.AddDatabase("coffee-brewing-db");
 
