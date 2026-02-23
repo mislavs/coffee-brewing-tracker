@@ -8,6 +8,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Toaster } from '@/components/ui/sonner'
 import { BeanListPage } from '@/features/beans/pages/BeanListPage'
 import { BeanFormPage } from '@/features/beans/pages/BeanFormPage'
+import { BrewLogListPage } from '@/features/brew-log/pages/BrewLogListPage'
 import { RecipeListPage } from '@/features/recipes/pages/RecipeListPage'
 import { RoasterListPage } from '@/features/roasters/pages/RoasterListPage'
 import { defaultFeatureRoute, featureRoutes } from '@/lib/navigation'
@@ -16,6 +17,8 @@ import {
   loadAccessoryDetailPage,
   loadAccessoryFormPage,
   loadBeanDetailPage,
+  loadBrewLogDetailPage,
+  loadBrewLogFormPage,
   loadBrewerDetailPage,
   loadBrewerFormPage,
   loadEquipmentPage,
@@ -40,6 +43,16 @@ const RoasterFormPage = lazy(() =>
 const BeanDetailPage = lazy(() =>
   loadBeanDetailPage().then((m) => ({
     default: m.BeanDetailPage,
+  })),
+)
+const BrewLogDetailPage = lazy(() =>
+  loadBrewLogDetailPage().then((m) => ({
+    default: m.BrewLogDetailPage,
+  })),
+)
+const BrewLogFormPage = lazy(() =>
+  loadBrewLogFormPage().then((m) => ({
+    default: m.BrewLogFormPage,
   })),
 )
 const EquipmentPage = lazy(() =>
@@ -92,7 +105,8 @@ const placeholderFeatureRoutes = featureRoutes.filter(
     route.path !== 'roasters' &&
     route.path !== 'beans' &&
     route.path !== 'equipment' &&
-    route.path !== 'recipes',
+    route.path !== 'recipes' &&
+    route.path !== 'brew-log',
 )
 
 function RouteFallback() {
@@ -120,6 +134,31 @@ function App() {
           <Route
             index
             element={<Navigate to={defaultFeatureRoute} replace />}
+          />
+          <Route path="brew-log" element={<BrewLogListPage />} />
+          <Route
+            path="brew-log/new"
+            element={
+              <Suspense fallback={<RouteFallback />}>
+                <BrewLogFormPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="brew-log/:id"
+            element={
+              <Suspense fallback={<RouteFallback />}>
+                <BrewLogDetailPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="brew-log/:id/edit"
+            element={
+              <Suspense fallback={<RouteFallback />}>
+                <BrewLogFormPage />
+              </Suspense>
+            }
           />
           <Route path="roasters" element={<RoasterListPage />} />
           <Route

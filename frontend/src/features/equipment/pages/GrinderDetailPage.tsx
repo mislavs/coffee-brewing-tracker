@@ -25,6 +25,33 @@ function GrinderDetailContent({ grinderId }: { grinderId: Guid }) {
         <div>
           <span className="font-medium">Name:</span> {grinder.name ?? '—'}
         </div>
+        {(grinder.totalBrews ?? 0) > 0 && (
+          <div className="space-y-2 pt-2">
+            <p className="font-medium">Brew Statistics</p>
+            <div>
+              <span className="font-medium">Total Brews:</span>{' '}
+              {grinder.totalBrews ?? 0}
+            </div>
+            <div>
+              <span className="font-medium">Total Coffee Ground:</span>{' '}
+              {grinder.totalCoffeeGround ?? 0}g
+            </div>
+            <div>
+              <span className="font-medium">Most Common Grind Setting:</span>{' '}
+              {grinder.mostCommonGrindSetting || '—'}
+            </div>
+            <div>
+              <span className="font-medium">Grind Setting Range:</span>{' '}
+              {grinder.grindSettingMin && grinder.grindSettingMax
+                ? `${grinder.grindSettingMin} - ${grinder.grindSettingMax}`
+                : '—'}
+            </div>
+            <div>
+              <span className="font-medium">Best Rated Grind Setting:</span>{' '}
+              {grinder.bestRatedGrindSetting || '—'}
+            </div>
+          </div>
+        )}
       </CardContent>
       <CardFooter className="flex items-center gap-2">
         <Button asChild>

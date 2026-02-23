@@ -2,6 +2,7 @@ import { useCallback, useRef } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { beanQueryKeys } from '@/features/beans/queryKeys'
+import { brewLogQueryKeys } from '@/features/brew-log/queryKeys'
 import {
   accessoryQueryKeys,
   brewerQueryKeys,
@@ -14,6 +15,7 @@ import { featureRoutes } from '@/lib/navigation'
 import { queryClient } from '@/lib/queryClient'
 import {
   preloadBeanFeatureRoutes,
+  preloadBrewLogFeatureRoutes,
   preloadEquipmentFeatureRoutes,
   preloadRecipeFeatureRoutes,
   preloadRoasterFeatureRoutes,
@@ -23,6 +25,7 @@ import { cn } from '@/lib/utils'
 export function AppLayout() {
   const hasPrefetchedRoasters = useRef(false)
   const hasPrefetchedBeans = useRef(false)
+  const hasPrefetchedBrewLog = useRef(false)
   const hasPrefetchedRecipes = useRef(false)
   const hasPrefetchedEquipment = useRef(false)
 
@@ -52,6 +55,21 @@ export function AppLayout() {
       void queryClient.prefetchQuery({
         queryKey: beanQueryKeys.list(''),
         queryFn: async () => (await apiClient.api.beans.get()) ?? [],
+        staleTime: 2 * 60_000,
+      })
+      return
+    }
+
+    if (featurePath === 'brew-log') {
+      if (hasPrefetchedBrewLog.current) {
+        return
+      }
+
+      hasPrefetchedBrewLog.current = true
+      preloadBrewLogFeatureRoutes()
+      void queryClient.prefetchQuery({
+        queryKey: brewLogQueryKeys.all(),
+        queryFn: async () => (await apiClient.api.brewLogs.get()) ?? [],
         staleTime: 2 * 60_000,
       })
       return
