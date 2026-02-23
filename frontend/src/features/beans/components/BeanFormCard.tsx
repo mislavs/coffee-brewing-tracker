@@ -1,6 +1,6 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Controller, useForm } from 'react-hook-form'
+import { Controller, useForm, useWatch } from 'react-hook-form'
 import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import {
@@ -46,6 +46,7 @@ import {
   normalizeOptional,
   type RoasterFormValues,
 } from '@/features/roasters/roasterFormSchema'
+import { toDisplayDate, toIsoDate } from '@/lib/date'
 
 const createRoasterValue = '__create_roaster__'
 
@@ -118,6 +119,16 @@ export function BeanFormCard({
     useCreateRoaster()
 
   const [isCreateRoasterOpen, setIsCreateRoasterOpen] = useState(false)
+  const watchedRoastDate = useWatch({ control: form.control, name: 'roastDate' })
+  const [roastDateDraft, setRoastDateDraft] = useState(
+    toDisplayDate(typeof watchedRoastDate === 'string' ? watchedRoastDate : undefined),
+  )
+
+  useEffect(() => {
+    setRoastDateDraft(
+      toDisplayDate(typeof watchedRoastDate === 'string' ? watchedRoastDate : undefined),
+    )
+  }, [watchedRoastDate])
 
   const roasterOptions = useMemo(
     () =>
@@ -176,6 +187,35 @@ export function BeanFormCard({
       shouldValidate: true,
     })
     setIsCreateRoasterOpen(false)
+  }
+
+  const commitRoastDate = (draftValue: string) => {
+    const normalized = draftValue.trim()
+    if (!normalized) {
+      form.clearErrors('roastDate')
+      form.setValue('roastDate', undefined, {
+        shouldDirty: true,
+        shouldValidate: true,
+      })
+      setRoastDateDraft('')
+      return
+    }
+
+    const isoDate = toIsoDate(normalized)
+    if (!isoDate) {
+      form.setError('roastDate', {
+        type: 'manual',
+        message: 'Use format dd.mm.yyyy.',
+      })
+      return
+    }
+
+    form.clearErrors('roastDate')
+    form.setValue('roastDate', isoDate, {
+      shouldDirty: true,
+      shouldValidate: true,
+    })
+    setRoastDateDraft(toDisplayDate(isoDate))
   }
 
   return (
@@ -361,7 +401,20 @@ export function BeanFormCard({
                 <label htmlFor="roastDate" className="text-sm font-medium">
                   Roast Date
                 </label>
-                <Input id="roastDate" type="date" {...form.register('roastDate')} />
+                <Input
+                  id="roastDate"
+                  type="text"
+                  inputMode="numeric"
+                  placeholder="dd.mm.yyyy"
+                  value={roastDateDraft}
+                  onChange={(event) => setRoastDateDraft(event.target.value)}
+                  onBlur={() => commitRoastDate(roastDateDraft)}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter') {
+                      commitRoastDate(roastDateDraft)
+                    }
+                  }}
+                />
                 <FieldErrorText message={form.formState.errors.roastDate?.message} />
               </div>
 

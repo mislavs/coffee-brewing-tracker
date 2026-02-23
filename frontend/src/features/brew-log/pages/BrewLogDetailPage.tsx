@@ -13,20 +13,8 @@ import {
 import { DeleteBrewLogDialog } from '@/features/brew-log/components/DeleteBrewLogDialog'
 import { useBrewLog } from '@/features/brew-log/hooks/useBrewLog'
 import { useDeleteBrewLog } from '@/features/brew-log/hooks/useDeleteBrewLog'
+import { formatDateTime } from '@/lib/date'
 import { tryParseGuid } from '@/lib/guid'
-
-function formatBrewDate(value: Date | null | undefined) {
-  if (!value) {
-    return '—'
-  }
-
-  const parsed = value instanceof Date ? value : new Date(value)
-  if (Number.isNaN(parsed.getTime())) {
-    return '—'
-  }
-
-  return parsed.toLocaleString()
-}
 
 function formatRatio(value: number | null | undefined) {
   if (value === null || value === undefined || !Number.isFinite(value) || value <= 0) {
@@ -185,7 +173,7 @@ function BrewLogDetailContent({ brewLogId }: { brewLogId: Guid }) {
           </div>
           <div>
             <span className="font-medium">Brew date:</span>{' '}
-            {formatBrewDate(brewLog.brewedAt)}
+            {formatDateTime(brewLog.brewedAt)}
           </div>
         </CardContent>
         <CardFooter className="flex items-center gap-2">

@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { Controller, useWatch, type UseFormReturn } from 'react-hook-form'
 import { Input } from '@/components/ui/input'
 import {
@@ -22,6 +23,7 @@ import {
   textareaFieldClassName,
   type IdNameOption,
 } from '@/features/brew-log/components/brewLogFormShared'
+import { toDisplayDateTime, toIsoDateTime } from '@/lib/date'
 
 const noRecipeValue = '__no_recipe__'
 
@@ -354,13 +356,64 @@ export function ResultsSection({ form }: FormSectionProps) {
 }
 
 export function BrewedAtSection({ form }: FormSectionProps) {
+  const watchedBrewedAt = useWatch({ control: form.control, name: 'brewedAt' })
+  const [brewedAtDraft, setBrewedAtDraft] = useState(
+    toDisplayDateTime(typeof watchedBrewedAt === 'string' ? watchedBrewedAt : undefined),
+  )
+
+  useEffect(() => {
+    setBrewedAtDraft(
+      toDisplayDateTime(typeof watchedBrewedAt === 'string' ? watchedBrewedAt : undefined),
+    )
+  }, [watchedBrewedAt])
+
+  const commitBrewedAt = (draftValue: string) => {
+    const normalized = draftValue.trim()
+    if (!normalized) {
+      form.setError('brewedAt', {
+        type: 'manual',
+        message: 'Brew date is required.',
+      })
+      return
+    }
+
+    const isoDateTime = toIsoDateTime(normalized)
+    if (!isoDateTime) {
+      form.setError('brewedAt', {
+        type: 'manual',
+        message: 'Use format dd.mm.yyyy hh:mm.',
+      })
+      return
+    }
+
+    form.clearErrors('brewedAt')
+    form.setValue('brewedAt', isoDateTime, {
+      shouldDirty: true,
+      shouldValidate: true,
+    })
+    setBrewedAtDraft(toDisplayDateTime(isoDateTime))
+  }
+
   return (
     <section className="space-y-4">
       <div className="space-y-2">
         <label htmlFor="brewedAt" className="text-sm font-medium">
           Brewed at
         </label>
-        <Input id="brewedAt" type="datetime-local" {...form.register('brewedAt')} />
+        <Input
+          id="brewedAt"
+          type="text"
+          inputMode="text"
+          placeholder="dd.mm.yyyy hh:mm"
+          value={brewedAtDraft}
+          onChange={(event) => setBrewedAtDraft(event.target.value)}
+          onBlur={() => commitBrewedAt(brewedAtDraft)}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter') {
+              commitBrewedAt(brewedAtDraft)
+            }
+          }}
+        />
         <FieldErrorText message={form.formState.errors.brewedAt?.message} />
       </div>
     </section>

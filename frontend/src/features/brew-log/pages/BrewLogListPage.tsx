@@ -18,6 +18,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { useBrewLogs } from '@/features/brew-log/hooks/useBrewLogs'
+import { formatDate, toDisplayDate, toIsoDate } from '@/lib/date'
 
 function getRatingEmoji(rating: number | null | undefined) {
   switch (rating) {
@@ -44,29 +45,26 @@ function formatRatio(value: number | null | undefined) {
   return `1:${value.toFixed(1)}`
 }
 
-function formatBrewDate(value: Date | null | undefined) {
-  if (!value) {
-    return '—'
-  }
-
-  const parsed = value instanceof Date ? value : new Date(value)
-  if (Number.isNaN(parsed.getTime())) {
-    return '—'
-  }
-
-  return parsed.toLocaleDateString()
-}
-
 export function BrewLogListPage() {
   const [searchParams, setSearchParams] = useSearchParams()
   const search = searchParams.get('search') ?? ''
   const dateFrom = searchParams.get('dateFrom') ?? ''
   const dateTo = searchParams.get('dateTo') ?? ''
   const [searchDraft, setSearchDraft] = useState(search)
+  const [dateFromDraft, setDateFromDraft] = useState(toDisplayDate(dateFrom))
+  const [dateToDraft, setDateToDraft] = useState(toDisplayDate(dateTo))
 
   useEffect(() => {
     setSearchDraft(search)
   }, [search])
+
+  useEffect(() => {
+    setDateFromDraft(toDisplayDate(dateFrom))
+  }, [dateFrom])
+
+  useEffect(() => {
+    setDateToDraft(toDisplayDate(dateTo))
+  }, [dateTo])
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -88,6 +86,29 @@ export function BrewLogListPage() {
 
     return () => clearTimeout(timeoutId)
   }, [searchDraft, setSearchParams])
+
+  const commitDateFilter = (name: 'dateFrom' | 'dateTo', draftValue: string) => {
+    const normalized = draftValue.trim()
+    const nextIsoDate = toIsoDate(normalized)
+
+    setSearchParams(
+      (previous) => {
+        if (normalized && !nextIsoDate) {
+          return previous
+        }
+
+        const next = new URLSearchParams(previous)
+        if (nextIsoDate) {
+          next.set(name, nextIsoDate)
+        } else {
+          next.delete(name)
+        }
+
+        return next
+      },
+      { replace: true },
+    )
+  }
 
   const { data: brewLogs = [], isPending } = useBrewLogs(search, dateFrom, dateTo)
 
@@ -122,23 +143,16 @@ export function BrewLogListPage() {
             </label>
             <Input
               id="brew-log-date-from"
-              type="date"
-              value={dateFrom}
-              onChange={(event) => {
-                const nextValue = event.target.value
-                setSearchParams(
-                  (previous) => {
-                    const next = new URLSearchParams(previous)
-                    if (nextValue) {
-                      next.set('dateFrom', nextValue)
-                    } else {
-                      next.delete('dateFrom')
-                    }
-
-                    return next
-                  },
-                  { replace: true },
-                )
+              type="text"
+              inputMode="numeric"
+              placeholder="dd.mm.yyyy"
+              value={dateFromDraft}
+              onChange={(event) => setDateFromDraft(event.target.value)}
+              onBlur={() => commitDateFilter('dateFrom', dateFromDraft)}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter') {
+                  commitDateFilter('dateFrom', dateFromDraft)
+                }
               }}
             />
           </div>
@@ -149,23 +163,16 @@ export function BrewLogListPage() {
             </label>
             <Input
               id="brew-log-date-to"
-              type="date"
-              value={dateTo}
-              onChange={(event) => {
-                const nextValue = event.target.value
-                setSearchParams(
-                  (previous) => {
-                    const next = new URLSearchParams(previous)
-                    if (nextValue) {
-                      next.set('dateTo', nextValue)
-                    } else {
-                      next.delete('dateTo')
-                    }
-
-                    return next
-                  },
-                  { replace: true },
-                )
+              type="text"
+              inputMode="numeric"
+              placeholder="dd.mm.yyyy"
+              value={dateToDraft}
+              onChange={(event) => setDateToDraft(event.target.value)}
+              onBlur={() => commitDateFilter('dateTo', dateToDraft)}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter') {
+                  commitDateFilter('dateTo', dateToDraft)
+                }
               }}
             />
           </div>
@@ -199,7 +206,7 @@ export function BrewLogListPage() {
                 <TableRow
                   key={brewLog.id ?? `${brewLog.beanName ?? 'brew'}-${brewLog.brewedAt ?? ''}`}
                 >
-                  <TableCell>{formatBrewDate(brewLog.brewedAt)}</TableCell>
+                  <TableCell>{formatDate(brewLog.brewedAt)}</TableCell>
                   <TableCell className="font-medium">
                     {brewLog.id ? (
                       <Link to={`/brew-log/${brewLog.id}`} className="hover:underline">

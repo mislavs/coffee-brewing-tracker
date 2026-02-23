@@ -1,8 +1,8 @@
 import {
   originTypeLabels,
   roastProfileLabels,
-  toDateInputValue,
 } from '@/features/beans/beanShared'
+import { formatDate } from '@/lib/date'
 
 export function formatOriginType(value: number | null | undefined) {
   if (value === null || value === undefined) {
@@ -43,16 +43,5 @@ export function formatPricePerKg(value: number | null | undefined) {
 }
 
 export function formatRoastDate(value: unknown) {
-  const dateInputValue = toDateInputValue(value as string | null | undefined)
-  if (!dateInputValue) {
-    return '—'
-  }
-
-  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateInputValue)
-  if (!match) {
-    return dateInputValue
-  }
-
-  const [, year, month, day] = match
-  return `${day}.${month}.${year}`
+  return formatDate(value)
 }
