@@ -356,6 +356,167 @@
         }
       }
     },
+    "/api/brew-logs": {
+      "get": {
+        "tags": [
+          "BrewLogs"
+        ],
+        "operationId": "GetBrewLogs",
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "dateFrom",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "dateTo",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BrewLogSummaryDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "BrewLogs"
+        ],
+        "operationId": "CreateBrewLog",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateBrewLogRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateBrewLogResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/brew-logs/{id}": {
+      "get": {
+        "tags": [
+          "BrewLogs"
+        ],
+        "operationId": "GetBrewLogById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BrewLogDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "BrewLogs"
+        ],
+        "operationId": "UpdateBrewLog",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateBrewLogRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "BrewLogs"
+        ],
+        "operationId": "DeleteBrewLog",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
     "/api/countries": {
       "get": {
         "tags": [
@@ -952,6 +1113,146 @@
         },
         "additionalProperties": false
       },
+      "BrewLogAccessoryDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "BrewLogDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "beanId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "beanName": {
+            "type": "string",
+            "nullable": true
+          },
+          "brewerId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "brewerName": {
+            "type": "string",
+            "nullable": true
+          },
+          "grinderId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "grinderName": {
+            "type": "string",
+            "nullable": true
+          },
+          "recipeId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "recipeName": {
+            "type": "string",
+            "nullable": true
+          },
+          "accessories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BrewLogAccessoryDto"
+            },
+            "nullable": true
+          },
+          "dose": {
+            "type": "number",
+            "format": "double"
+          },
+          "waterAmount": {
+            "type": "number",
+            "format": "double"
+          },
+          "waterTemperature": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "grindSize": {
+            "type": "string",
+            "nullable": true
+          },
+          "brewTimeSeconds": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "rating": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "notes": {
+            "type": "string",
+            "nullable": true
+          },
+          "adjustmentIdeas": {
+            "type": "string",
+            "nullable": true
+          },
+          "brewedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "brewRatio": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "BrewLogSummaryDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "brewedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "beanName": {
+            "type": "string",
+            "nullable": true
+          },
+          "brewerName": {
+            "type": "string",
+            "nullable": true
+          },
+          "rating": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "brewRatio": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "BrewerDto": {
         "type": "object",
         "properties": {
@@ -1100,6 +1401,86 @@
         },
         "additionalProperties": false
       },
+      "CreateBrewLogRequest": {
+        "type": "object",
+        "properties": {
+          "beanId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "brewerId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "grinderId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "recipeId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "accessoryIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "nullable": true
+          },
+          "dose": {
+            "type": "number",
+            "format": "double"
+          },
+          "waterAmount": {
+            "type": "number",
+            "format": "double"
+          },
+          "waterTemperature": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "grindSize": {
+            "type": "string",
+            "nullable": true
+          },
+          "brewTimeSeconds": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "rating": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "notes": {
+            "type": "string",
+            "nullable": true
+          },
+          "adjustmentIdeas": {
+            "type": "string",
+            "nullable": true
+          },
+          "brewedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CreateBrewLogResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "additionalProperties": false
+      },
       "CreateBrewerRequest": {
         "type": "object",
         "properties": {
@@ -1218,6 +1599,30 @@
             "format": "uuid"
           },
           "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "totalBrews": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalCoffeeGround": {
+            "type": "number",
+            "format": "double"
+          },
+          "mostCommonGrindSetting": {
+            "type": "string",
+            "nullable": true
+          },
+          "grindSettingMin": {
+            "type": "string",
+            "nullable": true
+          },
+          "grindSettingMax": {
+            "type": "string",
+            "nullable": true
+          },
+          "bestRatedGrindSetting": {
             "type": "string",
             "nullable": true
           }
@@ -1448,6 +1853,76 @@
         },
         "additionalProperties": false
       },
+      "UpdateBrewLogRequest": {
+        "type": "object",
+        "properties": {
+          "beanId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "brewerId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "grinderId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "recipeId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "accessoryIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "nullable": true
+          },
+          "dose": {
+            "type": "number",
+            "format": "double"
+          },
+          "waterAmount": {
+            "type": "number",
+            "format": "double"
+          },
+          "waterTemperature": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "grindSize": {
+            "type": "string",
+            "nullable": true
+          },
+          "brewTimeSeconds": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "rating": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "notes": {
+            "type": "string",
+            "nullable": true
+          },
+          "adjustmentIdeas": {
+            "type": "string",
+            "nullable": true
+          },
+          "brewedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false
+      },
       "UpdateBrewerRequest": {
         "type": "object",
         "properties": {
@@ -1515,6 +1990,9 @@
     },
     {
       "name": "Brewers"
+    },
+    {
+      "name": "BrewLogs"
     },
     {
       "name": "Countries"

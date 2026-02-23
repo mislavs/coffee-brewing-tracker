@@ -4,7 +4,7 @@ import {
   normalizeBrewLogFormValues,
   type BrewLogFormValues,
 } from '@/features/brew-log/brewLogFormSchema'
-import { BrewLogFormCard } from '@/features/brew-log/components/BrewLogFormCard'
+import { BrewLogFormCard } from '@/features/brew-log/components/BrewLogFormCardContainer'
 import { useBrewLog } from '@/features/brew-log/hooks/useBrewLog'
 import { useCreateBrewLog } from '@/features/brew-log/hooks/useCreateBrewLog'
 import { useUpdateBrewLog } from '@/features/brew-log/hooks/useUpdateBrewLog'
