@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button'
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
@@ -37,7 +36,6 @@ function BeanDetailContent({ beanId }: { beanId: Guid }) {
     <Card>
       <CardHeader>
         <CardTitle>{bean.name ?? 'Unnamed bean'}</CardTitle>
-        <CardDescription>Bean details</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4 text-sm">
         <div className="grid gap-2 sm:grid-cols-2">

@@ -9,19 +9,7 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
-import {
-  formatDecimal,
-  formatPricePerKg,
-  formatRoastProfile,
-} from '@/features/beans/formatters'
+import { BeanCard } from '@/features/beans/components/BeanCard'
 import { useBeans } from '@/features/beans/hooks/useBeans'
 
 export function BeanListPage() {
@@ -79,66 +67,25 @@ export function BeanListPage() {
           />
         </div>
 
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Roaster</TableHead>
-              <TableHead>Roast Profile</TableHead>
-              <TableHead>Bag Weight (g)</TableHead>
-              <TableHead>Remaining (g)</TableHead>
-              <TableHead>Price / kg</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {isPending && beans.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={6} className="text-muted-foreground">
-                  Loading beans...
-                </TableCell>
-              </TableRow>
-            ) : beans.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={6} className="text-muted-foreground">
-                  No beans found. Create your first bean to get started.
-                </TableCell>
-              </TableRow>
-            ) : (
-              beans.map((bean) => (
-                <TableRow
-                  key={
-                    bean.id ??
-                    `${bean.name ?? 'bean'}-${bean.roasterName ?? ''}-${bean.bagWeight ?? ''}`
-                  }
-                >
-                  <TableCell className="font-medium">
-                    {bean.id ? (
-                      <Link to={`/beans/${bean.id}`} className="hover:underline">
-                        {bean.name ?? 'Unnamed bean'}
-                      </Link>
-                    ) : (
-                      (bean.name ?? 'Unnamed bean')
-                    )}
-                  </TableCell>
-                  <TableCell>{bean.roasterName || '—'}</TableCell>
-                  <TableCell>{formatRoastProfile(bean.roastProfile)}</TableCell>
-                  <TableCell>{bean.bagWeight ?? '—'}</TableCell>
-                  <TableCell
-                    className={
-                      bean.bagWeight && bean.remainingQuantity !== null && bean.remainingQuantity !== undefined
-                      && bean.remainingQuantity / bean.bagWeight < 0.2
-                        ? 'text-destructive'
-                        : undefined
-                    }
-                  >
-                    {formatDecimal(bean.remainingQuantity)}
-                  </TableCell>
-                  <TableCell>{formatPricePerKg(bean.pricePerKg)}</TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
+        {isPending && beans.length === 0 ? (
+          <p className="text-muted-foreground">Loading beans...</p>
+        ) : beans.length === 0 ? (
+          <p className="text-muted-foreground">
+            No beans found. Create your first bean to get started.
+          </p>
+        ) : (
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            {beans.map((bean) => (
+              <BeanCard
+                key={
+                  bean.id ??
+                  `${bean.name ?? 'bean'}-${bean.roasterName ?? ''}-${bean.bagWeight ?? ''}`
+                }
+                bean={bean}
+              />
+            ))}
+          </div>
+        )}
       </CardContent>
     </Card>
   )
