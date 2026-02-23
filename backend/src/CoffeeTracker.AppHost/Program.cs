@@ -1,8 +1,10 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
-var postgres = builder.AddPostgres("postgres-db")
+var pgPassword = builder.AddParameter("postgres-db-password", secret: true);
+
+var postgres = builder.AddPostgres("postgres-db", password: pgPassword)
     .WithDataVolume()
-    .WithPgAdmin(resource => resource.WithUrlForEndpoint("http", u => u.DisplayText = "PG Admin"))
+    .WithPgWeb(resource => resource.WithUrlForEndpoint("http", u => u.DisplayText = "PG Web"))
     .WithLifetime(ContainerLifetime.Persistent);
 
 var appDb = postgres.AddDatabase("coffee-brewing-db");
