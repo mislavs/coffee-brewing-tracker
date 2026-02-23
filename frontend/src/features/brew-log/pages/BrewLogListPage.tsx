@@ -10,17 +10,8 @@ import {
 } from '@/components/ui/card'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Input } from '@/components/ui/input'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
-import { formatRatio, getRatingDisplay } from '@/features/brew-log/formatters'
+import { BrewLogCard } from '@/features/brew-log/components/BrewLogCard'
 import { useBrewLogs } from '@/features/brew-log/hooks/useBrewLogs'
-import { formatDate } from '@/lib/date'
 
 export function BrewLogListPage() {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -120,52 +111,22 @@ export function BrewLogListPage() {
           </div>
         </div>
 
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Date</TableHead>
-              <TableHead>Bean</TableHead>
-              <TableHead>Brewer</TableHead>
-              <TableHead>Rating</TableHead>
-              <TableHead>Ratio</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {isPending && brewLogs.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={5} className="text-muted-foreground">
-                  Loading brew logs...
-                </TableCell>
-              </TableRow>
-            ) : brewLogs.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={5} className="text-muted-foreground">
-                  No brew logs yet. Add your first brew to get started.
-                </TableCell>
-              </TableRow>
-            ) : (
-              brewLogs.map((brewLog) => (
-                <TableRow
-                  key={brewLog.id ?? `${brewLog.beanName ?? 'brew'}-${brewLog.brewedAt ?? ''}`}
-                >
-                  <TableCell>{formatDate(brewLog.brewedAt)}</TableCell>
-                  <TableCell className="font-medium">
-                    {brewLog.id ? (
-                      <Link to={`/brew-log/${brewLog.id}`} className="hover:underline">
-                        {brewLog.beanName ?? 'Unnamed bean'}
-                      </Link>
-                    ) : (
-                      (brewLog.beanName ?? 'Unnamed bean')
-                    )}
-                  </TableCell>
-                  <TableCell>{brewLog.brewerName || '—'}</TableCell>
-                  <TableCell>{getRatingDisplay(brewLog.rating)}</TableCell>
-                  <TableCell>{formatRatio(brewLog.brewRatio)}</TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
+        {isPending && brewLogs.length === 0 ? (
+          <p className="text-muted-foreground">Loading brew logs...</p>
+        ) : brewLogs.length === 0 ? (
+          <p className="text-muted-foreground">
+            No brew logs yet. Add your first brew to get started.
+          </p>
+        ) : (
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            {brewLogs.map((brewLog) => (
+              <BrewLogCard
+                key={brewLog.id ?? `${brewLog.beanName ?? 'brew'}-${brewLog.brewedAt ?? ''}`}
+                brewLog={brewLog}
+              />
+            ))}
+          </div>
+        )}
       </CardContent>
     </Card>
   )
