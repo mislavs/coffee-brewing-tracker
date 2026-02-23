@@ -15,6 +15,7 @@ import { Progress } from '@/components/ui/progress'
 import {
   formatDecimal,
   formatOriginType,
+  formatPrice,
   formatPricePerKg,
   formatRoastDate,
   formatRoastProfile,
@@ -55,7 +56,7 @@ function BeanDetailContent({ beanId }: { beanId: Guid }) {
             {bean.bagWeight ?? '—'}
             {bean.bagWeight ? ' g' : ''}
           </DetailField>
-          <DetailField label="Price">{formatDecimal(bean.price)}</DetailField>
+          <DetailField label="Price">{formatPrice(bean.price)}</DetailField>
           <DetailField label="Price / kg">{formatPricePerKg(bean.pricePerKg)}</DetailField>
           <DetailField label="Roast Date">{formatRoastDate(bean.roastDate)}</DetailField>
           <DetailField label="Altitude">

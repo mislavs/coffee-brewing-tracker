@@ -34,12 +34,20 @@ export function formatDecimal(
   }).format(value)
 }
 
+export function formatPrice(value: number | null | undefined) {
+  if (value === null || value === undefined) {
+    return '—'
+  }
+
+  return `${formatDecimal(value, 2)} €`
+}
+
 export function formatPricePerKg(value: number | null | undefined) {
   if (value === null || value === undefined) {
     return '—'
   }
 
-  return `€${formatDecimal(value, 2)} / kg`
+  return `${formatDecimal(value, 2)} € / kg`
 }
 
 export function formatRoastDate(value: unknown) {

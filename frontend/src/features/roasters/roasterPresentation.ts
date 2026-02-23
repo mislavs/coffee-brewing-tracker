@@ -21,7 +21,7 @@ export function formatPricePerKg(value: number | null | undefined) {
     return 'No price data'
   }
 
-  return `${value.toFixed(2)} / kg`
+  return `${value.toFixed(2)} € / kg`
 }
 
 export function getInitials(name: string | null | undefined) {
