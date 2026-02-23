@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { Guid } from '@microsoft/kiota-abstractions'
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
+import { DetailField } from '@/components/DetailField'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -35,8 +36,7 @@ function RecipeDetailContent({ recipeId }: { recipeId: Guid }) {
           <CardDescription>Recipe details</CardDescription>
         </CardHeader>
         <CardContent className="space-y-2 text-sm">
-          <div>
-            <span className="font-medium">Brewer:</span>{' '}
+          <DetailField label="Brewer">
             {recipe.brewerId ? (
               <Link
                 to={`/equipment/brewers/${recipe.brewerId}`}
@@ -47,9 +47,9 @@ function RecipeDetailContent({ recipeId }: { recipeId: Guid }) {
             ) : (
               (recipe.brewerName ?? '—')
             )}
-          </div>
+          </DetailField>
           <div className="space-y-1 pt-2">
-            <p className="font-medium">Description</p>
+            <p className="font-medium text-muted-foreground">Description</p>
             <p className="whitespace-pre-wrap text-muted-foreground">
               {recipe.description || '—'}
             </p>

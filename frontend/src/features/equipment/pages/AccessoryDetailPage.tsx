@@ -30,7 +30,7 @@ function AccessoryDetailContent({ accessoryId }: { accessoryId: Guid }) {
       </CardHeader>
       <CardContent className="space-y-3 text-sm">
         <div className="space-y-2">
-          <p className="font-medium">Compatible brewers</p>
+          <p className="font-medium text-muted-foreground">Compatible brewers</p>
           {compatibleBrewers.length > 0 ? (
             <div className="flex flex-wrap gap-2">
               {compatibleBrewers.map((brewer) => (

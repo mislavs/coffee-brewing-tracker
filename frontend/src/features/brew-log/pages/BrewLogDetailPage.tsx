@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import type { Guid } from '@microsoft/kiota-abstractions'
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
+import { DetailField } from '@/components/DetailField'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -80,8 +81,7 @@ function BrewLogDetailContent({ brewLogId }: { brewLogId: Guid }) {
           <CardDescription>Brew details</CardDescription>
         </CardHeader>
         <CardContent className="space-y-2 text-sm">
-          <div>
-            <span className="font-medium">Bean:</span>{' '}
+          <DetailField label="Bean">
             {brewLog.beanId ? (
               <Link to={`/beans/${brewLog.beanId}`} className="hover:underline">
                 {brewLog.beanName ?? 'View bean'}
@@ -89,9 +89,8 @@ function BrewLogDetailContent({ brewLogId }: { brewLogId: Guid }) {
             ) : (
               (brewLog.beanName ?? '—')
             )}
-          </div>
-          <div>
-            <span className="font-medium">Brewer:</span>{' '}
+          </DetailField>
+          <DetailField label="Brewer">
             {brewLog.brewerId ? (
               <Link
                 to={`/equipment/brewers/${brewLog.brewerId}`}
@@ -102,9 +101,8 @@ function BrewLogDetailContent({ brewLogId }: { brewLogId: Guid }) {
             ) : (
               (brewLog.brewerName ?? '—')
             )}
-          </div>
-          <div>
-            <span className="font-medium">Grinder:</span>{' '}
+          </DetailField>
+          <DetailField label="Grinder">
             {brewLog.grinderId ? (
               <Link
                 to={`/equipment/grinders/${brewLog.grinderId}`}
@@ -115,9 +113,8 @@ function BrewLogDetailContent({ brewLogId }: { brewLogId: Guid }) {
             ) : (
               (brewLog.grinderName ?? '—')
             )}
-          </div>
-          <div>
-            <span className="font-medium">Recipe:</span>{' '}
+          </DetailField>
+          <DetailField label="Recipe">
             {brewLog.recipeId ? (
               <Link to={`/recipes/${brewLog.recipeId}`} className="hover:underline">
                 {brewLog.recipeName ?? 'View recipe'}
@@ -125,56 +122,38 @@ function BrewLogDetailContent({ brewLogId }: { brewLogId: Guid }) {
             ) : (
               (brewLog.recipeName ?? '—')
             )}
-          </div>
-          <div>
-            <span className="font-medium">Accessories:</span> {accessoriesText}
-          </div>
-          <div>
-            <span className="font-medium">Dose:</span>{' '}
+          </DetailField>
+          <DetailField label="Accessories">{accessoriesText}</DetailField>
+          <DetailField label="Dose">
             {brewLog.dose !== null && brewLog.dose !== undefined ? `${brewLog.dose} g` : '—'}
-          </div>
-          <div>
-            <span className="font-medium">Water amount:</span>{' '}
+          </DetailField>
+          <DetailField label="Water amount">
             {brewLog.waterAmount !== null && brewLog.waterAmount !== undefined
               ? `${brewLog.waterAmount} ml`
               : '—'}
-          </div>
-          <div>
-            <span className="font-medium">Brew ratio:</span>{' '}
-            {formatRatio(brewLog.brewRatio)}
-          </div>
-          <div>
-            <span className="font-medium">Water temperature:</span>{' '}
+          </DetailField>
+          <DetailField label="Brew ratio">{formatRatio(brewLog.brewRatio)}</DetailField>
+          <DetailField label="Water temperature">
             {brewLog.waterTemperature !== null && brewLog.waterTemperature !== undefined
               ? `${brewLog.waterTemperature} C`
               : '—'}
-          </div>
-          <div>
-            <span className="font-medium">Grind size:</span> {brewLog.grindSize || '—'}
-          </div>
-          <div>
-            <span className="font-medium">Brew time:</span>{' '}
-            {formatBrewTime(brewLog.brewTimeSeconds)}
-          </div>
-          <div>
-            <span className="font-medium">Rating:</span> {getRatingDisplay(brewLog.rating)}
-          </div>
+          </DetailField>
+          <DetailField label="Grind size">{brewLog.grindSize || '—'}</DetailField>
+          <DetailField label="Brew time">{formatBrewTime(brewLog.brewTimeSeconds)}</DetailField>
+          <DetailField label="Rating">{getRatingDisplay(brewLog.rating)}</DetailField>
           <div className="space-y-1 pt-2">
-            <p className="font-medium">Notes</p>
+            <p className="font-medium text-muted-foreground">Notes</p>
             <p className="whitespace-pre-wrap text-muted-foreground">
               {brewLog.notes || '—'}
             </p>
           </div>
           <div className="space-y-1">
-            <p className="font-medium">Adjustment ideas</p>
+            <p className="font-medium text-muted-foreground">Adjustment ideas</p>
             <p className="whitespace-pre-wrap text-muted-foreground">
               {brewLog.adjustmentIdeas || '—'}
             </p>
           </div>
-          <div>
-            <span className="font-medium">Brew date:</span>{' '}
-            {formatDateTime(brewLog.brewedAt)}
-          </div>
+          <DetailField label="Brew date">{formatDateTime(brewLog.brewedAt)}</DetailField>
         </CardContent>
         <CardFooter className="flex items-center gap-2">
           <Button asChild>

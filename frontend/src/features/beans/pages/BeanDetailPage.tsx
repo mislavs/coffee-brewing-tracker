@@ -1,5 +1,6 @@
 import type { Guid } from '@microsoft/kiota-abstractions'
 import { Link, Navigate, useParams } from 'react-router-dom'
+import { DetailField } from '@/components/DetailField'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -39,8 +40,7 @@ function BeanDetailContent({ beanId }: { beanId: Guid }) {
       </CardHeader>
       <CardContent className="space-y-4 text-sm">
         <div className="grid gap-2 sm:grid-cols-2">
-          <div>
-            <span className="font-medium">Roaster:</span>{' '}
+          <DetailField label="Roaster">
             {bean.roasterId ? (
               <Link to={`/roasters/${bean.roasterId}`} className="hover:underline">
                 {bean.roasterName ?? 'Unnamed roaster'}
@@ -48,56 +48,35 @@ function BeanDetailContent({ beanId }: { beanId: Guid }) {
             ) : (
               (bean.roasterName ?? '—')
             )}
-          </div>
-          <div>
-            <span className="font-medium">Origin Type:</span>{' '}
-            {formatOriginType(bean.originType)}
-          </div>
-          <div>
-            <span className="font-medium">Roast Profile:</span>{' '}
-            {formatRoastProfile(bean.roastProfile)}
-          </div>
-          <div>
-            <span className="font-medium">Bag Weight:</span>{' '}
+          </DetailField>
+          <DetailField label="Origin Type">{formatOriginType(bean.originType)}</DetailField>
+          <DetailField label="Roast Profile">{formatRoastProfile(bean.roastProfile)}</DetailField>
+          <DetailField label="Bag Weight">
             {bean.bagWeight ?? '—'}
             {bean.bagWeight ? ' g' : ''}
-          </div>
-          <div>
-            <span className="font-medium">Price:</span> {formatDecimal(bean.price)}
-          </div>
-          <div>
-            <span className="font-medium">Price / kg:</span>{' '}
-            {formatPricePerKg(bean.pricePerKg)}
-          </div>
-          <div>
-            <span className="font-medium">Roast Date:</span>{' '}
-            {formatRoastDate(bean.roastDate)}
-          </div>
-          <div>
-            <span className="font-medium">Altitude:</span>{' '}
+          </DetailField>
+          <DetailField label="Price">{formatDecimal(bean.price)}</DetailField>
+          <DetailField label="Price / kg">{formatPricePerKg(bean.pricePerKg)}</DetailField>
+          <DetailField label="Roast Date">{formatRoastDate(bean.roastDate)}</DetailField>
+          <DetailField label="Altitude">
             {bean.altitude ?? '—'}
             {bean.altitude ? ' m' : ''}
-          </div>
+          </DetailField>
         </div>
 
-        <div>
-          <span className="font-medium">Variety:</span> {bean.variety || '—'}
-        </div>
-        <div>
-          <span className="font-medium">Processing Method:</span>{' '}
-          {bean.processingMethod || '—'}
-        </div>
+        <DetailField label="Variety">{bean.variety || '—'}</DetailField>
+        <DetailField label="Processing Method">{bean.processingMethod || '—'}</DetailField>
 
         <div className="space-y-2">
-          <p className="font-medium">Remaining Quantity</p>
-          <p className={isLowStock ? 'font-medium text-destructive' : 'text-muted-foreground'}>
+          <p className="font-medium text-muted-foreground">Remaining Quantity</p>
+          <p className={isLowStock ? 'font-medium text-destructive' : 'font-medium'}>
             {formatDecimal(clampedRemainingQuantity)} g / {formatDecimal(bean.bagWeight)} g
           </p>
           <Progress value={remainingPercentage} />
         </div>
 
         <div className="space-y-2">
-          <p className="font-medium">Origin Countries</p>
+          <p className="font-medium text-muted-foreground">Origin Countries</p>
           {bean.originCountries && bean.originCountries.length > 0 ? (
             <div className="flex flex-wrap gap-2">
               {bean.originCountries.map((country) => (
@@ -112,7 +91,7 @@ function BeanDetailContent({ beanId }: { beanId: Guid }) {
         </div>
 
         <div className="space-y-2">
-          <p className="font-medium">Flavor Notes</p>
+          <p className="font-medium text-muted-foreground">Flavor Notes</p>
           {bean.flavorNotes && bean.flavorNotes.length > 0 ? (
             <div className="flex flex-wrap gap-2">
               {bean.flavorNotes

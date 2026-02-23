@@ -1,5 +1,6 @@
 import type { Guid } from '@microsoft/kiota-abstractions'
 import { Link, Navigate, useParams } from 'react-router-dom'
+import { DetailField } from '@/components/DetailField'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import {
@@ -42,12 +43,8 @@ function RoasterDetailContent({ roasterId }: { roasterId: Guid }) {
         <CardDescription>Roaster details</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4 text-sm">
-        <div>
-          <span className="font-medium">City:</span> {roaster.city || '—'}
-        </div>
-        <div>
-          <span className="font-medium">Country:</span> {roaster.country || '—'}
-        </div>
+        <DetailField label="City">{roaster.city || '—'}</DetailField>
+        <DetailField label="Country">{roaster.country || '—'}</DetailField>
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
           <StatCard label="Beans" value={`${beanCount}`} />
           <StatCard
@@ -70,7 +67,7 @@ function RoasterDetailContent({ roasterId }: { roasterId: Guid }) {
         </div>
         <div className="space-y-1 pt-2">
           <div className="flex items-center gap-2">
-            <p className="font-medium">Beans</p>
+            <p className="font-medium text-muted-foreground">Beans</p>
             <Badge variant="secondary">{beanCount}</Badge>
           </div>
           {roaster.beans && roaster.beans.length > 0 ? (

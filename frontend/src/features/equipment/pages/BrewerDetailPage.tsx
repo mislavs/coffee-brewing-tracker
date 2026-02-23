@@ -29,7 +29,7 @@ function BrewerDetailContent({ brewerId }: { brewerId: Guid }) {
       </CardHeader>
       <CardContent className="space-y-2 text-sm">
         <div className="space-y-1 pt-2">
-          <p className="font-medium">Accessories</p>
+          <p className="font-medium text-muted-foreground">Accessories</p>
           {accessories.length > 0 ? (
             <ul className="list-inside list-disc">
               {accessories.map((accessory) => (

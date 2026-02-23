@@ -1,5 +1,6 @@
 import type { Guid } from '@microsoft/kiota-abstractions'
 import { Link, Navigate, useParams } from 'react-router-dom'
+import { DetailField } from '@/components/DetailField'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -22,34 +23,25 @@ function GrinderDetailContent({ grinderId }: { grinderId: Guid }) {
         <CardDescription>Grinder details</CardDescription>
       </CardHeader>
       <CardContent className="space-y-2 text-sm">
-        <div>
-          <span className="font-medium">Name:</span> {grinder.name ?? '—'}
-        </div>
+        <DetailField label="Name">{grinder.name ?? '—'}</DetailField>
         {(grinder.totalBrews ?? 0) > 0 && (
           <div className="space-y-2 pt-2">
-            <p className="font-medium">Brew Statistics</p>
-            <div>
-              <span className="font-medium">Total Brews:</span>{' '}
-              {grinder.totalBrews ?? 0}
-            </div>
-            <div>
-              <span className="font-medium">Total Coffee Ground:</span>{' '}
+            <p className="font-medium text-muted-foreground">Brew Statistics</p>
+            <DetailField label="Total Brews">{grinder.totalBrews ?? 0}</DetailField>
+            <DetailField label="Total Coffee Ground">
               {grinder.totalCoffeeGround ?? 0}g
-            </div>
-            <div>
-              <span className="font-medium">Most Common Grind Setting:</span>{' '}
+            </DetailField>
+            <DetailField label="Most Common Grind Setting">
               {grinder.mostCommonGrindSetting || '—'}
-            </div>
-            <div>
-              <span className="font-medium">Grind Setting Range:</span>{' '}
+            </DetailField>
+            <DetailField label="Grind Setting Range">
               {grinder.grindSettingMin && grinder.grindSettingMax
                 ? `${grinder.grindSettingMin} - ${grinder.grindSettingMax}`
                 : '—'}
-            </div>
-            <div>
-              <span className="font-medium">Best Rated Grind Setting:</span>{' '}
+            </DetailField>
+            <DetailField label="Best Rated Grind Setting">
               {grinder.bestRatedGrindSetting || '—'}
-            </div>
+            </DetailField>
           </div>
         )}
       </CardContent>
