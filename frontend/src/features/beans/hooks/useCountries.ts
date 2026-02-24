@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import type { CountryDto } from '@/lib/api/generated/models/index.js'
+import type { CountryDto } from '@/lib/api/schemas'
 import { apiClient } from '@/lib/api-client'
 import { countryQueryKeys } from '@/features/beans/queryKeys'
 

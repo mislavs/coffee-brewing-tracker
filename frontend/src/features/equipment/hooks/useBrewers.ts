@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import type { BrewerSummaryDto } from '@/lib/api/generated/models/index.js'
+import type { BrewerSummaryDto } from '@/lib/api/schemas'
 import { apiClient } from '@/lib/api-client'
 import { brewerQueryKeys } from '@/features/equipment/queryKeys'
 

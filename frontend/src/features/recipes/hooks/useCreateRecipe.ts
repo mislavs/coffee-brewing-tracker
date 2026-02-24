@@ -1,5 +1,5 @@
 import { recipeQueryKeys } from '@/features/recipes/queryKeys'
-import type { CreateRecipeRequest } from '@/lib/api/generated/models/index.js'
+import type { CreateRecipeRequest } from '@/lib/api/schemas'
 import { apiClient } from '@/lib/api-client'
 import { useEntityMutation } from '@/lib/useEntityMutation'
 

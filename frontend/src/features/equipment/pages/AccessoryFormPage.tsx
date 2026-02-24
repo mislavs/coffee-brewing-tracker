@@ -1,4 +1,4 @@
-import type { Guid } from '@microsoft/kiota-abstractions'
+import type { Guid } from '@/lib/api-types'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { AccessoryFormCard } from '@/features/equipment/components/AccessoryFormCard'
 import type { AccessoryFormValues } from '@/features/equipment/accessoryFormSchema'

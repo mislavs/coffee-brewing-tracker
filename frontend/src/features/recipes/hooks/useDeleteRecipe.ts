@@ -1,4 +1,4 @@
-import type { Guid } from '@microsoft/kiota-abstractions'
+import type { Guid } from '@/lib/api-types'
 import { recipeQueryKeys } from '@/features/recipes/queryKeys'
 import { apiClient } from '@/lib/api-client'
 import { useEntityMutation } from '@/lib/useEntityMutation'

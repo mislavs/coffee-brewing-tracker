@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import type { Guid } from '@microsoft/kiota-abstractions'
+import type { Guid } from '@/lib/api-types'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { DeleteConfirmationDialog } from '@/components/DeleteConfirmationDialog'
 import { DetailField } from '@/components/DetailField'

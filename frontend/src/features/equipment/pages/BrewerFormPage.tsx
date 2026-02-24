@@ -1,4 +1,4 @@
-import type { Guid } from '@microsoft/kiota-abstractions'
+import type { Guid } from '@/lib/api-types'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { BrewerFormCard } from '@/features/equipment/components/BrewerFormCard'
 import { useBrewer } from '@/features/equipment/hooks/useBrewer'

@@ -1,4 +1,4 @@
-import type { CreateAccessoryRequest } from '@/lib/api/generated/models/index.js'
+import type { CreateAccessoryRequest } from '@/lib/api/schemas'
 import { apiClient } from '@/lib/api-client'
 import { accessoryQueryKeys } from '@/features/equipment/queryKeys'
 import { useEntityMutation } from '@/lib/useEntityMutation'

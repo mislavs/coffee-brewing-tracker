@@ -1,6 +1,6 @@
 import { useSuspenseQuery } from '@tanstack/react-query'
-import type { Guid } from '@microsoft/kiota-abstractions'
-import type { RoasterDto } from '@/lib/api/generated/models/index.js'
+import type { Guid } from '@/lib/api-types'
+import type { RoasterDto } from '@/lib/api/schemas'
 import { apiClient } from '@/lib/api-client'
 import { roasterQueryKeys } from '@/features/roasters/queryKeys'
 

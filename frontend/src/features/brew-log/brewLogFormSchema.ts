@@ -1,6 +1,6 @@
-import type { Guid } from '@microsoft/kiota-abstractions'
+import type { Guid } from '@/lib/api-types'
 import { z } from 'zod'
-import type { CreateBrewLogRequest } from '@/lib/api/generated/models/index.js'
+import type { CreateBrewLogRequest } from '@/lib/api/schemas'
 
 const guidPattern =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
@@ -142,6 +142,6 @@ export function normalizeBrewLogFormValues(
     rating: values.rating,
     notes: normalizeOptional(values.tastingNotes),
     adjustmentIdeas: normalizeOptional(values.adjustmentIdeas),
-    brewedAt,
+    brewedAt: brewedAt.toISOString(),
   }
 }

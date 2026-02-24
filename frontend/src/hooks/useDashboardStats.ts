@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import type { DashboardStatsDto } from '@/lib/api/generated/models/index.js'
+import type { DashboardStatsDto } from '@/lib/api/schemas'
 import { apiClient } from '@/lib/api-client'
 
 export const dashboardStatsQueryKey = ['stats', 'dashboard'] as const

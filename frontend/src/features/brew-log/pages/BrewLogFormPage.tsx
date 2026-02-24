@@ -1,4 +1,4 @@
-import type { Guid } from '@microsoft/kiota-abstractions'
+import type { Guid } from '@/lib/api-types'
 import { Navigate, useNavigate } from 'react-router-dom'
 import {
   normalizeBrewLogFormValues,
@@ -10,7 +10,7 @@ import { useCreateBrewLog } from '@/features/brew-log/hooks/useCreateBrewLog'
 import { useUpdateBrewLog } from '@/features/brew-log/hooks/useUpdateBrewLog'
 import { useEntityFormId } from '@/lib/useEntityFormId'
 
-function toDateTimeLocalValue(value: Date | null | undefined) {
+function toDateTimeLocalValue(value: Date | string | null | undefined) {
   const parsed = value instanceof Date ? value : value ? new Date(value) : null
   if (!parsed || Number.isNaN(parsed.getTime())) {
     return ''

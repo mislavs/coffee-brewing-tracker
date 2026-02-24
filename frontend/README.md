@@ -8,7 +8,7 @@ React SPA for the Coffee Brewing Tracker project.
 - `react-router-dom` for routing
 - `@tanstack/react-query` for server state
 - Tailwind CSS v4 + `shadcn/ui`
-- Kiota-generated TypeScript API client from `openapi.json`
+- Orval-generated TypeScript API client from `openapi.json`
 
 ## Prerequisites
 
@@ -44,6 +44,12 @@ npm run generate-api
 
 `openapi.json` is committed. Generated client code is written to `src/lib/api/generated/` and ignored by git.
 
+For convenience, run both steps together:
+
+```bash
+npm run api:sync
+```
+
 ## Environment
 
 Default local config is in `.env`:
@@ -57,9 +63,10 @@ Override locally with `.env.local`.
 ## Scripts
 
 - `npm run dev` - start Vite dev server
-- `npm run build` - type-check and build
+- `npm run build` - regenerate API client, type-check, and build
 - `npm run lint` - run ESLint
 - `npm run format` - run Prettier
 - `npm run update-api-spec` - download Swagger JSON to `openapi.json`
-- `npm run generate-api` - generate Kiota TypeScript client
+- `npm run generate-api` - generate Orval TypeScript client
+- `npm run api:sync` - refresh OpenAPI contract and regenerate client
 - `npm run preview` - preview production build

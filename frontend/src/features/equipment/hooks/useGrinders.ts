@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import type { GrinderSummaryDto } from '@/lib/api/generated/models/index.js'
+import type { GrinderSummaryDto } from '@/lib/api/schemas'
 import { apiClient } from '@/lib/api-client'
 import { grinderQueryKeys } from '@/features/equipment/queryKeys'
 

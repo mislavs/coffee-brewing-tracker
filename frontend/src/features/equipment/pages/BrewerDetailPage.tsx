@@ -1,4 +1,4 @@
-import type { Guid } from '@microsoft/kiota-abstractions'
+import type { Guid } from '@/lib/api-types'
 import { Link, Navigate } from 'react-router-dom'
 import { DetailField } from '@/components/DetailField'
 import { Button } from '@/components/ui/button'

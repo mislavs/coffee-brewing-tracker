@@ -1,4 +1,4 @@
-import type { Guid } from '@microsoft/kiota-abstractions'
+import type { Guid } from '@/lib/api-types'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { GrinderFormCard } from '@/features/equipment/components/GrinderFormCard'
 import { useCreateGrinder } from '@/features/equipment/hooks/useCreateGrinder'

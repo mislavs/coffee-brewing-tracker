@@ -1,4 +1,4 @@
-import type { CreateBrewerRequest } from '@/lib/api/generated/models/index.js'
+import type { CreateBrewerRequest } from '@/lib/api/schemas'
 import { apiClient } from '@/lib/api-client'
 import { brewerQueryKeys } from '@/features/equipment/queryKeys'
 import { useEntityMutation } from '@/lib/useEntityMutation'

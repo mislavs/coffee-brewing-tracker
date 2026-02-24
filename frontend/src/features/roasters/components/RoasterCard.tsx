@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import type { RoasterSummaryDto } from '@/lib/api/generated/models/index.js'
+import type { RoasterSummaryDto } from '@/lib/api/schemas'
 import { Badge } from '@/components/ui/badge'
 import {
   Card,

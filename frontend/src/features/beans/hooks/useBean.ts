@@ -1,6 +1,6 @@
 import { useSuspenseQuery } from '@tanstack/react-query'
-import type { Guid } from '@microsoft/kiota-abstractions'
-import type { BeanDto } from '@/lib/api/generated/models/index.js'
+import type { Guid } from '@/lib/api-types'
+import type { BeanDto } from '@/lib/api/schemas'
 import { apiClient } from '@/lib/api-client'
 import { beanQueryKeys } from '@/features/beans/queryKeys'
 

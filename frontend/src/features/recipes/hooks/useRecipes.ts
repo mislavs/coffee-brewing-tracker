@@ -1,6 +1,6 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
-import type { Guid } from '@microsoft/kiota-abstractions'
-import type { RecipeSummaryDto } from '@/lib/api/generated/models/index.js'
+import type { Guid } from '@/lib/api-types'
+import type { RecipeSummaryDto } from '@/lib/api/schemas'
 import { apiClient } from '@/lib/api-client'
 import { recipeQueryKeys } from '@/features/recipes/queryKeys'
 

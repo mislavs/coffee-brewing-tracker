@@ -1,5 +1,6 @@
-import type { Guid } from '@microsoft/kiota-abstractions'
+import type { Guid } from '@/lib/api-types'
 import { Navigate, useNavigate } from 'react-router-dom'
+import type { CreateBeanRequest } from '@/lib/api/schemas'
 import { BeanFormCard } from '@/features/beans/components/BeanFormCard'
 import {
   normalizeDistinctNameList,
@@ -12,19 +13,19 @@ import { useCreateBean } from '@/features/beans/hooks/useCreateBean'
 import { useUpdateBean } from '@/features/beans/hooks/useUpdateBean'
 import { useEntityFormId } from '@/lib/useEntityFormId'
 
-function toBeanRequest(values: BeanFormValues) {
+function toBeanRequest(values: BeanFormValues): CreateBeanRequest {
   const normalizedOriginCountries = normalizeDistinctNameList(values.originCountries)
   const normalizedFlavorNotes = normalizeDistinctNameList(values.flavorNoteNames)
 
   return {
     name: values.name.trim(),
     roasterId: values.roasterId as Guid,
-    originType: values.originType,
+    originType: values.originType as CreateBeanRequest['originType'],
     originCountries:
       normalizedOriginCountries.length > 0 ? normalizedOriginCountries : undefined,
     variety: values.variety,
     processingMethod: values.processingMethod,
-    roastProfile: values.roastProfile,
+    roastProfile: values.roastProfile as CreateBeanRequest['roastProfile'],
     roastDate: toOptionalDateOnly(values.roastDate),
     altitude: values.altitude,
     bagWeight: values.bagWeight,

@@ -1,4 +1,4 @@
-import type { Guid } from '@microsoft/kiota-abstractions'
+import type { Guid } from '@/lib/api-types'
 import { useParams } from 'react-router-dom'
 import { tryParseGuid } from '@/lib/guid'
 

@@ -1,4 +1,4 @@
-import type { Guid } from '@microsoft/kiota-abstractions'
+import type { Guid } from '@/lib/api-types'
 import { apiClient } from '@/lib/api-client'
 import { beanQueryKeys } from '@/features/beans/queryKeys'
 import { brewLogQueryKeys } from '@/features/brew-log/queryKeys'

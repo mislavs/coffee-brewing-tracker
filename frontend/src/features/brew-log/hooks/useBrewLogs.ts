@@ -1,5 +1,5 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
-import type { BrewLogSummaryDto } from '@/lib/api/generated/models/index.js'
+import type { BrewLogSummaryDto } from '@/lib/api/schemas'
 import { apiClient } from '@/lib/api-client'
 import { brewLogQueryKeys } from '@/features/brew-log/queryKeys'
 

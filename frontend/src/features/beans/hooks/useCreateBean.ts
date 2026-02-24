@@ -1,4 +1,4 @@
-import type { CreateBeanRequest } from '@/lib/api/generated/models/index.js'
+import type { CreateBeanRequest } from '@/lib/api/schemas'
 import { apiClient } from '@/lib/api-client'
 import {
   beanQueryKeys,

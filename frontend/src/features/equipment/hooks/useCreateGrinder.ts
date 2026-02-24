@@ -1,4 +1,4 @@
-import type { CreateGrinderRequest } from '@/lib/api/generated/models/index.js'
+import type { CreateGrinderRequest } from '@/lib/api/schemas'
 import { apiClient } from '@/lib/api-client'
 import { grinderQueryKeys } from '@/features/equipment/queryKeys'
 import { useEntityMutation } from '@/lib/useEntityMutation'

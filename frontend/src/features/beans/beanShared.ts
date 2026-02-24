@@ -1,5 +1,3 @@
-import type { DateOnly } from '@microsoft/kiota-abstractions'
-
 export const originTypeLabels = {
   0: 'Single Origin',
   1: 'Blend',
@@ -12,7 +10,14 @@ export const roastProfileLabels = {
   3: 'Unknown',
 } as const
 
-export function toDateInputValue(value: DateOnly | string | null | undefined) {
+export function toDateInputValue(
+  value:
+    | string
+    | Date
+    | { year?: unknown; month?: unknown; day?: unknown }
+    | null
+    | undefined,
+) {
   if (!value) {
     return undefined
   }

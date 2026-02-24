@@ -1,7 +1,7 @@
 import type {
   CreateRoasterRequest,
   CreateRoasterResponse,
-} from '@/lib/api/generated/models/index.js'
+} from '@/lib/api/schemas'
 import { apiClient } from '@/lib/api-client'
 import { roasterQueryKeys } from '@/features/roasters/queryKeys'
 import { useEntityMutation } from '@/lib/useEntityMutation'

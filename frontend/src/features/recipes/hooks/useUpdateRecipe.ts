@@ -1,5 +1,5 @@
-import type { Guid } from '@microsoft/kiota-abstractions'
-import type { UpdateRecipeRequest } from '@/lib/api/generated/models/index.js'
+import type { Guid } from '@/lib/api-types'
+import type { UpdateRecipeRequest } from '@/lib/api/schemas'
 import { apiClient } from '@/lib/api-client'
 import { recipeQueryKeys } from '@/features/recipes/queryKeys'
 import { useEntityMutation } from '@/lib/useEntityMutation'

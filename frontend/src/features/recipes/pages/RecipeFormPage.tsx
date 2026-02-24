@@ -1,4 +1,4 @@
-import type { Guid } from '@microsoft/kiota-abstractions'
+import type { Guid } from '@/lib/api-types'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { RecipeFormCard } from '@/features/recipes/components/RecipeFormCard'
 import { useCreateRecipe } from '@/features/recipes/hooks/useCreateRecipe'

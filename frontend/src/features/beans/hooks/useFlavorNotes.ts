@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import type { FlavorNoteDto } from '@/lib/api/generated/models/index.js'
+import type { FlavorNoteDto } from '@/lib/api/schemas'
 import { apiClient } from '@/lib/api-client'
 import { flavorNoteQueryKeys } from '@/features/beans/queryKeys'
 

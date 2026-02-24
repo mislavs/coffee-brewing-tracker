@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import type { RoasterSummaryDto } from '@/lib/api/generated/models/index.js'
+import type { RoasterSummaryDto } from '@/lib/api/schemas'
 import { apiClient } from '@/lib/api-client'
 import { roasterQueryKeys } from '@/features/roasters/queryKeys'
 

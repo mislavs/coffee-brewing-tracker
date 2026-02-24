@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import type { BrewLogSummaryDto } from '@/lib/api/generated/models/index.js'
+import type { BrewLogSummaryDto } from '@/lib/api/schemas'
 import { formatDateTime } from '@/lib/date'
 import { Badge } from '@/components/ui/badge'
 import {

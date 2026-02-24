@@ -1,5 +1,5 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
-import type { BeanSummaryDto } from '@/lib/api/generated/models/index.js'
+import type { BeanSummaryDto } from '@/lib/api/schemas'
 import { apiClient } from '@/lib/api-client'
 import { beanQueryKeys } from '@/features/beans/queryKeys'
 

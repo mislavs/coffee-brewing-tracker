@@ -1,4 +1,4 @@
-import type { CreateBrewLogRequest } from '@/lib/api/generated/models/index.js'
+import type { CreateBrewLogRequest } from '@/lib/api/schemas'
 import { apiClient } from '@/lib/api-client'
 import { beanQueryKeys } from '@/features/beans/queryKeys'
 import { brewLogQueryKeys } from '@/features/brew-log/queryKeys'

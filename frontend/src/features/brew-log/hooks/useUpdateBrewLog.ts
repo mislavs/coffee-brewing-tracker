@@ -1,5 +1,5 @@
-import type { Guid } from '@microsoft/kiota-abstractions'
-import type { UpdateBrewLogRequest } from '@/lib/api/generated/models/index.js'
+import type { Guid } from '@/lib/api-types'
+import type { UpdateBrewLogRequest } from '@/lib/api/schemas'
 import { apiClient } from '@/lib/api-client'
 import { beanQueryKeys } from '@/features/beans/queryKeys'
 import { brewLogQueryKeys } from '@/features/brew-log/queryKeys'
