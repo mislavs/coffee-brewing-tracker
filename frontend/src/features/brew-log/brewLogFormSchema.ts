@@ -3,7 +3,7 @@ import { z } from 'zod'
 import type { CreateBrewLogRequest } from '@/lib/api/generated/models/index.js'
 
 const guidPattern =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
 const optionalTrimmedStringSchema = z.preprocess(
   (value) => {
@@ -68,8 +68,8 @@ export const brewLogFormSchema = z.object({
     'Water temperature must be between 0 and 100.',
   ),
   grindSize: optionalTrimmedStringSchema.refine(
-    (value) => value === undefined || value.length <= 100,
-    'Grind size must be 100 characters or fewer.',
+    (value) => value === undefined || value.length <= 10,
+    'Grind size must be 10 characters or fewer.',
   ),
   brewTimeMinutes: optionalNumberSchema.refine(
     (value) => value === undefined || (Number.isInteger(value) && value >= 0),
@@ -91,8 +91,8 @@ export const brewLogFormSchema = z.object({
     'Notes must be 2000 characters or fewer.',
   ),
   adjustmentIdeas: optionalTrimmedStringSchema.refine(
-    (value) => value === undefined || value.length <= 2000,
-    'Adjustment ideas must be 2000 characters or fewer.',
+    (value) => value === undefined || value.length <= 1000,
+    'Adjustment ideas must be 1000 characters or fewer.',
   ),
   accessoryIds: z.array(z.string().trim().regex(guidPattern)).default([]),
   brewedAt: z
