@@ -8,7 +8,7 @@
 --   Roasters   : full details / partial / name-only / no beans (orphan)
 --   Beans      : SingleOrigin & Blend × Filter, Espresso, Omni, Unknown
 --                all optional fields / minimal / many-few-no flavor notes
---                multiple / single origin countries / never brewed
+--                multiple / single origin countries / never brewed / used up (0g remaining)
 --   Brewers    : with & without accessories / with & without recipes
 --   Accessories: multi-brewer / single-brewer / standalone (no brewer)
 --   Grinders   : heavily used / lightly used / never used
@@ -25,10 +25,11 @@ BEGIN;
 -- r1  Onyx Coffee Lab          (full details, 3 beans)
 -- r2  April Coffee Roasters    (city only,    2 beans)
 -- r3  Square Mile Coffee       (name only,    1 bean)
--- r4  Tim Wendelboe            (full details, 0 beans - orphan)
+-- r4  Tim Wendelboe            (full details, 1 bean)
 
 -- Countries
 -- c1 Ethiopia  c2 Colombia  c3 Kenya  c4 Brazil  c5 Guatemala  c6 Indonesia
+-- c7 United States  c8 Norway
 
 -- FlavorNotes
 -- f01 Blueberry  f02 Chocolate  f03 Citrus      f04 Caramel  f05 Floral
@@ -41,6 +42,7 @@ BEGIN;
 -- bn4 Red Brick (Square Mile, Blend/Omni, 4 flavors, 2 brews)
 -- bn5 Tropical Weather (Onyx, SO/Espresso, 2 flavors, 1 brew)
 -- bn6 El Vergel Lactic (April, SO/Unknown, 0 flavors, 0 brews)
+-- bn7 Limu Natural     (Tim Wendelboe, SO/Filter, 3 flavors, 6 brews, USED UP - 0g remaining)
 
 -- Brewers
 -- br1 Hario V60     (accessories, 2 recipes, 7 brews)
@@ -65,7 +67,8 @@ BEGIN;
 -- re2 AeroPress Inverted   (AeroPress, with description)
 -- re3 Quick V60            (V60, no description)
 
--- BrewLogEntries: bl01 .. bl12 (see inline comments)
+-- BrewLogEntries: bl01 .. bl18 (see inline comments)
+--   bl13..bl18 are for bn7; doses sum to exactly 100g (bag used up)
 
 
 -- ─── Cleanup seed data (reverse dependency order) ───────────────────────────
@@ -76,7 +79,10 @@ DELETE FROM "BrewLogAccessory" WHERE "BrewLogEntryId" IN (
   'c1000001-0000-0000-0000-000000000005','c1000001-0000-0000-0000-000000000006',
   'c1000001-0000-0000-0000-000000000007','c1000001-0000-0000-0000-000000000008',
   'c1000001-0000-0000-0000-000000000009','c1000001-0000-0000-0000-000000000010',
-  'c1000001-0000-0000-0000-000000000011','c1000001-0000-0000-0000-000000000012'
+  'c1000001-0000-0000-0000-000000000011','c1000001-0000-0000-0000-000000000012',
+  'c1000001-0000-0000-0000-000000000013','c1000001-0000-0000-0000-000000000014',
+  'c1000001-0000-0000-0000-000000000015','c1000001-0000-0000-0000-000000000016',
+  'c1000001-0000-0000-0000-000000000017','c1000001-0000-0000-0000-000000000018'
 );
 
 DELETE FROM "BrewLogEntries" WHERE "Id" IN (
@@ -85,7 +91,10 @@ DELETE FROM "BrewLogEntries" WHERE "Id" IN (
   'c1000001-0000-0000-0000-000000000005','c1000001-0000-0000-0000-000000000006',
   'c1000001-0000-0000-0000-000000000007','c1000001-0000-0000-0000-000000000008',
   'c1000001-0000-0000-0000-000000000009','c1000001-0000-0000-0000-000000000010',
-  'c1000001-0000-0000-0000-000000000011','c1000001-0000-0000-0000-000000000012'
+  'c1000001-0000-0000-0000-000000000011','c1000001-0000-0000-0000-000000000012',
+  'c1000001-0000-0000-0000-000000000013','c1000001-0000-0000-0000-000000000014',
+  'c1000001-0000-0000-0000-000000000015','c1000001-0000-0000-0000-000000000016',
+  'c1000001-0000-0000-0000-000000000017','c1000001-0000-0000-0000-000000000018'
 );
 
 DELETE FROM "Recipes" WHERE "Id" IN (
@@ -103,19 +112,22 @@ DELETE FROM "AccessoryBrewer" WHERE "AccessoriesId" IN (
 DELETE FROM "BeanFlavorNote" WHERE "BeanId" IN (
   'd0000001-0000-0000-0000-000000000001','d0000001-0000-0000-0000-000000000002',
   'd0000001-0000-0000-0000-000000000003','d0000001-0000-0000-0000-000000000004',
-  'd0000001-0000-0000-0000-000000000005','d0000001-0000-0000-0000-000000000006'
+  'd0000001-0000-0000-0000-000000000005','d0000001-0000-0000-0000-000000000006',
+  'd0000001-0000-0000-0000-000000000007'
 );
 
 DELETE FROM "BeanCountry" WHERE "BeanId" IN (
   'd0000001-0000-0000-0000-000000000001','d0000001-0000-0000-0000-000000000002',
   'd0000001-0000-0000-0000-000000000003','d0000001-0000-0000-0000-000000000004',
-  'd0000001-0000-0000-0000-000000000005','d0000001-0000-0000-0000-000000000006'
+  'd0000001-0000-0000-0000-000000000005','d0000001-0000-0000-0000-000000000006',
+  'd0000001-0000-0000-0000-000000000007'
 );
 
 DELETE FROM "Beans" WHERE "Id" IN (
   'd0000001-0000-0000-0000-000000000001','d0000001-0000-0000-0000-000000000002',
   'd0000001-0000-0000-0000-000000000003','d0000001-0000-0000-0000-000000000004',
-  'd0000001-0000-0000-0000-000000000005','d0000001-0000-0000-0000-000000000006'
+  'd0000001-0000-0000-0000-000000000005','d0000001-0000-0000-0000-000000000006',
+  'd0000001-0000-0000-0000-000000000007'
 );
 
 DELETE FROM "Accessories" WHERE "Id" IN (
@@ -143,31 +155,17 @@ DELETE FROM "FlavorNotes" WHERE "Id" IN (
   'c0000001-0000-0000-0000-000000000009','c0000001-0000-0000-0000-000000000010'
 );
 
-DELETE FROM "Countries" WHERE "Id" IN (
-  'b0000001-0000-0000-0000-000000000001','b0000001-0000-0000-0000-000000000002',
-  'b0000001-0000-0000-0000-000000000003','b0000001-0000-0000-0000-000000000004',
-  'b0000001-0000-0000-0000-000000000005','b0000001-0000-0000-0000-000000000006'
-);
-
 DELETE FROM "Roasters" WHERE "Id" IN (
   'a0000001-0000-0000-0000-000000000001','a0000001-0000-0000-0000-000000000002',
   'a0000001-0000-0000-0000-000000000003','a0000001-0000-0000-0000-000000000004'
 );
 
-
--- =============================================================================
--- INSERT: Roasters
--- =============================================================================
-
-INSERT INTO "Roasters" ("Id", "Name", "City", "Country") VALUES
-  -- Full details, multiple beans
-  ('a0000001-0000-0000-0000-000000000001', 'Onyx Coffee Lab',         'Bentonville', 'United States'),
-  -- Partial: city only, no country
-  ('a0000001-0000-0000-0000-000000000002', 'April Coffee Roasters',   'Copenhagen',   NULL),
-  -- Name only
-  ('a0000001-0000-0000-0000-000000000003', 'Square Mile Coffee',       NULL,           NULL),
-  -- Full details but no beans (orphan roaster)
-  ('a0000001-0000-0000-0000-000000000004', 'Tim Wendelboe',           'Oslo',         'Norway');
+DELETE FROM "Countries" WHERE "Id" IN (
+  'b0000001-0000-0000-0000-000000000001','b0000001-0000-0000-0000-000000000002',
+  'b0000001-0000-0000-0000-000000000003','b0000001-0000-0000-0000-000000000004',
+  'b0000001-0000-0000-0000-000000000005','b0000001-0000-0000-0000-000000000006',
+  'b0000001-0000-0000-0000-000000000007','b0000001-0000-0000-0000-000000000008'
+);
 
 
 -- =============================================================================
@@ -180,7 +178,25 @@ INSERT INTO "Countries" ("Id", "Name") VALUES
   ('b0000001-0000-0000-0000-000000000003', 'Kenya'),
   ('b0000001-0000-0000-0000-000000000004', 'Brazil'),
   ('b0000001-0000-0000-0000-000000000005', 'Guatemala'),
-  ('b0000001-0000-0000-0000-000000000006', 'Indonesia');
+  ('b0000001-0000-0000-0000-000000000006', 'Indonesia'),
+  -- Roaster countries
+  ('b0000001-0000-0000-0000-000000000007', 'United States'),
+  ('b0000001-0000-0000-0000-000000000008', 'Norway');
+
+
+-- =============================================================================
+-- INSERT: Roasters
+-- =============================================================================
+
+INSERT INTO "Roasters" ("Id", "Name", "City", "CountryId") VALUES
+  -- Full details, multiple beans
+  ('a0000001-0000-0000-0000-000000000001', 'Onyx Coffee Lab',         'Bentonville', 'b0000001-0000-0000-0000-000000000007'),
+  -- Partial: city only, no country
+  ('a0000001-0000-0000-0000-000000000002', 'April Coffee Roasters',   'Copenhagen',   NULL),
+  -- Name only
+  ('a0000001-0000-0000-0000-000000000003', 'Square Mile Coffee',       NULL,           NULL),
+  -- Full details, 1 bean (Limu Natural)
+  ('a0000001-0000-0000-0000-000000000004', 'Tim Wendelboe',           'Oslo',         'b0000001-0000-0000-0000-000000000008');
 
 
 -- =============================================================================
@@ -248,7 +264,14 @@ VALUES
    'El Vergel Lactic', 'a0000001-0000-0000-0000-000000000002',
    'SingleOrigin', 'Unknown',
    NULL, 'Lactic', NULL, 1600,
-   200, 28.00);
+   200, 28.00),
+
+  -- bn7: SingleOrigin/Filter, 100g sample bag, USED UP (bl13-bl18 doses sum to 100g)
+  ('d0000001-0000-0000-0000-000000000007',
+   'Limu Natural', 'a0000001-0000-0000-0000-000000000004',
+   'SingleOrigin', 'Filter',
+   'Heirloom', 'Natural', CURRENT_DATE - INTERVAL '42 days', 1900,
+   100, 16.00);
 
 
 -- =============================================================================
@@ -270,7 +293,9 @@ INSERT INTO "BeanCountry" ("BeanId", "OriginCountriesId") VALUES
   -- bn5 Tropical Weather: Colombia (single origin)
   ('d0000001-0000-0000-0000-000000000005', 'b0000001-0000-0000-0000-000000000002'),
   -- bn6 El Vergel: Colombia (single origin)
-  ('d0000001-0000-0000-0000-000000000006', 'b0000001-0000-0000-0000-000000000002');
+  ('d0000001-0000-0000-0000-000000000006', 'b0000001-0000-0000-0000-000000000002'),
+  -- bn7 Limu Natural: Ethiopia (single origin)
+  ('d0000001-0000-0000-0000-000000000007', 'b0000001-0000-0000-0000-000000000001');
 
 
 -- =============================================================================
@@ -295,8 +320,12 @@ INSERT INTO "BeanFlavorNote" ("BeanId", "FlavorNotesId") VALUES
   ('d0000001-0000-0000-0000-000000000004', 'c0000001-0000-0000-0000-000000000004'),
   -- bn5 Tropical Weather: Tropical Fruit, Honey (2 notes)
   ('d0000001-0000-0000-0000-000000000005', 'c0000001-0000-0000-0000-000000000009'),
-  ('d0000001-0000-0000-0000-000000000005', 'c0000001-0000-0000-0000-000000000006');
+  ('d0000001-0000-0000-0000-000000000005', 'c0000001-0000-0000-0000-000000000006'),
   -- bn6 El Vergel: NO flavor notes
+  -- bn7 Limu Natural: Blueberry, Wine, Stone Fruit (3 notes)
+  ('d0000001-0000-0000-0000-000000000007', 'c0000001-0000-0000-0000-000000000001'),
+  ('d0000001-0000-0000-0000-000000000007', 'c0000001-0000-0000-0000-000000000010'),
+  ('d0000001-0000-0000-0000-000000000007', 'c0000001-0000-0000-0000-000000000008');
 
 
 -- =============================================================================
@@ -515,7 +544,76 @@ VALUES
    15.0, 250.0, 94.0, '13', 230,
    4, 'Good but slightly less clean than with Comandante grinder.',
    NULL,
-   NOW() - INTERVAL '105 days');
+   NOW() - INTERVAL '105 days'),
+
+  -- bl13..bl18: Limu Natural (bn7) — 100g sample bag, all used up
+  --   doses: 18+17+16+15+18+16 = 100g = bag weight → 0g remaining
+
+  -- bl13: First brew, excited about the new natural, Rating 4, ~5 weeks ago
+  ('c1000001-0000-0000-0000-000000000013',
+   'd0000001-0000-0000-0000-000000000007', -- Limu Natural
+   'e0000001-0000-0000-0000-000000000001', -- V60
+   'a1000001-0000-0000-0000-000000000001', -- Comandante
+   'b1000001-0000-0000-0000-000000000001', -- Hoffmann recipe
+   18.0, 300.0, 94.0, '22', 215,
+   4, 'Really jammy and fruit-forward. Classic Ethiopian natural — blueberry and wine.',
+   'Try lower temp to tame the fermented notes',
+   NOW() - INTERVAL '35 days'),
+
+  -- bl14: Dialled in temp, Rating 5, ~4 weeks ago
+  ('c1000001-0000-0000-0000-000000000014',
+   'd0000001-0000-0000-0000-000000000007', -- Limu Natural
+   'e0000001-0000-0000-0000-000000000001', -- V60
+   'a1000001-0000-0000-0000-000000000001', -- Comandante
+   'b1000001-0000-0000-0000-000000000001', -- Hoffmann recipe
+   17.0, 280.0, 91.0, '22', 210,
+   5, 'Perfect. Lower temp really balanced the fermented notes. Sweet and complex.',
+   NULL,
+   NOW() - INTERVAL '28 days'),
+
+  -- bl15: AeroPress experiment, no recipe, Rating 3, ~3 weeks ago
+  ('c1000001-0000-0000-0000-000000000015',
+   'd0000001-0000-0000-0000-000000000007', -- Limu Natural
+   'e0000001-0000-0000-0000-000000000002', -- AeroPress
+   'a1000001-0000-0000-0000-000000000002', -- Baratza
+   NULL,
+   16.0, 220.0, 88.0, '16', 130,
+   3, 'Lost some of the complexity in AeroPress. Too muted.',
+   'Stick to V60 for this bean',
+   NOW() - INTERVAL '21 days'),
+
+  -- bl16: Back to V60, Rating 4, ~2 weeks ago
+  ('c1000001-0000-0000-0000-000000000016',
+   'd0000001-0000-0000-0000-000000000007', -- Limu Natural
+   'e0000001-0000-0000-0000-000000000001', -- V60
+   'a1000001-0000-0000-0000-000000000001', -- Comandante
+   'b1000001-0000-0000-0000-000000000001', -- Hoffmann recipe
+   15.0, 250.0, 91.0, '23', 208,
+   4, 'Still lovely but slightly past peak — the fruit is fading a bit.',
+   NULL,
+   NOW() - INTERVAL '14 days'),
+
+  -- bl17: Rating 4, ~1 week ago
+  ('c1000001-0000-0000-0000-000000000017',
+   'd0000001-0000-0000-0000-000000000007', -- Limu Natural
+   'e0000001-0000-0000-0000-000000000001', -- V60
+   'a1000001-0000-0000-0000-000000000001', -- Comandante
+   NULL,
+   18.0, 300.0, 91.0, '23', 220,
+   4, 'Getting a bit flat now — been open too long. Still enjoyable.',
+   'Should have brewed through this bag faster',
+   NOW() - INTERVAL '7 days'),
+
+  -- bl18: Last brew, scraped the bag, Rating 3, 2 days ago (bag now empty)
+  ('c1000001-0000-0000-0000-000000000018',
+   'd0000001-0000-0000-0000-000000000007', -- Limu Natural
+   'e0000001-0000-0000-0000-000000000001', -- V60
+   'a1000001-0000-0000-0000-000000000001', -- Comandante
+   NULL,
+   16.0, 265.0, 91.0, '23', 218,
+   3, 'Last of the bag. Noticeably stale — should have finished it a week ago.',
+   NULL,
+   NOW() - INTERVAL '2 days');
 
 
 -- =============================================================================
@@ -550,6 +648,22 @@ INSERT INTO "BrewLogAccessory" ("AccessoriesId", "BrewLogEntryId") VALUES
   ('f0000001-0000-0000-0000-000000000003', 'c1000001-0000-0000-0000-000000000011'),
   ('f0000001-0000-0000-0000-000000000004', 'c1000001-0000-0000-0000-000000000011'),
   -- bl12: Gooseneck Kettle only
-  ('f0000001-0000-0000-0000-000000000001', 'c1000001-0000-0000-0000-000000000012');
+  ('f0000001-0000-0000-0000-000000000001', 'c1000001-0000-0000-0000-000000000012'),
+  -- bl13: Gooseneck Kettle, Paper Filter, Digital Scale
+  ('f0000001-0000-0000-0000-000000000001', 'c1000001-0000-0000-0000-000000000013'),
+  ('f0000001-0000-0000-0000-000000000002', 'c1000001-0000-0000-0000-000000000013'),
+  ('f0000001-0000-0000-0000-000000000004', 'c1000001-0000-0000-0000-000000000013'),
+  -- bl14: Gooseneck Kettle, Paper Filter, Digital Scale
+  ('f0000001-0000-0000-0000-000000000001', 'c1000001-0000-0000-0000-000000000014'),
+  ('f0000001-0000-0000-0000-000000000002', 'c1000001-0000-0000-0000-000000000014'),
+  ('f0000001-0000-0000-0000-000000000004', 'c1000001-0000-0000-0000-000000000014'),
+  -- bl15: Metal Filter (AeroPress)
+  ('f0000001-0000-0000-0000-000000000003', 'c1000001-0000-0000-0000-000000000015'),
+  -- bl16: Gooseneck Kettle, Paper Filter, Digital Scale
+  ('f0000001-0000-0000-0000-000000000001', 'c1000001-0000-0000-0000-000000000016'),
+  ('f0000001-0000-0000-0000-000000000002', 'c1000001-0000-0000-0000-000000000016'),
+  ('f0000001-0000-0000-0000-000000000004', 'c1000001-0000-0000-0000-000000000016');
+  -- bl17: no accessories
+  -- bl18: no accessories
 
 COMMIT;
