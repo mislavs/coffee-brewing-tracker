@@ -1,4 +1,4 @@
-import { useDeferredValue, useEffect, useState, useTransition } from 'react'
+import { useEffect, useState, useTransition } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import {
@@ -16,43 +16,26 @@ import { useBeans } from '@/features/beans/hooks/useBeans'
 export function BeanListPage() {
   const [searchParams, setSearchParams] = useSearchParams()
   const search = searchParams.get('search') ?? ''
-  const showUnavailableFromUrl = searchParams.get('showUnavailable') === 'true'
+  const showUnavailable = searchParams.get('showUnavailable') === 'true'
   const [searchDraft, setSearchDraft] = useState(search)
-  const [showUnavailable, setShowUnavailable] = useState(showUnavailableFromUrl)
   const [, startTransition] = useTransition()
-  const deferredShowUnavailable = useDeferredValue(showUnavailable)
 
   useEffect(() => {
     setSearchDraft(search)
   }, [search])
 
-  useEffect(() => {
-    setShowUnavailable(showUnavailableFromUrl)
-  }, [showUnavailableFromUrl])
+  function handleToggleUnavailable(checked: boolean) {
+    setSearchParams((previous) => {
+      const next = new URLSearchParams(previous)
+      if (checked) {
+        next.set('showUnavailable', 'true')
+      } else {
+        next.delete('showUnavailable')
+      }
 
-  useEffect(() => {
-    if (showUnavailable === showUnavailableFromUrl) {
-      return
-    }
-
-    startTransition(() => {
-      setSearchParams((previous) => {
-        const next = new URLSearchParams(previous)
-        if (showUnavailable) {
-          next.set('showUnavailable', 'true')
-        } else {
-          next.delete('showUnavailable')
-        }
-
-        return next
-      }, { replace: true })
-    })
-  }, [
-    showUnavailable,
-    showUnavailableFromUrl,
-    setSearchParams,
-    startTransition,
-  ])
+      return next
+    }, { replace: true })
+  }
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -74,7 +57,7 @@ export function BeanListPage() {
     return () => clearTimeout(timeoutId)
   }, [searchDraft, setSearchParams, startTransition])
 
-  const { data: beans = [], isPending } = useBeans(search, deferredShowUnavailable)
+  const { data: beans = [], isPending } = useBeans(search, showUnavailable)
   const availableBeans = beans.filter((bean) => bean.isAvailable !== false)
   const unavailableBeans = beans.filter((bean) => bean.isAvailable === false)
 
@@ -111,9 +94,7 @@ export function BeanListPage() {
           <Switch
             id="show-unavailable"
             checked={showUnavailable}
-            onCheckedChange={(checked) => {
-              setShowUnavailable(checked)
-            }}
+            onCheckedChange={handleToggleUnavailable}
           />
           <label htmlFor="show-unavailable" className="text-sm font-medium">
             Show unavailable
@@ -137,7 +118,7 @@ export function BeanListPage() {
               ))}
             </div>
 
-            {deferredShowUnavailable && unavailableBeans.length > 0 ? (
+            {showUnavailable && unavailableBeans.length > 0 ? (
               <>
                 {availableBeans.length > 0 ? (
                   <hr className="border-border" />
