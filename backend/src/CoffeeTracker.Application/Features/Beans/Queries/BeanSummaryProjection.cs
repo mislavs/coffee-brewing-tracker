@@ -17,6 +17,7 @@ public static class BeanSummaryProjection
             entity.Price.HasValue && entity.BagWeight > 0
                 ? entity.Price.Value / (entity.BagWeight / 1000m)
                 : null,
+            entity.IsAvailable,
             entity.BagWeight - (dbContext.BrewLogEntries
                 .Where(entry => entry.BeanId == entity.Id)
                 .Sum(entry => (decimal?)entry.Dose) ?? 0m));

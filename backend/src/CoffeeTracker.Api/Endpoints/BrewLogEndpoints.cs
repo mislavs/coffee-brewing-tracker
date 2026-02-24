@@ -59,7 +59,7 @@ public static class BrewLogEndpoints
         ISender sender,
         CancellationToken cancellationToken)
     {
-        var brewLogId = await sender.Send(
+        var result = await sender.Send(
             new CreateBrewLogCommand(
                 request.BeanId,
                 request.BrewerId,
@@ -80,10 +80,10 @@ public static class BrewLogEndpoints
         var location = linkGenerator.GetPathByName(
                            context,
                            "GetBrewLogById",
-                           new { id = brewLogId }) ??
-                       $"/api/brew-logs/{brewLogId}";
+                           new { id = result.Id }) ??
+                       $"/api/brew-logs/{result.Id}";
 
-        return TypedResults.Created(location, new CreateBrewLogResponse(brewLogId));
+        return TypedResults.Created(location, new CreateBrewLogResponse(result.Id, result.RemainingBeanQuantity));
     }
 
     private static async Task<Ok> UpdateBrewLog(

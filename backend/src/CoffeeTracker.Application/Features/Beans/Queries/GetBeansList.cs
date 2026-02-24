@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CoffeeTracker.Application.Features.Beans.Queries;
 
-public sealed record GetBeansListQuery(string? Search) : IRequest<IReadOnlyList<BeanSummaryDto>>;
+public sealed record GetBeansListQuery(string? Search, bool IncludeUnavailable = false) : IRequest<IReadOnlyList<BeanSummaryDto>>;
 
 public sealed class GetBeansListHandler(ApplicationDbContext dbContext)
     : IRequestHandler<GetBeansListQuery, IReadOnlyList<BeanSummaryDto>>
@@ -22,6 +22,11 @@ public sealed class GetBeansListHandler(ApplicationDbContext dbContext)
         {
             var searchTerm = request.Search.Trim();
             query = query.Where(entity => EF.Functions.ILike(entity.Name, $"%{searchTerm}%"));
+        }
+
+        if (!request.IncludeUnavailable)
+        {
+            query = query.Where(entity => entity.IsAvailable);
         }
 
         return await query

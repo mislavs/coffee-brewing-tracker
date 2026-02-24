@@ -27,6 +27,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { Switch } from '@/components/ui/switch'
 import {
   beanFormSchema,
   type BeanFormInput,
@@ -97,6 +98,7 @@ type BeanFormCardProps = {
   onSubmit: (values: BeanFormValues) => Promise<void>
   isSubmitting: boolean
   cancelHref: string
+  isEditMode?: boolean
 }
 
 export function BeanFormCard({
@@ -107,6 +109,7 @@ export function BeanFormCard({
   onSubmit,
   isSubmitting,
   cancelHref,
+  isEditMode = false,
 }: BeanFormCardProps) {
   const form = useForm<BeanFormInput, undefined, BeanFormValues>({
     resolver: zodResolver(beanFormSchema),
@@ -422,6 +425,30 @@ export function BeanFormCard({
                 <FieldErrorText message={form.formState.errors.price?.message} />
               </div>
             </div>
+
+            {isEditMode ? (
+              <div className="flex items-center justify-between rounded-lg border p-3">
+                <div className="space-y-0.5">
+                  <label htmlFor="isAvailable" className="text-sm font-medium">
+                    Available
+                  </label>
+                  <p className="text-sm text-muted-foreground">
+                    Unavailable beans are hidden from lists by default.
+                  </p>
+                </div>
+                <Controller
+                  control={form.control}
+                  name="isAvailable"
+                  render={({ field }) => (
+                    <Switch
+                      id="isAvailable"
+                      checked={Boolean(field.value)}
+                      onCheckedChange={field.onChange}
+                    />
+                  )}
+                />
+              </div>
+            ) : null}
 
             <FieldErrorText message={form.formState.errors.root?.serverError?.message} />
 

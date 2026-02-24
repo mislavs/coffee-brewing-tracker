@@ -22,6 +22,7 @@ public sealed record UpdateBeanCommand(
     int? Altitude,
     decimal BagWeight,
     decimal? Price,
+    bool IsAvailable,
     IReadOnlyList<string>? FlavorNoteNames) : IRequest, IBeanCommand;
 
 public sealed class UpdateBeanValidator : AbstractValidator<UpdateBeanCommand>
@@ -70,7 +71,8 @@ public sealed class UpdateBeanHandler(ApplicationDbContext dbContext)
             request.RoastDate,
             request.Altitude,
             request.BagWeight,
-            request.Price);
+            request.Price,
+            request.IsAvailable);
 
         bean.SetFlavorNotes(flavorNotes);
 

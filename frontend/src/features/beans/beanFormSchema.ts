@@ -77,6 +77,7 @@ export const beanFormSchema = z.object({
     return typeof value === 'number' ? value : Number(value)
   }, z.number().positive('Bag weight must be greater than 0.')),
   price: optionalPositiveNumberSchema,
+  isAvailable: z.boolean().default(true),
   flavorNoteNames: z.array(z.string().trim().min(1)).default([]),
 })
 

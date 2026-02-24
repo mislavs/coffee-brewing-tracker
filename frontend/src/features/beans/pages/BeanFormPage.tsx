@@ -1,6 +1,6 @@
 import type { Guid } from '@/lib/api-types'
 import { Navigate, useNavigate } from 'react-router-dom'
-import type { CreateBeanRequest } from '@/lib/api/schemas'
+import type { CreateBeanRequest, UpdateBeanRequest } from '@/lib/api/schemas'
 import { BeanFormCard } from '@/features/beans/components/BeanFormCard'
 import {
   normalizeDistinctNameList,
@@ -13,7 +13,7 @@ import { useCreateBean } from '@/features/beans/hooks/useCreateBean'
 import { useUpdateBean } from '@/features/beans/hooks/useUpdateBean'
 import { useEntityFormId } from '@/lib/useEntityFormId'
 
-function toBeanRequest(values: BeanFormValues): CreateBeanRequest {
+function toBeanRequestBase(values: BeanFormValues): CreateBeanRequest {
   const normalizedOriginCountries = normalizeDistinctNameList(values.originCountries)
   const normalizedFlavorNotes = normalizeDistinctNameList(values.flavorNoteNames)
 
@@ -32,6 +32,17 @@ function toBeanRequest(values: BeanFormValues): CreateBeanRequest {
     price: values.price,
     flavorNoteNames:
       normalizedFlavorNotes.length > 0 ? normalizedFlavorNotes : undefined,
+  }
+}
+
+function toCreateBeanRequest(values: BeanFormValues): CreateBeanRequest {
+  return toBeanRequestBase(values)
+}
+
+function toUpdateBeanRequest(values: BeanFormValues): UpdateBeanRequest {
+  return {
+    ...toBeanRequestBase(values),
+    isAvailable: values.isAvailable,
   }
 }
 
@@ -58,10 +69,11 @@ function CreateBeanForm() {
         altitude: undefined,
         bagWeight: 250,
         price: undefined,
+        isAvailable: true,
         flavorNoteNames: [],
       }}
       onSubmit={async (values) => {
-        await mutateAsync(toBeanRequest(values))
+        await mutateAsync(toCreateBeanRequest(values))
         navigate('/beans')
       }}
     />
@@ -92,15 +104,17 @@ function EditBeanForm({ beanId }: { beanId: Guid }) {
         altitude: bean.altitude ?? undefined,
         bagWeight: bean.bagWeight ?? 0,
         price: bean.price ?? undefined,
+        isAvailable: bean.isAvailable ?? true,
         flavorNoteNames:
           bean.flavorNotes
             ?.map((flavorNote) => flavorNote.name?.trim() ?? '')
             .filter((name) => name.length > 0) ?? [],
       }}
+      isEditMode
       onSubmit={async (values) => {
         await mutateAsync({
           id: beanId,
-          request: toBeanRequest(values),
+          request: toUpdateBeanRequest(values),
         })
 
         navigate(`/beans/${beanId}`)

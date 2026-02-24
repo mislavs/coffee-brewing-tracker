@@ -65,6 +65,11 @@ export function BeanCard({ bean }: BeanCardProps) {
       </CardHeader>
       <CardContent className="flex flex-wrap gap-2">
         <Badge variant="secondary">{roastProfileLabel}</Badge>
+        {bean.isAvailable === false ? (
+          <Badge variant="outline" className="text-muted-foreground">
+            Unavailable
+          </Badge>
+        ) : null}
         <Badge variant="outline">{formatPricePerKg(bean.pricePerKg)}</Badge>
         <Badge
           variant="outline"

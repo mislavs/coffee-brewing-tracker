@@ -19,4 +19,5 @@ public sealed record BeanDto(
     decimal? Price,
     decimal? PricePerKg,
     IReadOnlyList<FlavorNoteDto> FlavorNotes,
+    bool IsAvailable,
     decimal RemainingQuantity);

@@ -64,6 +64,8 @@ public class Bean
 
     public decimal? Price { get; private set; }
 
+    public bool IsAvailable { get; private set; } = true;
+
     public Roaster Roaster { get; private set; } = null!;
 
     public IReadOnlyCollection<FlavorNote> FlavorNotes => _flavorNotes.AsReadOnly();
@@ -111,7 +113,8 @@ public class Bean
         DateOnly? roastDate,
         int? altitude,
         decimal bagWeight,
-        decimal? price)
+        decimal? price,
+        bool isAvailable)
     {
         Name = EntityNormalization.NormalizeRequired(name, nameof(name));
         RoasterId = EntityNormalization.EnsureRequired(roasterId, nameof(roasterId));
@@ -124,6 +127,12 @@ public class Bean
         Altitude = altitude;
         BagWeight = bagWeight;
         Price = price;
+        IsAvailable = isAvailable;
+    }
+
+    public void SetAvailability(bool isAvailable)
+    {
+        IsAvailable = isAvailable;
     }
 
     public void SetFlavorNotes(IEnumerable<FlavorNote> flavorNotes)

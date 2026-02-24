@@ -26,15 +26,19 @@ public static class BeanEndpoints
         group.MapPut("/{id:guid}", UpdateBean)
             .WithName("UpdateBean");
 
+        group.MapPatch("/{id:guid}/availability", SetBeanAvailability)
+            .WithName("SetBeanAvailability");
+
         return app;
     }
 
     private static async Task<Ok<IReadOnlyList<BeanSummaryDto>>> GetBeans(
         string? search,
+        bool? includeUnavailable,
         ISender sender,
         CancellationToken cancellationToken)
     {
-        var beans = await sender.Send(new GetBeansListQuery(search), cancellationToken);
+        var beans = await sender.Send(new GetBeansListQuery(search, includeUnavailable ?? false), cancellationToken);
         return TypedResults.Ok(beans);
     }
 
@@ -99,7 +103,21 @@ public static class BeanEndpoints
                 request.Altitude,
                 request.BagWeight,
                 request.Price,
+                request.IsAvailable,
                 request.FlavorNoteNames),
+            cancellationToken);
+
+        return TypedResults.Ok();
+    }
+
+    private static async Task<Ok> SetBeanAvailability(
+        Guid id,
+        SetBeanAvailabilityRequest request,
+        ISender sender,
+        CancellationToken cancellationToken)
+    {
+        await sender.Send(
+            new SetBeanAvailabilityCommand(id, request.IsAvailable),
             cancellationToken);
 
         return TypedResults.Ok();

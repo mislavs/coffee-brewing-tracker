@@ -9,6 +9,7 @@ import {
   getCreateBeanUrl,
   getGetBeanByIdUrl,
   getGetBeansUrl,
+  getSetBeanAvailabilityUrl,
   getUpdateBeanUrl,
 } from '@/lib/api/generated/beans/beans'
 import {
@@ -83,6 +84,7 @@ import type {
   RecipeSummaryDto,
   RoasterDto,
   RoasterSummaryDto,
+  SetBeanAvailabilityRequest,
   UpdateAccessoryRequest,
   UpdateBeanRequest,
   UpdateBrewLogRequest,
@@ -170,6 +172,12 @@ export const apiClient = {
         put: (request: UpdateBeanRequest) =>
           requestVoid(getUpdateBeanUrl(id), {
             method: 'PUT',
+            headers: jsonRequestHeaders,
+            body: serializeJsonBody(request),
+          }),
+        setAvailability: (request: SetBeanAvailabilityRequest) =>
+          requestVoid(getSetBeanAvailabilityUrl(id), {
+            method: 'PATCH',
             headers: jsonRequestHeaders,
             body: serializeJsonBody(request),
           }),

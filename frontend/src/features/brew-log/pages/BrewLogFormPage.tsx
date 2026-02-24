@@ -1,5 +1,17 @@
 import type { Guid } from '@/lib/api-types'
+import { useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
+import { useSetBeanAvailability } from '@/features/beans/hooks/useSetBeanAvailability'
 import {
   normalizeBrewLogFormValues,
   type BrewLogFormValues,
@@ -57,20 +69,92 @@ function createInitialValues(): BrewLogFormValues {
 function CreateBrewLogForm() {
   const navigate = useNavigate()
   const { mutateAsync, isPending } = useCreateBrewLog()
+  const { mutateAsync: setBeanAvailability, isPending: isSettingAvailability } =
+    useSetBeanAvailability()
+  const [lowStockPrompt, setLowStockPrompt] = useState<{
+    beanId: Guid
+    remainingQuantity: number
+  } | null>(null)
+
+  const closeLowStockPrompt = () => {
+    setLowStockPrompt(null)
+    navigate('/brew-log')
+  }
 
   return (
-    <BrewLogFormCard
-      title="Log Brew"
-      description="Record a new brew entry."
-      submitLabel="Create"
-      cancelHref="/brew-log"
-      isSubmitting={isPending}
-      initialValues={createInitialValues()}
-      onSubmit={async (values) => {
-        await mutateAsync(normalizeBrewLogFormValues(values))
-        navigate('/brew-log')
-      }}
-    />
+    <>
+      <BrewLogFormCard
+        title="Log Brew"
+        description="Record a new brew entry."
+        submitLabel="Create"
+        cancelHref="/brew-log"
+        isSubmitting={isPending}
+        initialValues={createInitialValues()}
+        onSubmit={async (values) => {
+          const request = normalizeBrewLogFormValues(values)
+          const response = await mutateAsync(request)
+          const remainingQuantity = response?.remainingBeanQuantity
+
+          if (
+            typeof remainingQuantity === 'number' &&
+            remainingQuantity < 15 &&
+            request.beanId
+          ) {
+            setLowStockPrompt({
+              beanId: request.beanId as Guid,
+              remainingQuantity,
+            })
+            return
+          }
+
+          navigate('/brew-log')
+        }}
+      />
+
+      <AlertDialog
+        open={Boolean(lowStockPrompt)}
+        onOpenChange={(open) => {
+          if (!open && !isSettingAvailability) {
+            closeLowStockPrompt()
+          }
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Mark bean as unavailable?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {`Only ${
+                lowStockPrompt?.remainingQuantity.toFixed(1) ?? '0.0'
+              }g remains for this bean. Do you want to mark it unavailable?`}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isSettingAvailability}>
+              Keep available
+            </AlertDialogCancel>
+            <AlertDialogAction
+              disabled={isSettingAvailability}
+              onClick={(event) => {
+                event.preventDefault()
+                if (!lowStockPrompt || isSettingAvailability) {
+                  return
+                }
+
+                void (async () => {
+                  await setBeanAvailability({
+                    id: lowStockPrompt.beanId,
+                    isAvailable: false,
+                  })
+                  closeLowStockPrompt()
+                })()
+              }}
+            >
+              {isSettingAvailability ? 'Saving...' : 'Mark unavailable'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   )
 }
 

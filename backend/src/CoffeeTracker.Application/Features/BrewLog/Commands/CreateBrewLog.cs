@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CoffeeTracker.Application.Features.BrewLog.Commands;
 
+public sealed record CreateBrewLogResult(Guid Id, decimal RemainingBeanQuantity);
+
 public sealed record CreateBrewLogCommand(
     Guid BeanId,
     Guid BrewerId,
@@ -22,7 +24,7 @@ public sealed record CreateBrewLogCommand(
     int? Rating,
     string? Notes,
     string? AdjustmentIdeas,
-    DateTime BrewedAt) : IRequest<Guid>;
+    DateTime BrewedAt) : IRequest<CreateBrewLogResult>;
 
 public sealed class CreateBrewLogValidator : AbstractValidator<CreateBrewLogCommand>
 {
@@ -73,9 +75,9 @@ public sealed class CreateBrewLogValidator : AbstractValidator<CreateBrewLogComm
 }
 
 public sealed class CreateBrewLogHandler(ApplicationDbContext dbContext)
-    : IRequestHandler<CreateBrewLogCommand, Guid>
+    : IRequestHandler<CreateBrewLogCommand, CreateBrewLogResult>
 {
-    public async Task<Guid> Handle(CreateBrewLogCommand request, CancellationToken cancellationToken)
+    public async Task<CreateBrewLogResult> Handle(CreateBrewLogCommand request, CancellationToken cancellationToken)
     {
         await EnsureRequiredEntitiesExist(request, cancellationToken);
         await EnsureRecipeConsistency(request.RecipeId, request.BrewerId, cancellationToken);
@@ -103,7 +105,15 @@ public sealed class CreateBrewLogHandler(ApplicationDbContext dbContext)
         dbContext.BrewLogEntries.Add(brewLogEntry);
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        return brewLogEntry.Id;
+        var remainingBeanQuantity = await dbContext.Beans
+            .AsNoTracking()
+            .Where(entity => entity.Id == request.BeanId)
+            .Select(entity => entity.BagWeight - (dbContext.BrewLogEntries
+                .Where(entry => entry.BeanId == entity.Id)
+                .Sum(entry => (decimal?)entry.Dose) ?? 0m))
+            .SingleAsync(cancellationToken);
+
+        return new CreateBrewLogResult(brewLogEntry.Id, remainingBeanQuantity);
     }
 
     private async Task EnsureRequiredEntitiesExist(CreateBrewLogCommand request, CancellationToken cancellationToken)

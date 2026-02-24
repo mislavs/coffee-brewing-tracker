@@ -132,6 +132,13 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "includeUnavailable",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
           }
         ],
         "responses": {
@@ -230,6 +237,40 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/UpdateBeanRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/beans/{id}/availability": {
+      "patch": {
+        "tags": [
+          "Beans"
+        ],
+        "operationId": "SetBeanAvailability",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetBeanAvailabilityRequest"
               }
             }
           },
@@ -1188,6 +1229,9 @@
             },
             "nullable": true
           },
+          "isAvailable": {
+            "type": "boolean"
+          },
           "remainingQuantity": {
             "type": "number",
             "format": "double"
@@ -1221,6 +1265,9 @@
             "type": "number",
             "format": "double",
             "nullable": true
+          },
+          "isAvailable": {
+            "type": "boolean"
           },
           "remainingQuantity": {
             "type": "number",
@@ -1617,6 +1664,10 @@
           "id": {
             "type": "string",
             "format": "uuid"
+          },
+          "remainingBeanQuantity": {
+            "type": "number",
+            "format": "double"
           }
         },
         "additionalProperties": false
@@ -1996,6 +2047,15 @@
         },
         "additionalProperties": false
       },
+      "SetBeanAvailabilityRequest": {
+        "type": "object",
+        "properties": {
+          "isAvailable": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
       "UpdateAccessoryRequest": {
         "type": "object",
         "properties": {
@@ -2064,6 +2124,9 @@
             "type": "number",
             "format": "double",
             "nullable": true
+          },
+          "isAvailable": {
+            "type": "boolean"
           },
           "flavorNoteNames": {
             "type": "array",

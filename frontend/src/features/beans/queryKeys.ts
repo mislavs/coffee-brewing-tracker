@@ -1,6 +1,7 @@
 export const beanQueryKeys = {
   all: ['beans'] as const,
-  list: (search: string) => ['beans', 'list', search] as const,
+  list: (search: string, includeUnavailable = false) =>
+    ['beans', 'list', search, includeUnavailable] as const,
   detail: (id: string) => ['beans', id] as const,
 }
 

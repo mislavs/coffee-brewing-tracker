@@ -50,6 +50,7 @@ public sealed class GetBeanByIdHandler(ApplicationDbContext dbContext)
                 .OrderBy(entity => entity.Name)
                 .Select(entity => new FlavorNoteDto(entity.Id, entity.Name))
                 .ToList(),
+            bean.IsAvailable,
             bean.BagWeight - totalDose);
     }
 }

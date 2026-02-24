@@ -31,6 +31,10 @@ public class BeanConfiguration : IEntityTypeConfiguration<Bean>
         builder.Property(bean => bean.BagWeight)
             .IsRequired();
 
+        builder.Property(bean => bean.IsAvailable)
+            .IsRequired()
+            .HasDefaultValue(true);
+
         builder.Ignore(bean => bean.PricePerKg);
 
         builder.HasOne(bean => bean.Roaster)

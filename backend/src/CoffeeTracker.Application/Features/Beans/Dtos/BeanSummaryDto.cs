@@ -9,4 +9,5 @@ public sealed record BeanSummaryDto(
     RoastProfile RoastProfile,
     decimal BagWeight,
     decimal? PricePerKg,
+    bool IsAvailable,
     decimal RemainingQuantity);
