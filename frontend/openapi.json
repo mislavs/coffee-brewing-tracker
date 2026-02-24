@@ -1058,6 +1058,26 @@
           }
         }
       }
+    },
+    "/api/stats/dashboard": {
+      "get": {
+        "tags": [
+          "Stats"
+        ],
+        "operationId": "GetDashboardStats",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DashboardStatsDto"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1697,6 +1717,28 @@
         },
         "additionalProperties": false
       },
+      "DashboardStatsDto": {
+        "type": "object",
+        "properties": {
+          "totalBrews": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "coffeeAvailableGrams": {
+            "type": "number",
+            "format": "double"
+          },
+          "beansExplored": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalCoffeeConsumedGrams": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
       "FlavorNoteDto": {
         "type": "object",
         "properties": {
@@ -2177,6 +2219,9 @@
     },
     {
       "name": "Roasters"
+    },
+    {
+      "name": "Stats"
     }
   ]
 }

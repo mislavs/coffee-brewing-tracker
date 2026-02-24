@@ -1,4 +1,6 @@
 import { useCallback, useRef } from 'react'
+import { DashboardStats } from '@/components/DashboardStats'
+import { SettingsButton } from '@/components/SettingsButton'
 import { NavLink, Outlet } from 'react-router-dom'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { beanQueryKeys } from '@/features/beans/queryKeys'
@@ -145,10 +147,14 @@ export function AppLayout() {
               </NavLink>
             ))}
           </nav>
-          <ThemeToggle />
+          <div className="flex items-center gap-1">
+            <SettingsButton />
+            <ThemeToggle />
+          </div>
         </div>
       </header>
       <div className="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8">
+        <DashboardStats />
         <main>
           <Outlet />
         </main>

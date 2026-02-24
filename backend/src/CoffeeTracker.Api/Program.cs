@@ -44,6 +44,7 @@ app.MapCountryEndpoints();
 app.MapFlavorNoteEndpoints();
 app.MapRecipeEndpoints();
 app.MapBrewLogEndpoints();
+app.MapStatsEndpoints();
 
 app.Run();
 
