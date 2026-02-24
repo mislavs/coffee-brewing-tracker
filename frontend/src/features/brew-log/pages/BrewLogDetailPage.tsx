@@ -6,9 +6,8 @@ import { DetailField } from '@/components/DetailField'
 import { Button } from '@/components/ui/button'
 import {
   Card,
+  CardAction,
   CardContent,
-  CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
@@ -47,100 +46,147 @@ function BrewLogDetailContent({ brewLogId }: { brewLogId: Guid }) {
     <>
       <Card>
         <CardHeader>
+          <CardAction className="flex items-center gap-2">
+            <Button asChild>
+              <Link to={`/brew-log/${brewLogId}/edit`}>Edit</Link>
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={() => setIsDeleteDialogOpen(true)}
+              disabled={isDeleting}
+            >
+              Delete
+            </Button>
+            <Button variant="outline" asChild>
+              <Link to="/brew-log">Back</Link>
+            </Button>
+          </CardAction>
           <CardTitle>{brewLog.beanName ?? 'Brew log entry'}</CardTitle>
-          <CardDescription>Brew details</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-2 text-sm">
-          <DetailField label="Bean">
-            {brewLog.beanId ? (
-              <Link to={`/beans/${brewLog.beanId}`} className="hover:underline">
-                {brewLog.beanName ?? 'View bean'}
-              </Link>
-            ) : (
-              (brewLog.beanName ?? '—')
-            )}
-          </DetailField>
-          <DetailField label="Brewer">
-            {brewLog.brewerId ? (
-              <Link
-                to={`/equipment/brewers/${brewLog.brewerId}`}
-                className="hover:underline"
-              >
-                {brewLog.brewerName ?? 'View brewer'}
-              </Link>
-            ) : (
-              (brewLog.brewerName ?? '—')
-            )}
-          </DetailField>
-          <DetailField label="Grinder">
-            {brewLog.grinderId ? (
-              <Link
-                to={`/equipment/grinders/${brewLog.grinderId}`}
-                className="hover:underline"
-              >
-                {brewLog.grinderName ?? 'View grinder'}
-              </Link>
-            ) : (
-              (brewLog.grinderName ?? '—')
-            )}
-          </DetailField>
-          <DetailField label="Recipe">
-            {brewLog.recipeId ? (
-              <Link to={`/recipes/${brewLog.recipeId}`} className="hover:underline">
-                {brewLog.recipeName ?? 'View recipe'}
-              </Link>
-            ) : (
-              (brewLog.recipeName ?? '—')
-            )}
-          </DetailField>
-          <DetailField label="Accessories">{accessoriesText}</DetailField>
-          <DetailField label="Dose">
-            {brewLog.dose !== null && brewLog.dose !== undefined ? `${brewLog.dose} g` : '—'}
-          </DetailField>
-          <DetailField label="Water amount">
-            {brewLog.waterAmount !== null && brewLog.waterAmount !== undefined
-              ? `${brewLog.waterAmount} ml`
-              : '—'}
-          </DetailField>
-          <DetailField label="Brew ratio">{formatRatio(brewLog.brewRatio)}</DetailField>
-          <DetailField label="Water temperature">
-            {brewLog.waterTemperature !== null && brewLog.waterTemperature !== undefined
-              ? `${brewLog.waterTemperature} C`
-              : '—'}
-          </DetailField>
-          <DetailField label="Grind size">{brewLog.grindSize || '—'}</DetailField>
-          <DetailField label="Brew time">{formatBrewTime(brewLog.brewTimeSeconds)}</DetailField>
-          <DetailField label="Rating">{getRatingDisplay(brewLog.rating)}</DetailField>
-          <div className="space-y-1 pt-2">
-            <p className="font-medium text-muted-foreground">Notes</p>
-            <p className="whitespace-pre-wrap text-muted-foreground">
-              {brewLog.notes || '—'}
-            </p>
+        <CardContent className="text-sm">
+          <div className="grid gap-6 md:grid-cols-2">
+            <div className="space-y-6">
+              <section className="space-y-3">
+                <p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
+                  Equipment
+                </p>
+                <div className="grid gap-3">
+                  <DetailField label="Bean" stacked>
+                    {brewLog.beanId ? (
+                      <Link to={`/beans/${brewLog.beanId}`} className="hover:underline">
+                        {brewLog.beanName ?? 'View bean'}
+                      </Link>
+                    ) : (
+                      (brewLog.beanName ?? '—')
+                    )}
+                  </DetailField>
+                  <DetailField label="Brewer" stacked>
+                    {brewLog.brewerId ? (
+                      <Link
+                        to={`/equipment/brewers/${brewLog.brewerId}`}
+                        className="hover:underline"
+                      >
+                        {brewLog.brewerName ?? 'View brewer'}
+                      </Link>
+                    ) : (
+                      (brewLog.brewerName ?? '—')
+                    )}
+                  </DetailField>
+                  <DetailField label="Grinder" stacked>
+                    {brewLog.grinderId ? (
+                      <Link
+                        to={`/equipment/grinders/${brewLog.grinderId}`}
+                        className="hover:underline"
+                      >
+                        {brewLog.grinderName ?? 'View grinder'}
+                      </Link>
+                    ) : (
+                      (brewLog.grinderName ?? '—')
+                    )}
+                  </DetailField>
+                  <DetailField label="Recipe" stacked>
+                    {brewLog.recipeId ? (
+                      <Link to={`/recipes/${brewLog.recipeId}`} className="hover:underline">
+                        {brewLog.recipeName ?? 'View recipe'}
+                      </Link>
+                    ) : (
+                      (brewLog.recipeName ?? '—')
+                    )}
+                  </DetailField>
+                  <DetailField label="Accessories" stacked>
+                    {accessoriesText}
+                  </DetailField>
+                </div>
+              </section>
+
+              <section className="space-y-3">
+                <p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
+                  Notes
+                </p>
+                <p className="whitespace-pre-wrap text-muted-foreground">{brewLog.notes || '—'}</p>
+              </section>
+
+              <section className="space-y-3">
+                <p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
+                  Adjustments
+                </p>
+                <p className="whitespace-pre-wrap text-muted-foreground">
+                  {brewLog.adjustmentIdeas || '—'}
+                </p>
+              </section>
+            </div>
+
+            <div className="space-y-6">
+              <section className="space-y-3">
+                <p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
+                  Brew Parameters
+                </p>
+                <div className="grid gap-3">
+                  <DetailField label="Dose" stacked>
+                    {brewLog.dose !== null && brewLog.dose !== undefined
+                      ? `${brewLog.dose} g`
+                      : '—'}
+                  </DetailField>
+                  <DetailField label="Water amount" stacked>
+                    {brewLog.waterAmount !== null && brewLog.waterAmount !== undefined
+                      ? `${brewLog.waterAmount} ml`
+                      : '—'}
+                  </DetailField>
+                  <DetailField label="Brew ratio" stacked>
+                    {formatRatio(brewLog.brewRatio)}
+                  </DetailField>
+                  <DetailField label="Water temperature" stacked>
+                    {brewLog.waterTemperature !== null && brewLog.waterTemperature !== undefined
+                      ? `${brewLog.waterTemperature}°C`
+                      : '—'}
+                  </DetailField>
+                  <DetailField label="Grind size" stacked>
+                    {brewLog.grindSize || '—'}
+                  </DetailField>
+                  <DetailField label="Brew time" stacked>
+                    {formatBrewTime(brewLog.brewTimeSeconds)}
+                  </DetailField>
+                </div>
+              </section>
+
+              <section className="space-y-3">
+                <p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
+                  Result
+                </p>
+                <div className="grid gap-3">
+                  <DetailField label="Rating" stacked>
+                    {getRatingDisplay(brewLog.rating)}
+                  </DetailField>
+                  <DetailField label="Brew date" stacked>
+                    {formatDateTime(brewLog.brewedAt)}
+                  </DetailField>
+                </div>
+              </section>
+
+            </div>
           </div>
-          <div className="space-y-1">
-            <p className="font-medium text-muted-foreground">Adjustment ideas</p>
-            <p className="whitespace-pre-wrap text-muted-foreground">
-              {brewLog.adjustmentIdeas || '—'}
-            </p>
-          </div>
-          <DetailField label="Brew date">{formatDateTime(brewLog.brewedAt)}</DetailField>
         </CardContent>
-        <CardFooter className="flex items-center gap-2">
-          <Button asChild>
-            <Link to={`/brew-log/${brewLogId}/edit`}>Edit</Link>
-          </Button>
-          <Button
-            type="button"
-            variant="destructive"
-            onClick={() => setIsDeleteDialogOpen(true)}
-            disabled={isDeleting}
-          >
-            Delete
-          </Button>
-          <Button variant="outline" asChild>
-            <Link to="/brew-log">Back</Link>
-          </Button>
-        </CardFooter>
       </Card>
 
       <DeleteConfirmationDialog

@@ -22,7 +22,7 @@ export function RoasterCard({ roaster }: RoasterCardProps) {
   const logoUrl = resolveRoasterLogoUrl(roaster.logoUrl)
   const name = roaster.name ?? 'Unnamed roaster'
   const city = roaster.city || '—'
-  const country = roaster.country || '—'
+  const country = roaster.countryName || '—'
   const beanCount = roaster.beanCount ?? 0
 
   return (

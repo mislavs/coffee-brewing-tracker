@@ -17,12 +17,14 @@ public class RoasterConfiguration : IEntityTypeConfiguration<Roaster>
         builder.Property(roaster => roaster.City)
             .HasMaxLength(100);
 
-        builder.Property(roaster => roaster.Country)
-            .HasMaxLength(100);
-
         builder.Property(roaster => roaster.LogoFileName)
             .HasMaxLength(255);
 
         builder.Property(roaster => roaster.LogoData);
+
+        builder.HasOne(roaster => roaster.Country)
+            .WithMany()
+            .HasForeignKey(roaster => roaster.CountryId)
+            .OnDelete(DeleteBehavior.SetNull);
     }
 }

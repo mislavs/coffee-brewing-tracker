@@ -66,7 +66,7 @@ public static class RoasterEndpoints
         CancellationToken cancellationToken)
     {
         var roasterId = await sender.Send(
-            new CreateRoasterCommand(request.Name, request.City, request.Country),
+            new CreateRoasterCommand(request.Name, request.City, request.CountryId),
             cancellationToken);
 
         var location = linkGenerator.GetPathByName(
@@ -85,7 +85,7 @@ public static class RoasterEndpoints
         CancellationToken cancellationToken)
     {
         await sender.Send(
-            new UpdateRoasterCommand(id, request.Name, request.City, request.Country),
+            new UpdateRoasterCommand(id, request.Name, request.City, request.CountryId),
             cancellationToken);
 
         return TypedResults.Ok();

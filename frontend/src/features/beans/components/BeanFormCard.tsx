@@ -165,7 +165,7 @@ export function BeanFormCard({
     const response = await createRoaster({
       name: values.name.trim(),
       city: normalizeOptional(values.city),
-      country: normalizeOptional(values.country),
+      countryId: normalizeOptional(values.countryId),
     })
 
     const createdId = response?.id
@@ -454,7 +454,7 @@ export function BeanFormCard({
             initialValues={{
               name: '',
               city: '',
-              country: '',
+              countryId: undefined,
             }}
             onSubmit={submitInlineRoaster}
             isSubmitting={isCreatingRoaster}

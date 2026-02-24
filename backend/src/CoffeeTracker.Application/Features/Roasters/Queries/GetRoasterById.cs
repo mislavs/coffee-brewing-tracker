@@ -21,7 +21,8 @@ public sealed class GetRoasterByIdHandler(ApplicationDbContext dbContext)
                 entity.Id,
                 entity.Name,
                 entity.City,
-                entity.Country,
+                entity.CountryId,
+                CountryName = entity.Country != null ? entity.Country.Name : null,
                 HasLogo = entity.LogoData != null
             })
             .FirstOrDefaultAsync(cancellationToken);
@@ -85,7 +86,8 @@ public sealed class GetRoasterByIdHandler(ApplicationDbContext dbContext)
             roaster.Id,
             roaster.Name,
             roaster.City,
-            roaster.Country,
+            roaster.CountryId,
+            roaster.CountryName,
             beanSummaries,
             beanCount,
             avgPricePerKgResult,

@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
 import { Link } from 'react-router-dom'
 import { ImageUpload } from '@/components/ImageUpload'
 import { Button } from '@/components/ui/button'
@@ -13,6 +13,14 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { useCountries } from '@/features/beans/hooks/useCountries'
 import { applyRoasterFormServerErrors } from '@/features/roasters/mapApiValidationErrors'
 import {
   roasterFormSchema,
@@ -36,6 +44,8 @@ export type RoasterLogoSubmission = {
   removeExistingLogo: boolean
 }
 
+const noCountryValue = '__no_country__'
+
 export function RoasterFormCard({
   title,
   description,
@@ -52,10 +62,26 @@ export function RoasterFormCard({
     defaultValues: initialValues,
   })
   const [selectedLogoFile, setSelectedLogoFile] = useState<File | null>(null)
+  const { data: countries = [] } = useCountries()
   const [selectedLogoPreviewUrl, setSelectedLogoPreviewUrl] = useState<string | null>(
     null,
   )
   const [removeExistingLogo, setRemoveExistingLogo] = useState(false)
+  const countryOptions = useMemo(
+    () =>
+      countries
+        .map((country) =>
+          country.id
+            ? {
+                id: country.id,
+                name: country.name ?? 'Unnamed country',
+              }
+            : null,
+        )
+        .filter((country): country is { id: string; name: string } => Boolean(country))
+        .sort((left, right) => left.name.localeCompare(right.name)),
+    [countries],
+  )
 
   useEffect(() => {
     if (!selectedLogoFile) {
@@ -120,13 +146,36 @@ export function RoasterFormCard({
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="country" className="text-sm font-medium">
+            <label htmlFor="countryId" className="text-sm font-medium">
               Country
             </label>
-            <Input id="country" {...form.register('country')} />
-            {form.formState.errors.country && (
+            <Controller
+              control={form.control}
+              name="countryId"
+              render={({ field }) => (
+                <Select
+                  value={field.value || noCountryValue}
+                  onValueChange={(nextValue) =>
+                    field.onChange(nextValue === noCountryValue ? undefined : nextValue)
+                  }
+                >
+                  <SelectTrigger id="countryId" className="w-full">
+                    <SelectValue placeholder="Select a country" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={noCountryValue}>No country</SelectItem>
+                    {countryOptions.map((country) => (
+                      <SelectItem key={country.id} value={country.id}>
+                        {country.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
+            {form.formState.errors.countryId && (
               <p className="text-sm text-destructive">
-                {form.formState.errors.country.message}
+                {form.formState.errors.countryId.message}
               </p>
             )}
           </div>

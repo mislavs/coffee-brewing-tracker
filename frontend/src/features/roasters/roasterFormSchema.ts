@@ -11,10 +11,10 @@ export const roasterFormSchema = z.object({
     .trim()
     .max(100, 'City must be 100 characters or fewer.')
     .optional(),
-  country: z
+  countryId: z
     .string()
     .trim()
-    .max(100, 'Country must be 100 characters or fewer.')
+    .uuid('Country must be a valid identifier.')
     .optional(),
 })
 

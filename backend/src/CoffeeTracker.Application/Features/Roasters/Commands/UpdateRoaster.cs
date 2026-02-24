@@ -10,7 +10,7 @@ public sealed record UpdateRoasterCommand(
     Guid Id,
     string Name,
     string? City,
-    string? Country) : IRequest;
+    Guid? CountryId) : IRequest;
 
 public sealed class UpdateRoasterValidator : AbstractValidator<UpdateRoasterCommand>
 {
@@ -26,8 +26,6 @@ public sealed class UpdateRoasterValidator : AbstractValidator<UpdateRoasterComm
         RuleFor(command => command.City)
             .MaximumLength(100);
 
-        RuleFor(command => command.Country)
-            .MaximumLength(100);
     }
 }
 
@@ -43,7 +41,18 @@ public sealed class UpdateRoasterHandler(ApplicationDbContext dbContext) : IRequ
             throw new NotFoundException($"Roaster '{request.Id}' was not found.");
         }
 
-        roaster.Update(request.Name, request.City, request.Country);
+        if (request.CountryId.HasValue)
+        {
+            var countryExists = await dbContext.Countries
+                .AnyAsync(entity => entity.Id == request.CountryId.Value, cancellationToken);
+
+            if (!countryExists)
+            {
+                throw new NotFoundException($"Country '{request.CountryId.Value}' was not found.");
+            }
+        }
+
+        roaster.Update(request.Name, request.City, request.CountryId);
         await dbContext.SaveChangesAsync(cancellationToken);
     }
 }

@@ -39,7 +39,7 @@ export function RoasterListPage() {
               <RoasterCard
                 key={
                   roaster.id ??
-                  `${roaster.name ?? 'roaster'}-${roaster.city ?? ''}-${roaster.country ?? ''}`
+                  `${roaster.name ?? 'roaster'}-${roaster.city ?? ''}-${roaster.countryName ?? ''}`
                 }
                 roaster={roaster}
               />

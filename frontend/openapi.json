@@ -1700,8 +1700,9 @@
             "type": "string",
             "nullable": true
           },
-          "country": {
+          "countryId": {
             "type": "string",
+            "format": "uuid",
             "nullable": true
           }
         },
@@ -1900,7 +1901,12 @@
             "type": "string",
             "nullable": true
           },
-          "country": {
+          "countryId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "countryName": {
             "type": "string",
             "nullable": true
           },
@@ -1962,7 +1968,12 @@
             "type": "string",
             "nullable": true
           },
-          "country": {
+          "countryId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "countryName": {
             "type": "string",
             "nullable": true
           },
@@ -2183,8 +2194,9 @@
             "type": "string",
             "nullable": true
           },
-          "country": {
+          "countryId": {
             "type": "string",
+            "format": "uuid",
             "nullable": true
           }
         },

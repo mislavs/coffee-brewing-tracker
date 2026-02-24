@@ -44,7 +44,7 @@ function RoasterDetailContent({ roasterId }: { roasterId: Guid }) {
       </CardHeader>
       <CardContent className="space-y-2 text-sm">
         <DetailField label="City">{roaster.city || '—'}</DetailField>
-        <DetailField label="Country">{roaster.country || '—'}</DetailField>
+        <DetailField label="Country">{roaster.countryName || '—'}</DetailField>
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
           <StatCard label="Beans" value={`${beanCount}`} />
           <StatCard
