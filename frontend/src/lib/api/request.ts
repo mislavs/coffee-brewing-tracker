@@ -1,3 +1,10 @@
+import {
+  SpanKind,
+  SpanStatusCode,
+  context,
+  propagation,
+  trace,
+} from '@opentelemetry/api'
 import { API_URL } from '@/lib/config'
 
 function resolveApiUrl(path: string) {
@@ -82,13 +89,65 @@ async function parseJsonOrUndefined<T>(response: Response): Promise<T | undefine
   return JSON.parse(responseText) as T
 }
 
+function toSpanName(method: string, url: string) {
+  try {
+    const pathname = new URL(url, window.location.origin).pathname
+    return `${method.toUpperCase()} ${pathname}`
+  } catch {
+    return `${method.toUpperCase()} ${url}`
+  }
+}
+
+async function tracedFetch(url: string, init?: RequestInit) {
+  const method = init?.method ?? 'GET'
+  const tracer = trace.getTracer('frontend')
+  const span = tracer.startSpan(toSpanName(method, url), {
+    kind: SpanKind.CLIENT,
+    attributes: {
+      'http.method': method,
+      'http.url': url,
+    },
+  })
+
+  const spanContext = trace.setSpan(context.active(), span)
+  const headers = new Headers(init?.headers)
+
+  propagation.inject(spanContext, headers, {
+    set(carrier, key, value) {
+      carrier.set(key, value)
+    },
+  })
+
+  try {
+    const response = await context.with(spanContext, () =>
+      fetch(url, { ...init, headers }),
+    )
+
+    span.setAttribute('http.status_code', response.status)
+    span.setStatus({
+      code: response.ok ? SpanStatusCode.OK : SpanStatusCode.ERROR,
+      message: response.ok ? undefined : response.statusText,
+    })
+
+    return response
+  } catch (error) {
+    span.setStatus({
+      code: SpanStatusCode.ERROR,
+      message: error instanceof Error ? error.message : String(error),
+    })
+    throw error
+  } finally {
+    span.end()
+  }
+}
+
 export async function requestJson<T>(path: string, init?: RequestInit) {
-  const response = await fetch(resolveApiUrl(path), init)
+  const response = await tracedFetch(resolveApiUrl(path), init)
   await ensureSuccess(response)
   return parseJsonOrUndefined<T>(response)
 }
 
 export async function requestVoid(path: string, init?: RequestInit) {
-  const response = await fetch(resolveApiUrl(path), init)
+  const response = await tracedFetch(resolveApiUrl(path), init)
   await ensureSuccess(response)
 }
