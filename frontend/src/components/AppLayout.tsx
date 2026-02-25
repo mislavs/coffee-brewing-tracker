@@ -3,6 +3,7 @@ import { DashboardStats } from '@/components/DashboardStats'
 import { SettingsButton } from '@/components/SettingsButton'
 import { NavLink, Outlet } from 'react-router-dom'
 import { ThemeToggle } from '@/components/ThemeToggle'
+import { WorldMap } from '@/features/world-map/components/WorldMap'
 import { beanQueryKeys } from '@/features/beans/queryKeys'
 import { brewLogQueryKeys } from '@/features/brew-log/queryKeys'
 import {
@@ -13,6 +14,7 @@ import {
 import { recipeQueryKeys } from '@/features/recipes/queryKeys'
 import { roasterQueryKeys } from '@/features/roasters/queryKeys'
 import { apiClient } from '@/lib/api-client'
+import { useSettings } from '@/hooks/useSettings'
 import { featureRoutes } from '@/lib/navigation'
 import { queryClient } from '@/lib/queryClient'
 import {
@@ -25,6 +27,7 @@ import {
 import { cn } from '@/lib/utils'
 
 export function AppLayout() {
+  const { settings } = useSettings()
   const hasPrefetchedRoasters = useRef(false)
   const hasPrefetchedBeans = useRef(false)
   const hasPrefetchedBrewLog = useRef(false)
@@ -153,7 +156,17 @@ export function AppLayout() {
           </div>
         </div>
       </header>
-      <div className="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8">
+      {settings.showWorldMap ? (
+        <div className="mx-auto w-full max-w-[86rem] px-2 pt-2 sm:px-4 lg:px-6">
+          <WorldMap compact />
+        </div>
+      ) : null}
+      <div
+        className={cn(
+          'mx-auto flex max-w-7xl flex-col px-4 sm:px-6 lg:px-8',
+          settings.showWorldMap ? 'gap-5 pt-3 pb-6' : 'gap-6 py-6',
+        )}
+      >
         <DashboardStats />
         <main>
           <Outlet />

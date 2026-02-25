@@ -6,6 +6,7 @@ export type FeatureRoute = {
 
 export const featureRoutes: FeatureRoute[] = [
   { path: 'brew-log', href: '/brew-log', title: 'Brew Log' },
+  { path: 'map', href: '/map', title: 'Map' },
   { path: 'beans', href: '/beans', title: 'Beans' },
   { path: 'equipment', href: '/equipment', title: 'Equipment' },
   { path: 'recipes', href: '/recipes', title: 'Recipes' },

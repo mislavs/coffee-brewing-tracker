@@ -32,9 +32,14 @@ export function SettingsButton() {
               Choose what appears in the global dashboard header.
             </p>
           </div>
-          <label htmlFor="show-dashboard-stats" className="flex items-start justify-between gap-3">
+          <label
+            htmlFor="show-dashboard-stats"
+            className="flex items-start justify-between gap-3"
+          >
             <div className="space-y-1">
-              <p className="text-sm font-medium leading-none">Show dashboard stats</p>
+              <p className="text-sm font-medium leading-none">
+                Show dashboard stats
+              </p>
               <p className="text-muted-foreground text-xs">
                 Display brew and bean summary stats above each page.
               </p>
@@ -46,6 +51,25 @@ export function SettingsButton() {
                 updateSettings({ showDashboardStats: checked })
               }}
               aria-label="Toggle dashboard stats visibility"
+            />
+          </label>
+          <label
+            htmlFor="show-world-map"
+            className="flex items-start justify-between gap-3"
+          >
+            <div className="space-y-1">
+              <p className="text-sm font-medium leading-none">Show world map</p>
+              <p className="text-muted-foreground text-xs">
+                Display the origin country map above each page.
+              </p>
+            </div>
+            <Switch
+              id="show-world-map"
+              checked={settings.showWorldMap}
+              onCheckedChange={(checked) => {
+                updateSettings({ showWorldMap: checked })
+              }}
+              aria-label="Toggle world map visibility"
             />
           </label>
         </div>

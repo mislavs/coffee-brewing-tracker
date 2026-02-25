@@ -12,10 +12,12 @@ const SETTINGS_STORAGE_KEY = 'coffee-tracker-settings'
 
 export type AppSettings = {
   showDashboardStats: boolean
+  showWorldMap: boolean
 }
 
 const DEFAULT_SETTINGS: AppSettings = {
   showDashboardStats: true,
+  showWorldMap: true,
 }
 
 type SettingsContextValue = {

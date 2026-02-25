@@ -12,6 +12,7 @@ import { BrewLogListPage } from '@/features/brew-log/pages/BrewLogListPage'
 import { EquipmentPage } from '@/features/equipment/pages/EquipmentPage'
 import { RecipeListPage } from '@/features/recipes/pages/RecipeListPage'
 import { RoasterListPage } from '@/features/roasters/pages/RoasterListPage'
+import { WorldMapPage } from '@/features/world-map/pages/WorldMapPage'
 import { defaultFeatureRoute, featureRoutes } from '@/lib/navigation'
 import { queryClient } from '@/lib/queryClient'
 import {
@@ -101,7 +102,8 @@ const placeholderFeatureRoutes = featureRoutes.filter(
     route.path !== 'beans' &&
     route.path !== 'equipment' &&
     route.path !== 'recipes' &&
-    route.path !== 'brew-log',
+    route.path !== 'brew-log' &&
+    route.path !== 'map',
 )
 
 function RouteFallback() {
@@ -131,6 +133,7 @@ function App() {
             element={<Navigate to={defaultFeatureRoute} replace />}
           />
           <Route path="brew-log" element={<BrewLogListPage />} />
+          <Route path="map" element={<WorldMapPage />} />
           <Route
             path="brew-log/new"
             element={

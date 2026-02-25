@@ -1119,6 +1119,29 @@
           }
         }
       }
+    },
+    "/api/stats/country-map": {
+      "get": {
+        "tags": [
+          "Stats"
+        ],
+        "operationId": "GetCountryMapStats",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CountryMapStatsDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1485,6 +1508,53 @@
           "name": {
             "type": "string",
             "nullable": true
+          },
+          "isoAlpha2": {
+            "type": "string",
+            "nullable": true
+          },
+          "isoNumericCode": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CountryMapStatsDto": {
+        "type": "object",
+        "properties": {
+          "countryId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "countryName": {
+            "type": "string",
+            "nullable": true
+          },
+          "isoAlpha2": {
+            "type": "string",
+            "nullable": true
+          },
+          "isoNumericCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "beanCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalBagWeightGrams": {
+            "type": "number",
+            "format": "double"
+          },
+          "avgBrewRating": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "totalBrews": {
+            "type": "integer",
+            "format": "int32"
           }
         },
         "additionalProperties": false

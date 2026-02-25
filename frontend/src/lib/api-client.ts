@@ -48,7 +48,10 @@ import {
   getUpdateRoasterUrl,
   getUploadRoasterLogoUrl,
 } from '@/lib/api/generated/roasters/roasters'
-import { getGetDashboardStatsUrl } from '@/lib/api/generated/stats/stats'
+import {
+  getGetCountryMapStatsUrl,
+  getGetDashboardStatsUrl,
+} from '@/lib/api/generated/stats/stats'
 import { requestJson, requestVoid } from '@/lib/api/request'
 import type {
   AccessoryDto,
@@ -73,6 +76,7 @@ import type {
   CreateRecipeResponse,
   CreateRoasterRequest,
   CreateRoasterResponse,
+  CountryMapStatsDto,
   DashboardStatsDto,
   FlavorNoteDto,
   GetBeansParams,
@@ -356,6 +360,12 @@ export const apiClient = {
       dashboard: {
         get: () =>
           requestJson<DashboardStatsDto>(getGetDashboardStatsUrl(), {
+            method: 'GET',
+          }),
+      },
+      countryMap: {
+        get: () =>
+          requestJson<CountryMapStatsDto[]>(getGetCountryMapStatsUrl(), {
             method: 'GET',
           }),
       },

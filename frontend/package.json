@@ -28,6 +28,7 @@
     "@tailwindcss/vite": "^4.1.18",
     "@tanstack/react-query": "^5.90.21",
     "@tanstack/react-table": "^8.21.3",
+    "@vnedyalk0v/react19-simple-maps": "^2.0.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
@@ -41,6 +42,7 @@
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.4.1",
     "tailwindcss": "^4.1.18",
+    "world-atlas": "^2.0.2",
     "zod": "^4.3.6"
   },
   "devDependencies": {
