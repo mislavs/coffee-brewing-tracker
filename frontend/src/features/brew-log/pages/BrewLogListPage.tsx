@@ -8,6 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
+import { BrewLogCardSkeleton } from '@/components/skeletons/BrewLogCardSkeleton'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Input } from '@/components/ui/input'
 import { BrewLogCard } from '@/features/brew-log/components/BrewLogCard'
@@ -112,7 +113,20 @@ export function BrewLogListPage() {
         </div>
 
         {isPending && brewLogs.length === 0 ? (
-          <p className="text-muted-foreground">Loading brew logs...</p>
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            {Array.from({ length: 6 }).map((_, index) => (
+              <BrewLogCardSkeleton
+                key={`brew-log-skeleton-${index}`}
+                className={
+                  index === 3
+                    ? 'hidden sm:block'
+                    : index >= 4
+                      ? 'hidden xl:block'
+                      : undefined
+                }
+              />
+            ))}
+          </div>
         ) : brewLogs.length === 0 ? (
           <p className="text-muted-foreground">
             No brew logs yet. Add your first brew to get started.

@@ -9,6 +9,7 @@ import { Toaster } from '@/components/ui/sonner'
 import { BeanListPage } from '@/features/beans/pages/BeanListPage'
 import { BeanFormPage } from '@/features/beans/pages/BeanFormPage'
 import { BrewLogListPage } from '@/features/brew-log/pages/BrewLogListPage'
+import { EquipmentPage } from '@/features/equipment/pages/EquipmentPage'
 import { RecipeListPage } from '@/features/recipes/pages/RecipeListPage'
 import { RoasterListPage } from '@/features/roasters/pages/RoasterListPage'
 import { defaultFeatureRoute, featureRoutes } from '@/lib/navigation'
@@ -21,7 +22,6 @@ import {
   loadBrewLogFormPage,
   loadBrewerDetailPage,
   loadBrewerFormPage,
-  loadEquipmentPage,
   loadGrinderDetailPage,
   loadGrinderFormPage,
   loadRecipeDetailPage,
@@ -53,11 +53,6 @@ const BrewLogDetailPage = lazy(() =>
 const BrewLogFormPage = lazy(() =>
   loadBrewLogFormPage().then((m) => ({
     default: m.BrewLogFormPage,
-  })),
-)
-const EquipmentPage = lazy(() =>
-  loadEquipmentPage().then((m) => ({
-    default: m.EquipmentPage,
   })),
 )
 const BrewerDetailPage = lazy(() =>
@@ -228,14 +223,7 @@ function App() {
               </Suspense>
             }
           />
-          <Route
-            path="equipment"
-            element={
-              <Suspense fallback={<RouteFallback />}>
-                <EquipmentPage />
-              </Suspense>
-            }
-          />
+          <Route path="equipment" element={<EquipmentPage />} />
           <Route
             path="equipment/brewers/new"
             element={

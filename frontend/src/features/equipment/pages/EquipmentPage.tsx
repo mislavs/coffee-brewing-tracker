@@ -16,6 +16,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { TableRowSkeleton } from '@/components/skeletons/TableRowSkeleton'
 import { useAccessories } from '@/features/equipment/hooks/useAccessories'
 import { useBrewers } from '@/features/equipment/hooks/useBrewers'
 import { useGrinders } from '@/features/equipment/hooks/useGrinders'
@@ -53,11 +54,11 @@ function BrewerList() {
           </TableHeader>
           <TableBody>
             {isPending && brewers.length === 0 ? (
-              <TableRow>
-                <TableCell className="text-muted-foreground">
-                  Loading brewers...
-                </TableCell>
-              </TableRow>
+              <TableRowSkeleton
+                columns={1}
+                rowCount={4}
+                columnWidthClasses={['w-3/5']}
+              />
             ) : brewers.length === 0 ? (
               <TableRow>
                 <TableCell className="text-muted-foreground">
@@ -112,11 +113,11 @@ function GrinderList() {
           </TableHeader>
           <TableBody>
             {isPending && grinders.length === 0 ? (
-              <TableRow>
-                <TableCell className="text-muted-foreground">
-                  Loading grinders...
-                </TableCell>
-              </TableRow>
+              <TableRowSkeleton
+                columns={1}
+                rowCount={4}
+                columnWidthClasses={['w-3/5']}
+              />
             ) : grinders.length === 0 ? (
               <TableRow>
                 <TableCell className="text-muted-foreground">
@@ -172,11 +173,11 @@ function AccessoryList() {
           </TableHeader>
           <TableBody>
             {isPending && accessories.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={2} className="text-muted-foreground">
-                  Loading accessories...
-                </TableCell>
-              </TableRow>
+              <TableRowSkeleton
+                columns={2}
+                rowCount={4}
+                columnWidthClasses={['w-2/3', 'w-5/6']}
+              />
             ) : accessories.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={2} className="text-muted-foreground">

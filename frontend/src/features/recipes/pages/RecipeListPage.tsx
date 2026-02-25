@@ -22,6 +22,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { TableRowSkeleton } from '@/components/skeletons/TableRowSkeleton'
 import { useBrewers } from '@/features/equipment/hooks/useBrewers'
 import { useRecipes } from '@/features/recipes/hooks/useRecipes'
 
@@ -110,11 +111,11 @@ export function RecipeListPage() {
           </TableHeader>
           <TableBody>
             {isPending && recipes.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={3} className="text-muted-foreground">
-                  Loading recipes...
-                </TableCell>
-              </TableRow>
+              <TableRowSkeleton
+                columns={3}
+                rowCount={5}
+                columnWidthClasses={['w-2/3', 'w-1/2', 'w-5/6']}
+              />
             ) : recipes.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={3} className="text-muted-foreground">

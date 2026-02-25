@@ -9,6 +9,7 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { CardSkeleton } from '@/components/skeletons/CardSkeleton'
 import { Switch } from '@/components/ui/switch'
 import { BeanCard } from '@/features/beans/components/BeanCard'
 import { useBeans } from '@/features/beans/hooks/useBeans'
@@ -102,7 +103,21 @@ export function BeanListPage() {
         </div>
 
         {isPending && beans.length === 0 ? (
-          <p className="text-muted-foreground">Loading beans...</p>
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            {Array.from({ length: 6 }).map((_, index) => (
+              <CardSkeleton
+                key={`bean-skeleton-${index}`}
+                badgeCount={3}
+                className={
+                  index === 3
+                    ? 'hidden sm:block'
+                    : index >= 4
+                      ? 'hidden xl:block'
+                      : undefined
+                }
+              />
+            ))}
+          </div>
         ) : beans.length === 0 ? (
           <p className="text-muted-foreground">
             No beans yet. Add your first bean to get started.
