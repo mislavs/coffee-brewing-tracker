@@ -114,6 +114,7 @@ public class UpdateBeanValidatorTests
             1800,
             250m,
             35m,
+            true,
             ["Blackcurrant"]);
     }
 }

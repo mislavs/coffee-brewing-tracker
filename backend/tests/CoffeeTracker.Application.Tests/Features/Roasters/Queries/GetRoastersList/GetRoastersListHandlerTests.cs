@@ -13,9 +13,9 @@ public class GetRoastersListHandlerTests(IntegrationTestFactory factory) : Integ
         // Arrange
         var roasters = new[]
         {
-            Roaster.Create("Zulu Roasters", "City 1", "Country 1"),
-            Roaster.Create("Alpha Roasters", "City 2", "Country 2"),
-            Roaster.Create("Beta Roasters", "City 3", "Country 3")
+            Roaster.Create("Zulu Roasters", "City 1", null),
+            Roaster.Create("Alpha Roasters", "City 2", null),
+            Roaster.Create("Beta Roasters", "City 3", null)
         };
         await InsertMany(roasters);
         var query = new GetRoastersListQuery();

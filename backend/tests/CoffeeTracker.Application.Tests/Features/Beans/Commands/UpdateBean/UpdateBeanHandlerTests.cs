@@ -14,8 +14,8 @@ public class UpdateBeanHandlerTests(IntegrationTestFactory factory) : Integratio
     public async Task Handle_WhenBeanExists_UpdatesPropertiesAndFlavorNotes()
     {
         // Arrange
-        var roasterA = Roaster.Create("Roaster A", "City A", "Country A");
-        var roasterB = Roaster.Create("Roaster B", "City B", "Country B");
+        var roasterA = Roaster.Create("Roaster A", "City A", null);
+        var roasterB = Roaster.Create("Roaster B", "City B", null);
         var citrus = FlavorNote.Create("Citrus");
         var chocolate = FlavorNote.Create("Chocolate");
         var floral = FlavorNote.Create("Floral");
@@ -54,6 +54,7 @@ public class UpdateBeanHandlerTests(IntegrationTestFactory factory) : Integratio
             1500,
             300m,
             45m,
+            true,
             ["Floral"]);
 
         // Act
@@ -94,6 +95,7 @@ public class UpdateBeanHandlerTests(IntegrationTestFactory factory) : Integratio
             null,
             250m,
             30m,
+            true,
             ["Citrus"]);
 
         // Act

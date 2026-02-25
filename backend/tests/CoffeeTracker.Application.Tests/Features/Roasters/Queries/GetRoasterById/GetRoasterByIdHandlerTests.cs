@@ -13,7 +13,9 @@ public class GetRoasterByIdHandlerTests(IntegrationTestFactory factory) : Integr
     public async Task Handle_WhenRoasterExists_ReturnsRoasterDetails()
     {
         // Arrange
-        var roaster = Roaster.Create("Kawa", "Warsaw", "Poland");
+        var country = Country.Create("Poland");
+        await Insert(country);
+        var roaster = Roaster.Create("Kawa", "Warsaw", country.Id);
         await Insert(roaster);
         var query = new GetRoasterByIdQuery(roaster.Id);
 
@@ -24,7 +26,8 @@ public class GetRoasterByIdHandlerTests(IntegrationTestFactory factory) : Integr
         result.Id.Should().Be(roaster.Id);
         result.Name.Should().Be("Kawa");
         result.City.Should().Be("Warsaw");
-        result.Country.Should().Be("Poland");
+        result.CountryId.Should().Be(country.Id);
+        result.CountryName.Should().Be("Poland");
         result.Beans.Should().BeEmpty();
         result.BeanCount.Should().Be(0);
         result.AvgPricePerKg.Should().BeNull();
@@ -40,7 +43,9 @@ public class GetRoasterByIdHandlerTests(IntegrationTestFactory factory) : Integr
     public async Task Handle_WhenRoasterHasBeans_ReturnsBeanSummariesAndStats()
     {
         // Arrange
-        var roaster = Roaster.Create("Kawa", "Warsaw", "Poland");
+        var country = Country.Create("Poland");
+        await Insert(country);
+        var roaster = Roaster.Create("Kawa", "Warsaw", country.Id);
         await Insert(roaster);
         var kenya = Country.Create("Kenya");
         var ethiopia = Country.Create("Ethiopia");

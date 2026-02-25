@@ -11,7 +11,7 @@ public class CreateRoasterValidatorTests
     public void Validate_WhenNameIsEmpty_ShouldHaveValidationError()
     {
         // Arrange
-        var command = new CreateRoasterCommand(string.Empty, "City", "Country");
+        var command = new CreateRoasterCommand(string.Empty, "City", null);
 
         // Act
         var result = _sut.TestValidate(command);
@@ -24,7 +24,7 @@ public class CreateRoasterValidatorTests
     public void Validate_WhenNameIsProvided_ShouldNotHaveValidationError()
     {
         // Arrange
-        var command = new CreateRoasterCommand("Kawa", "City", "Country");
+        var command = new CreateRoasterCommand("Kawa", "City", null);
 
         // Act
         var result = _sut.TestValidate(command);

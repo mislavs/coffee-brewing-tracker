@@ -56,10 +56,10 @@ public class RemainingQuantityTests(IntegrationTestFactory factory) : Integratio
     {
         // Arrange
         var (bean, brewer, grinder) = await SeedRequiredEntities("remaining-update", 500m);
-        var brewLogId = await Send(CreateBrewCommand(bean.Id, brewer.Id, grinder.Id, 18m));
+        var brewLogResult = await Send(CreateBrewCommand(bean.Id, brewer.Id, grinder.Id, 18m));
 
         await Send(new UpdateBrewLogCommand(
-            brewLogId,
+            brewLogResult.Id,
             bean.Id,
             brewer.Id,
             grinder.Id,
@@ -87,9 +87,9 @@ public class RemainingQuantityTests(IntegrationTestFactory factory) : Integratio
     {
         // Arrange
         var (bean, brewer, grinder) = await SeedRequiredEntities("remaining-delete", 500m);
-        var firstBrewId = await Send(CreateBrewCommand(bean.Id, brewer.Id, grinder.Id, 18m));
+        var firstBrewResult = await Send(CreateBrewCommand(bean.Id, brewer.Id, grinder.Id, 18m));
         await Send(CreateBrewCommand(bean.Id, brewer.Id, grinder.Id, 15m));
-        await Send(new DeleteBrewLogCommand(firstBrewId));
+        await Send(new DeleteBrewLogCommand(firstBrewResult.Id));
 
         // Act
         var result = await Send(new GetBeanByIdQuery(bean.Id));

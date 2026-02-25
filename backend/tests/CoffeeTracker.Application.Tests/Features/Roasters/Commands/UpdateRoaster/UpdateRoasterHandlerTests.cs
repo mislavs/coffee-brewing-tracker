@@ -13,9 +13,9 @@ public class UpdateRoasterHandlerTests(IntegrationTestFactory factory) : Integra
     public async Task Handle_WhenRoasterExists_UpdatesRoaster()
     {
         // Arrange
-        var roaster = Roaster.Create("Kawa", "Warsaw", "Poland");
+        var roaster = Roaster.Create("Kawa", "Warsaw", null);
         await Insert(roaster);
-        var command = new UpdateRoasterCommand(roaster.Id, "Kawa Roasters", "Krakow", "Poland");
+        var command = new UpdateRoasterCommand(roaster.Id, "Kawa Roasters", "Krakow", null);
 
         // Act
         await Send(command);
@@ -32,7 +32,7 @@ public class UpdateRoasterHandlerTests(IntegrationTestFactory factory) : Integra
     public async Task Handle_WhenRoasterDoesNotExist_ThrowsNotFoundException()
     {
         // Arrange
-        var command = new UpdateRoasterCommand(Guid.NewGuid(), "Kawa", "Warsaw", "Poland");
+        var command = new UpdateRoasterCommand(Guid.NewGuid(), "Kawa", "Warsaw", null);
 
         // Act
         Func<Task> act = () => Send(command);

@@ -26,7 +26,6 @@ DELETE FROM "Accessories";
 DELETE FROM "Grinders";
 DELETE FROM "Brewers";
 DELETE FROM "FlavorNotes";
-DELETE FROM "Countries";
 DELETE FROM "Roasters";
 
 COMMIT;

@@ -16,5 +16,21 @@ public class CountryConfiguration : IEntityTypeConfiguration<Country>
 
         builder.HasIndex(country => country.Name)
             .IsUnique();
+
+        builder.Property(country => country.IsoAlpha2)
+            .HasMaxLength(2)
+            .IsRequired();
+
+        builder.Property(country => country.IsoNumericCode)
+            .HasMaxLength(3)
+            .IsRequired();
+
+        builder.HasIndex(country => country.IsoAlpha2)
+            .IsUnique()
+            .HasFilter("\"IsoAlpha2\" <> ''");
+
+        builder.HasIndex(country => country.IsoNumericCode)
+            .IsUnique()
+            .HasFilter("\"IsoNumericCode\" <> ''");
     }
 }

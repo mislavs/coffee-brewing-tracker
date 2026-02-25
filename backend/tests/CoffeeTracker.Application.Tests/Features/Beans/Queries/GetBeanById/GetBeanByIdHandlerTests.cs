@@ -13,7 +13,7 @@ public class GetBeanByIdHandlerTests(IntegrationTestFactory factory) : Integrati
     public async Task Handle_WhenBeanExists_ReturnsBeanWithRoasterAndFlavorNotes()
     {
         // Arrange
-        var roaster = Roaster.Create("Kawa", "Warsaw", "Poland");
+        var roaster = Roaster.Create("Kawa", "Warsaw", null);
         var kenya = Country.Create("Kenya");
         var citrus = FlavorNote.Create("Citrus");
         var chocolate = FlavorNote.Create("Chocolate");

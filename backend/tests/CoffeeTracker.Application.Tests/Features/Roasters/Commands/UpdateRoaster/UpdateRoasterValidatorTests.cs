@@ -11,7 +11,7 @@ public class UpdateRoasterValidatorTests
     public void Validate_WhenIdIsEmpty_ShouldHaveValidationError()
     {
         // Arrange
-        var command = new UpdateRoasterCommand(Guid.Empty, "Kawa", "City", "Country");
+        var command = new UpdateRoasterCommand(Guid.Empty, "Kawa", "City", null);
 
         // Act
         var result = _sut.TestValidate(command);
@@ -24,7 +24,7 @@ public class UpdateRoasterValidatorTests
     public void Validate_WhenNameIsEmpty_ShouldHaveValidationError()
     {
         // Arrange
-        var command = new UpdateRoasterCommand(Guid.NewGuid(), string.Empty, "City", "Country");
+        var command = new UpdateRoasterCommand(Guid.NewGuid(), string.Empty, "City", null);
 
         // Act
         var result = _sut.TestValidate(command);
@@ -37,7 +37,7 @@ public class UpdateRoasterValidatorTests
     public void Validate_WhenIdAndNameAreProvided_ShouldNotHaveValidationErrors()
     {
         // Arrange
-        var command = new UpdateRoasterCommand(Guid.NewGuid(), "Kawa", "City", "Country");
+        var command = new UpdateRoasterCommand(Guid.NewGuid(), "Kawa", "City", null);
 
         // Act
         var result = _sut.TestValidate(command);

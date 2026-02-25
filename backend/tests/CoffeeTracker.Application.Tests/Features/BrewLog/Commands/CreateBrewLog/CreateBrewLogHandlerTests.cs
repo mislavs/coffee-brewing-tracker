@@ -32,12 +32,12 @@ public class CreateBrewLogHandlerTests(IntegrationTestFactory factory) : Integra
             DateTime.UtcNow);
 
         // Act
-        var brewLogId = await Send(command);
+        var brewLogResult = await Send(command);
 
         // Assert
         var brewLogEntry = await DbContext.BrewLogEntries
             .AsNoTracking()
-            .FirstOrDefaultAsync(entity => entity.Id == brewLogId);
+            .FirstOrDefaultAsync(entity => entity.Id == brewLogResult.Id);
 
         brewLogEntry.Should().NotBeNull();
         brewLogEntry!.BeanId.Should().Be(bean.Id);
@@ -111,13 +111,13 @@ public class CreateBrewLogHandlerTests(IntegrationTestFactory factory) : Integra
             DateTime.UtcNow);
 
         // Act
-        var brewLogId = await Send(command);
+        var brewLogResult = await Send(command);
 
         // Assert
         var brewLogEntry = await DbContext.BrewLogEntries
             .AsNoTracking()
             .Include(entity => entity.Accessories)
-            .FirstOrDefaultAsync(entity => entity.Id == brewLogId);
+            .FirstOrDefaultAsync(entity => entity.Id == brewLogResult.Id);
 
         brewLogEntry.Should().NotBeNull();
         brewLogEntry!.Accessories.Should().HaveCount(2);

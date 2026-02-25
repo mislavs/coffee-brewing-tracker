@@ -13,7 +13,7 @@ public class GetCountryBeansListHandlerTests(IntegrationTestFactory factory) : I
     public async Task Handle_WhenCountryHasBeans_ReturnsBeanSummariesOrderedByName()
     {
         // Arrange
-        var roaster = Roaster.Create("Kawa", "Warsaw", "Poland");
+        var roaster = Roaster.Create("Kawa", "Warsaw", null);
         var kenya = Country.Create("Kenya");
         var ethiopia = Country.Create("Ethiopia");
         await Insert(roaster);

@@ -11,16 +11,16 @@ public class RoasterTests
         // Arrange
         const string name = "  Kawa  ";
         const string city = "  Warsaw  ";
-        const string country = "  Poland  ";
+        var countryId = Guid.NewGuid();
 
         // Act
-        var roaster = Roaster.Create(name, city, country);
+        var roaster = Roaster.Create(name, city, countryId);
 
         // Assert
         roaster.Id.Should().NotBeEmpty();
         roaster.Name.Should().Be("Kawa");
         roaster.City.Should().Be("Warsaw");
-        roaster.Country.Should().Be("Poland");
+        roaster.CountryId.Should().Be(countryId);
     }
 
     [Fact]
@@ -30,12 +30,12 @@ public class RoasterTests
         const string name = "Kawa";
 
         // Act
-        var roaster = Roaster.Create(name, "   ", "");
+        var roaster = Roaster.Create(name, "   ", null);
 
         // Assert
         roaster.Name.Should().Be("Kawa");
         roaster.City.Should().BeNull();
-        roaster.Country.Should().BeNull();
+        roaster.CountryId.Should().BeNull();
     }
 
     [Fact]
@@ -45,7 +45,7 @@ public class RoasterTests
         const string invalidName = " ";
 
         // Act
-        Action act = () => Roaster.Create(invalidName, "City", "Country");
+        Action act = () => Roaster.Create(invalidName, "City", Guid.NewGuid());
 
         // Assert
         act.Should().Throw<ArgumentException>()
@@ -56,25 +56,26 @@ public class RoasterTests
     public void Update_WhenValuesAreValid_UpdatesWithNormalizedValues()
     {
         // Arrange
-        var roaster = Roaster.Create("Kawa", "Warsaw", "Poland");
+        var roaster = Roaster.Create("Kawa", "Warsaw", Guid.NewGuid());
+        var updatedCountryId = Guid.NewGuid();
 
         // Act
-        roaster.Update("  Kawa Roasters  ", "  Krakow  ", "  Poland  ");
+        roaster.Update("  Kawa Roasters  ", "  Krakow  ", updatedCountryId);
 
         // Assert
         roaster.Name.Should().Be("Kawa Roasters");
         roaster.City.Should().Be("Krakow");
-        roaster.Country.Should().Be("Poland");
+        roaster.CountryId.Should().Be(updatedCountryId);
     }
 
     [Fact]
     public void Update_WhenNameIsWhitespace_ThrowsArgumentException()
     {
         // Arrange
-        var roaster = Roaster.Create("Kawa", "Warsaw", "Poland");
+        var roaster = Roaster.Create("Kawa", "Warsaw", Guid.NewGuid());
 
         // Act
-        Action act = () => roaster.Update(" ", "City", "Country");
+        Action act = () => roaster.Update(" ", "City", Guid.NewGuid());
 
         // Assert
         act.Should().Throw<ArgumentException>()
@@ -85,7 +86,7 @@ public class RoasterTests
     public void SetLogo_WhenValuesAreValid_SetsLogoProperties()
     {
         // Arrange
-        var roaster = Roaster.Create("Kawa", "Warsaw", "Poland");
+        var roaster = Roaster.Create("Kawa", "Warsaw", null);
         var data = new byte[] { 1, 2, 3 };
 
         // Act
@@ -100,7 +101,7 @@ public class RoasterTests
     public void SetLogo_WhenDataIsEmpty_ThrowsArgumentException()
     {
         // Arrange
-        var roaster = Roaster.Create("Kawa", "Warsaw", "Poland");
+        var roaster = Roaster.Create("Kawa", "Warsaw", null);
 
         // Act
         Action act = () => roaster.SetLogo("logo.png", []);
@@ -114,7 +115,7 @@ public class RoasterTests
     public void RemoveLogo_WhenLogoExists_ClearsLogoProperties()
     {
         // Arrange
-        var roaster = Roaster.Create("Kawa", "Warsaw", "Poland");
+        var roaster = Roaster.Create("Kawa", "Warsaw", null);
         roaster.SetLogo("logo.png", [1, 2, 3]);
 
         // Act

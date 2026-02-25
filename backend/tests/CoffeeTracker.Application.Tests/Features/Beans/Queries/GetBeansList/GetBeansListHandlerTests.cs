@@ -12,7 +12,7 @@ public class GetBeansListHandlerTests(IntegrationTestFactory factory) : Integrat
     public async Task Handle_WhenBeansExist_ReturnsAllOrderedByName()
     {
         // Arrange
-        var roaster = Roaster.Create("Kawa", "Warsaw", "Poland");
+        var roaster = Roaster.Create("Kawa", "Warsaw", null);
         await Insert(roaster);
         var brazil = Country.Create("Brazil");
         var kenya = Country.Create("Kenya");
@@ -41,7 +41,7 @@ public class GetBeansListHandlerTests(IntegrationTestFactory factory) : Integrat
     public async Task Handle_WhenSearchProvided_FiltersByNameCaseInsensitive()
     {
         // Arrange
-        var roaster = Roaster.Create("Kawa", "Warsaw", "Poland");
+        var roaster = Roaster.Create("Kawa", "Warsaw", null);
         await Insert(roaster);
         var kenya = Country.Create("Kenya");
         var ethiopia = Country.Create("Ethiopia");

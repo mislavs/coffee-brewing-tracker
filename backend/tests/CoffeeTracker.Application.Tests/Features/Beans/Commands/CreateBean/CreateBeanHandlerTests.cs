@@ -13,7 +13,7 @@ public class CreateBeanHandlerTests(IntegrationTestFactory factory) : Integratio
     public async Task Handle_WhenRoasterExists_CreatesBean()
     {
         // Arrange
-        var roaster = Roaster.Create("Kawa", "Warsaw", "Poland");
+        var roaster = Roaster.Create("Kawa", "Warsaw", null);
         await Insert(roaster);
         var command = CreateCommand(roaster.Id, ["Citrus", "Chocolate"]);
 
@@ -42,7 +42,7 @@ public class CreateBeanHandlerTests(IntegrationTestFactory factory) : Integratio
     public async Task Handle_WhenFlavorNotesDoNotExist_CreatesNewFlavorNotes()
     {
         // Arrange
-        var roaster = Roaster.Create("Kawa", "Warsaw", "Poland");
+        var roaster = Roaster.Create("Kawa", "Warsaw", null);
         await Insert(roaster);
         var command = CreateCommand(roaster.Id, ["Strawberry", "Caramel"]);
 
@@ -63,7 +63,7 @@ public class CreateBeanHandlerTests(IntegrationTestFactory factory) : Integratio
     public async Task Handle_WhenFlavorNotesExist_ReusesExistingFlavorNotes()
     {
         // Arrange
-        var roaster = Roaster.Create("Kawa", "Warsaw", "Poland");
+        var roaster = Roaster.Create("Kawa", "Warsaw", null);
         var existingFlavorNote = FlavorNote.Create("Berry");
         await Insert(roaster);
         await Insert(existingFlavorNote);

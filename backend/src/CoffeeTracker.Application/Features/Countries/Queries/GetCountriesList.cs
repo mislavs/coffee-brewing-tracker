@@ -17,7 +17,11 @@ public sealed class GetCountriesListHandler(ApplicationDbContext dbContext)
         return await dbContext.Countries
             .AsNoTracking()
             .OrderBy(entity => entity.Name)
-            .Select(entity => new CountryDto(entity.Id, entity.Name))
+            .Select(entity => new CountryDto(
+                entity.Id,
+                entity.Name,
+                entity.IsoAlpha2,
+                entity.IsoNumericCode))
             .ToListAsync(cancellationToken);
     }
 }
