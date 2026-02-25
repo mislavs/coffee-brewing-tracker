@@ -15,6 +15,9 @@ public static class StatsEndpoints
         group.MapGet("/dashboard", GetDashboardStats)
             .WithName("GetDashboardStats");
 
+        group.MapGet("/country-map", GetCountryMapStats)
+            .WithName("GetCountryMapStats");
+
         return app;
     }
 
@@ -23,6 +26,14 @@ public static class StatsEndpoints
         CancellationToken cancellationToken)
     {
         var stats = await sender.Send(new GetDashboardStatsQuery(), cancellationToken);
+        return TypedResults.Ok(stats);
+    }
+
+    private static async Task<Ok<IReadOnlyList<CountryMapStatsDto>>> GetCountryMapStats(
+        ISender sender,
+        CancellationToken cancellationToken)
+    {
+        var stats = await sender.Send(new GetCountryMapStatsQuery(), cancellationToken);
         return TypedResults.Ok(stats);
     }
 }
