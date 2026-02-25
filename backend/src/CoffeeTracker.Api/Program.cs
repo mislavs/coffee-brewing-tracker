@@ -2,50 +2,72 @@ using CoffeeTracker.Api.ExceptionHandlers;
 using CoffeeTracker.Api.Endpoints;
 using CoffeeTracker.Application;
 using CoffeeTracker.Infrastructure;
+using Serilog;
 
-var builder = WebApplication.CreateBuilder(args);
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .CreateBootstrapLogger();
 
-builder.AddServiceDefaults();
-
-builder.Services
-    .AddApplication()
-    .AddInfrastructure(builder.Configuration);
-
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
-builder.Services.AddProblemDetails();
-
-builder.Services.AddCors(options =>
+try
 {
-    options.AddDefaultPolicy(policy =>
-        policy.AllowAnyOrigin()
-            .AllowAnyMethod()
-            .AllowAnyHeader());
-});
+    var builder = WebApplication.CreateBuilder(args);
 
-var app = builder.Build();
+    builder.Host.UseSerilog((context, services, configuration) =>
+        configuration
+            .ReadFrom.Configuration(context.Configuration)
+            .ReadFrom.Services(services));
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    builder.AddServiceDefaults();
+
+    builder.Services
+        .AddApplication()
+        .AddInfrastructure(builder.Configuration);
+
+    builder.Services.AddEndpointsApiExplorer();
+    builder.Services.AddSwaggerGen();
+    builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+    builder.Services.AddProblemDetails();
+
+    builder.Services.AddCors(options =>
+    {
+        options.AddDefaultPolicy(policy =>
+            policy.AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader());
+    });
+
+    var app = builder.Build();
+
+    if (app.Environment.IsDevelopment())
+    {
+        app.UseSwagger();
+        app.UseSwaggerUI();
+    }
+
+    app.UseCors();
+    app.UseExceptionHandler();
+    app.UseSerilogRequestLogging();
+    app.MapDefaultEndpoints();
+    app.MapAccessoryEndpoints();
+    app.MapBrewerEndpoints();
+    app.MapGrinderEndpoints();
+    app.MapRoasterEndpoints();
+    app.MapBeanEndpoints();
+    app.MapCountryEndpoints();
+    app.MapFlavorNoteEndpoints();
+    app.MapRecipeEndpoints();
+    app.MapBrewLogEndpoints();
+    app.MapStatsEndpoints();
+
+    app.Run();
 }
-
-app.UseCors();
-app.UseExceptionHandler();
-app.MapDefaultEndpoints();
-app.MapAccessoryEndpoints();
-app.MapBrewerEndpoints();
-app.MapGrinderEndpoints();
-app.MapRoasterEndpoints();
-app.MapBeanEndpoints();
-app.MapCountryEndpoints();
-app.MapFlavorNoteEndpoints();
-app.MapRecipeEndpoints();
-app.MapBrewLogEndpoints();
-app.MapStatsEndpoints();
-
-app.Run();
+catch (Exception ex)
+{
+    Log.Fatal(ex, "Application terminated unexpectedly");
+}
+finally
+{
+    Log.CloseAndFlush();
+}
 
 public partial class Program;
