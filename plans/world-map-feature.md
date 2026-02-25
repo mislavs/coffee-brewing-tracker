@@ -12,9 +12,11 @@
 
 ---
 
-## Step 1: Enhance Country Entity with ISO Codes + Seed Countries
+## Step 1: Enhance Country Entity with ISO Codes + Seed Countries [Completed]
 
 **Goal:** Country entity gains ISO codes; all ~195 countries are pre-seeded in the database.
+
+**Status:** Completed.
 
 **Scope:**
 
@@ -162,7 +164,7 @@ public sealed record CountryMapStatsDto(
 
 ## Final Validation Checklist
 
-- [ ] All countries seeded with correct ISO alpha-2 and numeric codes
+- [x] All countries seeded with correct ISO alpha-2 and numeric codes
 - [ ] `GET /api/stats/country-map` returns correct aggregates
 - [ ] Map renders with choropleth on every page (when enabled)
 - [ ] Settings toggle hides/shows map; preference persists across reloads
@@ -171,6 +173,6 @@ public sealed record CountryMapStatsDto(
 - [ ] Click on highlighted country navigates to `/beans?country=<id>` with correct filtering
 - [ ] Click on country with no beans does nothing (no navigation)
 - [ ] Beans page shows active country filter with clear button
-- [ ] `dotnet build` and `dotnet test` pass
+- [x] `dotnet build` and `dotnet test` pass
 - [ ] `npm run build` succeeds
 - [ ] Dark mode: map colors work in both themes
