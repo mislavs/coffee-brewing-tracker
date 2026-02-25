@@ -47,9 +47,11 @@
 
 ---
 
-## Step 2: Country Map Stats API Endpoint
+## Step 2: Country Map Stats API Endpoint [Completed]
 
 **Goal:** New endpoint returns per-country aggregated stats for the map choropleth and tooltips.
+
+**Status:** Completed.
 
 **Scope:**
 
@@ -75,7 +77,7 @@ public sealed record CountryMapStatsDto(
 
 **Tests:**
 
-- Unit test for `GetCountryMapStatsHandler` (verify aggregation logic)
+- Integration tests for `GetCountryMapStatsHandler` (aggregation correctness, country exclusion when no beans, null average rating when no ratings)
 
 **Verification:** `dotnet build` and `dotnet test`
 
@@ -165,7 +167,7 @@ public sealed record CountryMapStatsDto(
 ## Final Validation Checklist
 
 - [x] All countries seeded with correct ISO alpha-2 and numeric codes
-- [ ] `GET /api/stats/country-map` returns correct aggregates
+- [x] `GET /api/stats/country-map` returns correct aggregates
 - [ ] Map renders with choropleth on every page (when enabled)
 - [ ] Settings toggle hides/shows map; preference persists across reloads
 - [ ] "Map" nav entry works, `/map` shows full-page map
