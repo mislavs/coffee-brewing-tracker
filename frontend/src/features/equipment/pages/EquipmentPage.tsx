@@ -16,6 +16,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { CardSkeleton } from '@/components/skeletons/CardSkeleton'
 import { TableRowSkeleton } from '@/components/skeletons/TableRowSkeleton'
 import { useAccessories } from '@/features/equipment/hooks/useAccessories'
 import { useBrewers } from '@/features/equipment/hooks/useBrewers'
@@ -46,29 +47,22 @@ function BrewerList() {
         </Button>
       </CardHeader>
       <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Name</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {isPending && brewers.length === 0 ? (
-              <TableRowSkeleton
-                columns={1}
-                rowCount={4}
-                columnWidthClasses={['w-3/5']}
-              />
-            ) : brewers.length === 0 ? (
-              <TableRow>
-                <TableCell className="text-muted-foreground">
-                  No brewers yet. Add your first brewer to get started.
-                </TableCell>
-              </TableRow>
-            ) : (
-              brewers.map((brewer) => (
-                <TableRow key={brewer.id ?? brewer.name ?? 'brewer'}>
-                  <TableCell className="font-medium">
+        {isPending && brewers.length === 0 ? (
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            {Array.from({ length: 4 }).map((_, index) => (
+              <CardSkeleton key={`brewer-card-skeleton-${index}`} badgeCount={0} />
+            ))}
+          </div>
+        ) : brewers.length === 0 ? (
+          <p className="py-8 text-center text-muted-foreground">
+            No brewers yet. Add your first brewer to get started.
+          </p>
+        ) : (
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            {brewers.map((brewer) => (
+              <Card key={brewer.id ?? brewer.name ?? 'brewer'} className="h-full">
+                <CardHeader>
+                  <CardTitle className="text-base">
                     {brewer.id ? (
                       <Link
                         to={`/equipment/brewers/${brewer.id}`}
@@ -79,12 +73,12 @@ function BrewerList() {
                     ) : (
                       (brewer.name ?? 'Unnamed brewer')
                     )}
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
+                  </CardTitle>
+                </CardHeader>
+              </Card>
+            ))}
+          </div>
+        )}
       </CardContent>
     </Card>
   )
@@ -105,29 +99,22 @@ function GrinderList() {
         </Button>
       </CardHeader>
       <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Name</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {isPending && grinders.length === 0 ? (
-              <TableRowSkeleton
-                columns={1}
-                rowCount={4}
-                columnWidthClasses={['w-3/5']}
-              />
-            ) : grinders.length === 0 ? (
-              <TableRow>
-                <TableCell className="text-muted-foreground">
-                  No grinders yet. Add your first grinder to get started.
-                </TableCell>
-              </TableRow>
-            ) : (
-              grinders.map((grinder) => (
-                <TableRow key={grinder.id ?? grinder.name ?? 'grinder'}>
-                  <TableCell className="font-medium">
+        {isPending && grinders.length === 0 ? (
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            {Array.from({ length: 4 }).map((_, index) => (
+              <CardSkeleton key={`grinder-card-skeleton-${index}`} badgeCount={0} />
+            ))}
+          </div>
+        ) : grinders.length === 0 ? (
+          <p className="py-8 text-center text-muted-foreground">
+            No grinders yet. Add your first grinder to get started.
+          </p>
+        ) : (
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            {grinders.map((grinder) => (
+              <Card key={grinder.id ?? grinder.name ?? 'grinder'} className="h-full">
+                <CardHeader>
+                  <CardTitle className="text-base">
                     {grinder.id ? (
                       <Link
                         to={`/equipment/grinders/${grinder.id}`}
@@ -138,12 +125,12 @@ function GrinderList() {
                     ) : (
                       (grinder.name ?? 'Unnamed grinder')
                     )}
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
+                  </CardTitle>
+                </CardHeader>
+              </Card>
+            ))}
+          </div>
+        )}
       </CardContent>
     </Card>
   )
