@@ -3,7 +3,7 @@ import { Globe, X } from 'lucide-react'
 import { DashboardStats } from '@/components/DashboardStats'
 import { SettingsButton } from '@/components/SettingsButton'
 import { Button } from '@/components/ui/button'
-import { NavLink, Outlet } from 'react-router-dom'
+import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { WorldMap } from '@/features/world-map/components/WorldMap'
 import { beanQueryKeys } from '@/features/beans/queryKeys'
@@ -32,6 +32,7 @@ const expandedMapHeightClass = 'h-[42rem] md:h-[46rem]'
 
 export function AppLayout() {
   const { settings } = useSettings()
+  const navigate = useNavigate()
   const [isMapExpanded, setIsMapExpanded] = useState(false)
   const hasPrefetchedRoasters = useRef(false)
   const hasPrefetchedBeans = useRef(false)
@@ -204,6 +205,10 @@ export function AppLayout() {
           <WorldMap
             compact
             mapHeightClassName={isMapExpanded ? expandedMapHeightClass : undefined}
+            onCountryClick={(country) => {
+              setIsMapExpanded(false)
+              navigate(`/beans?country=${encodeURIComponent(country.countryId)}`)
+            }}
           />
         </div>
       ) : null}

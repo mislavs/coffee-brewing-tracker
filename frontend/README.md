@@ -28,38 +28,6 @@ npm install
 npm run dev
 ```
 
-## API Client Workflow
-
-1. Refresh OpenAPI contract:
-
-```bash
-npm run update-api-spec
-```
-
-2. Generate typed client:
-
-```bash
-npm run generate-api
-```
-
-`openapi.json` is committed. Generated client code is written to `src/lib/api/generated/` and ignored by git.
-
-For convenience, run both steps together:
-
-```bash
-npm run api:sync
-```
-
-## Environment
-
-Default local config is in `.env`:
-
-```env
-VITE_API_URL=http://localhost:5081
-```
-
-Override locally with `.env.local`.
-
 ## Scripts
 
 - `npm run dev` - start Vite dev server

@@ -48,6 +48,7 @@ export function DefaultWorldMapRenderer({
   onCountryPointerEnter,
   onCountryPointerMove,
   onCountryPointerLeave,
+  onCountryClick,
 }: WorldMapRendererProps) {
   return (
     <ComposableMap
@@ -71,8 +72,14 @@ export function DefaultWorldMapRenderer({
                 stroke="var(--border)"
                 strokeWidth={getCountryStrokeWidth ? getCountryStrokeWidth(country) : 0.45}
                 style={{
-                  default: { outline: 'none' },
-                  hover: { outline: 'none' },
+                  default: {
+                    outline: 'none',
+                    cursor: onCountryClick ? 'pointer' : 'default',
+                  },
+                  hover: {
+                    outline: 'none',
+                    cursor: onCountryClick ? 'pointer' : 'default',
+                  },
                   pressed: { outline: 'none' },
                 }}
                 onMouseEnter={(event: MouseEvent<SVGPathElement>) => {
@@ -89,6 +96,9 @@ export function DefaultWorldMapRenderer({
                 }}
                 onMouseLeave={() => {
                   onCountryPointerLeave?.(country)
+                }}
+                onClick={() => {
+                  onCountryClick?.(country)
                 }}
               />
             ))

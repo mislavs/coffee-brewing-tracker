@@ -18,6 +18,13 @@ type WorldMapProps = {
   compact?: boolean
   projection?: WorldMapProjection
   mapHeightClassName?: string
+  onCountryClick?: (country: SelectedWorldMapCountry) => void
+}
+
+type SelectedWorldMapCountry = {
+  countryId: string
+  countryName: string
+  isoNumericCode: string
 }
 
 type HoveredCountry = {
@@ -69,6 +76,7 @@ function WorldMapComponent({
   compact = false,
   projection = 'geoMercator',
   mapHeightClassName,
+  onCountryClick,
 }: WorldMapProps) {
   const { data: countryStats = [], isLoading, isError, refetch, isFetching } =
     useCountryMapStats()
@@ -212,6 +220,19 @@ function WorldMapComponent({
               }
 
               return current
+            })
+          }}
+          onCountryClick={(country) => {
+            const stats = resolveCountryStats(country)
+            if (!stats?.countryId) {
+              return
+            }
+
+            setHoveredCountry(null)
+            onCountryClick?.({
+              countryId: stats.countryId,
+              countryName: stats.countryName ?? country.name,
+              isoNumericCode: country.isoNumericCode,
             })
           }}
         />

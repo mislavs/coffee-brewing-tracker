@@ -5,7 +5,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CoffeeTracker.Application.Features.Beans.Queries;
 
-public sealed record GetBeansListQuery(string? Search, bool IncludeUnavailable = false) : IRequest<IReadOnlyList<BeanSummaryDto>>;
+public sealed record GetBeansListQuery(
+    string? Search,
+    bool IncludeUnavailable = false,
+    Guid? CountryId = null) : IRequest<IReadOnlyList<BeanSummaryDto>>;
 
 public sealed class GetBeansListHandler(ApplicationDbContext dbContext)
     : IRequestHandler<GetBeansListQuery, IReadOnlyList<BeanSummaryDto>>
@@ -27,6 +30,12 @@ public sealed class GetBeansListHandler(ApplicationDbContext dbContext)
         if (!request.IncludeUnavailable)
         {
             query = query.Where(entity => entity.IsAvailable);
+        }
+
+        if (request.CountryId.HasValue)
+        {
+            query = query.Where(entity =>
+                entity.OriginCountries.Any(country => country.Id == request.CountryId.Value));
         }
 
         return await query

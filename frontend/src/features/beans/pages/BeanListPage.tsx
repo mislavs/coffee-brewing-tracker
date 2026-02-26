@@ -10,16 +10,28 @@ import {
 } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { CardSkeleton } from '@/components/skeletons/CardSkeleton'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
 import { BeanCard } from '@/features/beans/components/BeanCard'
 import { useBeans } from '@/features/beans/hooks/useBeans'
+import { useCountryMapStats } from '@/features/world-map/hooks/useCountryMapStats'
+
+const allCountriesValue = '__all_countries__'
 
 export function BeanListPage() {
   const [searchParams, setSearchParams] = useSearchParams()
   const search = searchParams.get('search') ?? ''
   const showUnavailable = searchParams.get('showUnavailable') === 'true'
+  const countryId = searchParams.get('country') ?? ''
   const [searchDraft, setSearchDraft] = useState(search)
   const [, startTransition] = useTransition()
+  const { data: countryStats = [] } = useCountryMapStats()
 
   useEffect(() => {
     setSearchDraft(search)
@@ -58,7 +70,11 @@ export function BeanListPage() {
     return () => clearTimeout(timeoutId)
   }, [searchDraft, setSearchParams, startTransition])
 
-  const { data: beans = [], isPending } = useBeans(search, showUnavailable)
+  const { data: beans = [], isPending } = useBeans(
+    search,
+    showUnavailable,
+    countryId || undefined,
+  )
   const availableBeans = beans.filter((bean) => bean.isAvailable !== false)
   const unavailableBeans = beans.filter((bean) => bean.isAvailable === false)
 
@@ -80,16 +96,51 @@ export function BeanListPage() {
         </Button>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="max-w-md space-y-2">
-          <label htmlFor="bean-search" className="text-sm font-medium">
-            Search by name
-          </label>
-          <Input
-            id="bean-search"
-            placeholder="Filter beans..."
-            value={searchDraft}
-            onChange={(event) => setSearchDraft(event.target.value)}
-          />
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="space-y-2">
+            <label htmlFor="bean-search" className="text-sm font-medium">
+              Search by name
+            </label>
+            <Input
+              id="bean-search"
+              placeholder="Filter beans..."
+              value={searchDraft}
+              onChange={(event) => setSearchDraft(event.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <label htmlFor="bean-country-filter" className="text-sm font-medium">
+              Filter by country
+            </label>
+            <Select
+              value={countryId || allCountriesValue}
+              onValueChange={(nextValue) => {
+                setSearchParams((previous) => {
+                  const next = new URLSearchParams(previous)
+                  if (nextValue === allCountriesValue) {
+                    next.delete('country')
+                  } else {
+                    next.set('country', nextValue)
+                  }
+                  return next
+                }, { replace: true })
+              }}
+            >
+              <SelectTrigger id="bean-country-filter" className="w-full">
+                <SelectValue placeholder="All countries" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={allCountriesValue}>All countries</SelectItem>
+                {countryStats.map((country) =>
+                  country.countryId ? (
+                    <SelectItem key={country.countryId} value={country.countryId}>
+                      {country.countryName ?? 'Unnamed country'}
+                    </SelectItem>
+                  ) : null,
+                )}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
         <div className="flex items-center gap-3">
           <Switch

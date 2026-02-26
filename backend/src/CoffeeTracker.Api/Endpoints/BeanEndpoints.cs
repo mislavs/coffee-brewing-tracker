@@ -35,10 +35,13 @@ public static class BeanEndpoints
     private static async Task<Ok<IReadOnlyList<BeanSummaryDto>>> GetBeans(
         string? search,
         bool? includeUnavailable,
+        Guid? country,
         ISender sender,
         CancellationToken cancellationToken)
     {
-        var beans = await sender.Send(new GetBeansListQuery(search, includeUnavailable ?? false), cancellationToken);
+        var beans = await sender.Send(
+            new GetBeansListQuery(search, includeUnavailable ?? false, country),
+            cancellationToken);
         return TypedResults.Ok(beans);
     }
 

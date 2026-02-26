@@ -63,4 +63,112 @@ public class GetBeansListHandlerTests(IntegrationTestFactory factory) : Integrat
         result.Should().ContainSingle();
         result.Single().Name.Should().Be("Kenya AB");
     }
+
+    [Fact]
+    public async Task Handle_WhenCountryFilterProvided_ReturnsOnlyBeansFromCountry()
+    {
+        // Arrange
+        var roaster = Roaster.Create("Kawa", "Warsaw", null);
+        await Insert(roaster);
+        var kenya = Country.Create("Kenya");
+        var brazil = Country.Create("Brazil");
+        await InsertMany([kenya, brazil]);
+
+        var beans = new[]
+        {
+            Bean.Create("Kenya AB", roaster.Id, OriginType.SingleOrigin, [kenya], null, null, RoastProfile.Filter, null, null, 250m, 42m),
+            Bean.Create("Kenya PB", roaster.Id, OriginType.SingleOrigin, [kenya], null, null, RoastProfile.Filter, null, null, 250m, 39m),
+            Bean.Create("Brazil Santos", roaster.Id, OriginType.SingleOrigin, [brazil], null, null, RoastProfile.Filter, null, null, 250m, 36m)
+        };
+        await InsertMany(beans);
+
+        var query = new GetBeansListQuery(null, false, kenya.Id);
+
+        // Act
+        var result = await Send(query);
+
+        // Assert
+        result.Should().HaveCount(2);
+        result.Select(entity => entity.Name)
+            .Should()
+            .BeEquivalentTo(["Kenya AB", "Kenya PB"]);
+    }
+
+    [Fact]
+    public async Task Handle_WhenCountrySearchAndAvailabilityFiltersCombined_AppliesAllFilters()
+    {
+        // Arrange
+        var roaster = Roaster.Create("Kawa", "Warsaw", null);
+        await Insert(roaster);
+        var kenya = Country.Create("Kenya");
+        var brazil = Country.Create("Brazil");
+        await InsertMany([kenya, brazil]);
+
+        var kenyaAvailable = Bean.Create(
+            "Kenya Filter Bright",
+            roaster.Id,
+            OriginType.SingleOrigin,
+            [kenya],
+            null,
+            null,
+            RoastProfile.Filter,
+            null,
+            null,
+            250m,
+            41m);
+        var kenyaUnavailable = Bean.Create(
+            "Kenya Filter Classic",
+            roaster.Id,
+            OriginType.SingleOrigin,
+            [kenya],
+            null,
+            null,
+            RoastProfile.Filter,
+            null,
+            null,
+            250m,
+            38m);
+        kenyaUnavailable.SetAvailability(false);
+
+        var kenyaDifferentName = Bean.Create(
+            "Kenya Floral",
+            roaster.Id,
+            OriginType.SingleOrigin,
+            [kenya],
+            null,
+            null,
+            RoastProfile.Filter,
+            null,
+            null,
+            250m,
+            35m);
+        var brazilSameSearch = Bean.Create(
+            "Kenya Filter Brazil",
+            roaster.Id,
+            OriginType.SingleOrigin,
+            [brazil],
+            null,
+            null,
+            RoastProfile.Filter,
+            null,
+            null,
+            250m,
+            37m);
+        await InsertMany([kenyaAvailable, kenyaUnavailable, kenyaDifferentName, brazilSameSearch]);
+
+        var excludeUnavailableQuery = new GetBeansListQuery("kenya filter", false, kenya.Id);
+        var includeUnavailableQuery = new GetBeansListQuery("kenya filter", true, kenya.Id);
+
+        // Act
+        var excludeUnavailableResult = await Send(excludeUnavailableQuery);
+        var includeUnavailableResult = await Send(includeUnavailableQuery);
+
+        // Assert
+        excludeUnavailableResult.Should().ContainSingle();
+        excludeUnavailableResult.Single().Name.Should().Be("Kenya Filter Bright");
+
+        includeUnavailableResult.Select(entity => entity.Name)
+            .Should()
+            .BeEquivalentTo(["Kenya Filter Bright", "Kenya Filter Classic"]);
+    }
 }

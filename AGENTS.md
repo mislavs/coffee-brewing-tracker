@@ -1,5 +1,10 @@
 # AGENTS Runbook
 
+## General Execution Rules
+
+- When a plan or skill file exists for the current task, always read and follow it before starting implementation.
+- Do not deviate from plan specifications without explicitly noting the deviation and getting approval.
+
 ## OpenAPI Refresh (Aspire)
 
 1. Ensure Aspire is running.

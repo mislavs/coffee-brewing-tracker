@@ -40,4 +40,5 @@ export type WorldMapRendererProps = {
   onCountryPointerEnter?: (country: WorldCountryFeature, pointer: MapPointer) => void
   onCountryPointerMove?: (country: WorldCountryFeature, pointer: MapPointer) => void
   onCountryPointerLeave?: (country: WorldCountryFeature) => void
+  onCountryClick?: (country: WorldCountryFeature) => void
 }
