@@ -74,11 +74,7 @@ export function BrewLogCard({ brewLog }: BrewLogCardProps) {
             <dd className="font-medium text-foreground">{formatBrewTime(brewLog.brewTimeSeconds)}</dd>
 
             <dt className="text-muted-foreground">Rating:</dt>
-            <dd>
-              <Badge variant="outline" className="text-foreground">
-                {getRatingDisplay(brewLog.rating)}
-              </Badge>
-            </dd>
+            <dd className="font-medium text-foreground">{getRatingDisplay(brewLog.rating)}</dd>
           </dl>
         </div>
       </CardContent>
