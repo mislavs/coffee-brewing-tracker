@@ -2008,6 +2008,13 @@
           "description": {
             "type": "string",
             "nullable": true
+          },
+          "grindStats": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RecipeGrindStatsDto"
+            },
+            "nullable": true
           }
         },
         "additionalProperties": false

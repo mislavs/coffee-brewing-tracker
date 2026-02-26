@@ -1,5 +1,6 @@
 import { Link, useSearchParams } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
+import { CardSkeleton } from '@/components/skeletons/CardSkeleton'
 import {
   Card,
   CardContent,
@@ -14,36 +15,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
-import { TableRowSkeleton } from '@/components/skeletons/TableRowSkeleton'
 import { useBrewers } from '@/features/equipment/hooks/useBrewers'
+import { RecipeCard } from '@/features/recipes/components/RecipeCard'
 import { useRecipes } from '@/features/recipes/hooks/useRecipes'
 
 const allBrewersValue = '__all_brewers__'
-
-function truncateDescription(value: string | null | undefined) {
-  if (!value) {
-    return '—'
-  }
-
-  const trimmed = value.trim()
-  if (trimmed.length === 0) {
-    return '—'
-  }
-
-  if (trimmed.length <= 120) {
-    return trimmed
-  }
-
-  return `${trimmed.slice(0, 117)}...`
-}
 
 export function RecipeListPage() {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -101,48 +77,35 @@ export function RecipeListPage() {
           </Select>
         </div>
 
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Brewer</TableHead>
-              <TableHead>Description</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {isPending && recipes.length === 0 ? (
-              <TableRowSkeleton
-                columns={3}
-                rowCount={5}
-                columnWidthClasses={['w-2/3', 'w-1/2', 'w-5/6']}
+        {isPending && recipes.length === 0 ? (
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            {Array.from({ length: 6 }).map((_, index) => (
+              <CardSkeleton
+                key={`recipe-skeleton-${index}`}
+                className={
+                  index === 3
+                    ? 'hidden sm:block'
+                    : index >= 4
+                      ? 'hidden xl:block'
+                      : undefined
+                }
               />
-            ) : recipes.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={3} className="text-muted-foreground">
-                  No recipes yet. Add your first recipe to get started.
-                </TableCell>
-              </TableRow>
-            ) : (
-              recipes.map((recipe) => (
-                <TableRow
-                  key={recipe.id ?? `${recipe.name ?? 'recipe'}-${recipe.brewerName ?? ''}`}
-                >
-                  <TableCell className="font-medium">
-                    {recipe.id ? (
-                      <Link to={`/recipes/${recipe.id}`} className="hover:underline">
-                        {recipe.name ?? 'Unnamed recipe'}
-                      </Link>
-                    ) : (
-                      (recipe.name ?? 'Unnamed recipe')
-                    )}
-                  </TableCell>
-                  <TableCell>{recipe.brewerName || '—'}</TableCell>
-                  <TableCell>{truncateDescription(recipe.description)}</TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
+            ))}
+          </div>
+        ) : recipes.length === 0 ? (
+          <p className="text-muted-foreground">
+            No recipes yet. Add your first recipe to get started.
+          </p>
+        ) : (
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            {recipes.map((recipe, index) => (
+              <RecipeCard
+                key={recipe.id ?? `${recipe.name ?? 'recipe'}-${recipe.brewerName ?? ''}-${index}`}
+                recipe={recipe}
+              />
+            ))}
+          </div>
+        )}
       </CardContent>
     </Card>
   )

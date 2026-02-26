@@ -1,5 +1,6 @@
 using CoffeeTracker.Application.Features.Recipes.Queries;
 using CoffeeTracker.Domain.Entities;
+using CoffeeTracker.Domain.Enums;
 using FluentAssertions;
 
 namespace CoffeeTracker.Application.Tests.Features.Recipes.Queries.GetRecipesList;
@@ -33,6 +34,7 @@ public class GetRecipesListHandlerTests(IntegrationTestFactory factory) : Integr
         result.Select(entity => entity.Name)
             .Should()
             .ContainInOrder("Alpha Recipe", "Beta Recipe", "Zulu Recipe");
+        result.Should().OnlyContain(entity => entity.GrindStats.Count == 0);
     }
 
     [Fact]
@@ -61,6 +63,7 @@ public class GetRecipesListHandlerTests(IntegrationTestFactory factory) : Integr
         result.Select(entity => entity.Name)
             .Should()
             .ContainInOrder("V60 Daily", "V60 Fast");
+        result.Should().OnlyContain(entity => entity.GrindStats.Count == 0);
     }
 
     [Fact]
@@ -78,5 +81,76 @@ public class GetRecipesListHandlerTests(IntegrationTestFactory factory) : Integr
 
         // Assert
         result.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task Handle_WhenRecipesHaveBrews_ReturnsMostCommonGrindSizePerGrinder()
+    {
+        // Arrange
+        var roaster = Roaster.Create("Roaster", null, null);
+        await Insert(roaster);
+
+        var bean = Bean.Create(
+            "Bean",
+            roaster.Id,
+            OriginType.SingleOrigin,
+            null,
+            null,
+            null,
+            RoastProfile.Filter,
+            null,
+            null,
+            250m,
+            null);
+        await Insert(bean);
+
+        var brewer = Brewer.Create("V60");
+        var comandante = Grinder.Create("Comandante");
+        var kultra = Grinder.Create("K-Ultra");
+        await Insert(brewer);
+        await Insert(comandante);
+        await Insert(kultra);
+
+        var dailyRecipe = Recipe.Create("Daily V60", brewer.Id, null);
+        var weekendRecipe = Recipe.Create("Weekend V60", brewer.Id, null);
+        await InsertMany([dailyRecipe, weekendRecipe]);
+
+        await InsertMany<BrewLogEntry>(
+        [
+            BrewLogEntry.Create(bean.Id, brewer.Id, comandante.Id, dailyRecipe.Id, 18m, 300m, null, "20", null, null, null, null, DateTime.UtcNow.AddDays(-8)),
+            BrewLogEntry.Create(bean.Id, brewer.Id, comandante.Id, dailyRecipe.Id, 18m, 300m, null, "20", null, null, null, null, DateTime.UtcNow.AddDays(-7)),
+            BrewLogEntry.Create(bean.Id, brewer.Id, comandante.Id, dailyRecipe.Id, 18m, 300m, null, "21", null, null, null, null, DateTime.UtcNow.AddDays(-6)),
+            BrewLogEntry.Create(bean.Id, brewer.Id, kultra.Id, dailyRecipe.Id, 18m, 300m, null, "8.5", null, null, null, null, DateTime.UtcNow.AddDays(-5)),
+            BrewLogEntry.Create(bean.Id, brewer.Id, kultra.Id, dailyRecipe.Id, 18m, 300m, null, "8.5", null, null, null, null, DateTime.UtcNow.AddDays(-4)),
+            BrewLogEntry.Create(bean.Id, brewer.Id, kultra.Id, dailyRecipe.Id, 18m, 300m, null, "8.0", null, null, null, null, DateTime.UtcNow.AddDays(-3)),
+            BrewLogEntry.Create(bean.Id, brewer.Id, comandante.Id, weekendRecipe.Id, 18m, 300m, null, "16", null, null, null, null, DateTime.UtcNow.AddDays(-2)),
+            BrewLogEntry.Create(bean.Id, brewer.Id, comandante.Id, weekendRecipe.Id, 18m, 300m, null, "16", null, null, null, null, DateTime.UtcNow.AddDays(-1)),
+            BrewLogEntry.Create(bean.Id, brewer.Id, comandante.Id, weekendRecipe.Id, 18m, 300m, null, null, null, null, null, null, DateTime.UtcNow)
+        ]);
+
+        var query = new GetRecipesListQuery(null);
+
+        // Act
+        var result = await Send(query);
+
+        // Assert
+        var dailyResult = result.Single(entity => entity.Id == dailyRecipe.Id);
+        dailyResult.GrindStats.Should().HaveCount(2);
+        var dailyComandante = dailyResult.GrindStats.Single(stat => stat.GrinderId == comandante.Id);
+        dailyComandante.GrinderName.Should().Be("Comandante");
+        dailyComandante.MostCommonGrindSize.Should().Be("20");
+        dailyComandante.UsageCount.Should().Be(2);
+
+        var dailyKultra = dailyResult.GrindStats.Single(stat => stat.GrinderId == kultra.Id);
+        dailyKultra.GrinderName.Should().Be("K-Ultra");
+        dailyKultra.MostCommonGrindSize.Should().Be("8.5");
+        dailyKultra.UsageCount.Should().Be(2);
+
+        var weekendResult = result.Single(entity => entity.Id == weekendRecipe.Id);
+        weekendResult.GrindStats.Should().HaveCount(1);
+        var weekendComandante = weekendResult.GrindStats.Single();
+        weekendComandante.GrinderId.Should().Be(comandante.Id);
+        weekendComandante.MostCommonGrindSize.Should().Be("16");
+        weekendComandante.UsageCount.Should().Be(2);
     }
 }
