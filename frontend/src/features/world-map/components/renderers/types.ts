@@ -1,3 +1,24 @@
+export const worldMapProjectionOptions = [
+  'geoEquirectangular',
+  'geoNaturalEarth1',
+  'geoEqualEarth',
+  'geoMercator',
+  'geoConicEquidistant',
+  'geoAlbers',
+  'geoAlbersUsa',
+  'geoAzimuthalEqualArea',
+  'geoAzimuthalEquidistant',
+  'geoConicConformal',
+  'geoConicEqualArea',
+  'geoGnomonic',
+  'geoIdentity',
+  'geoOrthographic',
+  'geoStereographic',
+  'geoTransverseMercator',
+] as const
+
+export type WorldMapProjection = (typeof worldMapProjectionOptions)[number]
+
 export type MapPointer = {
   x: number
   y: number
@@ -11,6 +32,7 @@ export type WorldCountryFeature = {
 
 export type WorldMapRendererProps = {
   compact?: boolean
+  projection?: WorldMapProjection
   geography: string | Record<string, unknown>
   shouldIncludeCountry?: (country: WorldCountryFeature) => boolean
   getCountryFill: (country: WorldCountryFeature) => string

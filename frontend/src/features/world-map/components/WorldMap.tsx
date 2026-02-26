@@ -3,7 +3,10 @@ import countriesGeoRaw from 'world-atlas/countries-110m.json?raw'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { WorldMapRenderer } from '@/features/world-map/components/renderers/WorldMapRenderer'
-import type { WorldCountryFeature } from '@/features/world-map/components/renderers/types'
+import type {
+  WorldCountryFeature,
+  WorldMapProjection,
+} from '@/features/world-map/components/renderers/types'
 import { useCountryMapStats } from '@/features/world-map/hooks/useCountryMapStats'
 import { WorldMapTooltip } from '@/features/world-map/components/WorldMapTooltip'
 import { cn } from '@/lib/utils'
@@ -13,6 +16,7 @@ const countriesGeoData = JSON.parse(countriesGeoRaw) as Record<string, unknown>
 
 type WorldMapProps = {
   compact?: boolean
+  projection?: WorldMapProjection
 }
 
 type HoveredCountry = {
@@ -24,6 +28,10 @@ type HoveredCountry = {
   totalBrews: number
   x: number
   y: number
+}
+
+function getMapHeightClass(compact: boolean) {
+  return compact ? 'h-[34rem]' : 'h-[48rem]'
 }
 
 function normalizeIsoNumericCode(value: string | number | null | undefined) {
@@ -52,7 +60,10 @@ function getCountryFill(beanCount: number, maxBeanCount: number, isHovered: bool
   return `color-mix(in hsl, var(--muted) ${mutedMix}%, var(--primary) ${primaryMix}%)`
 }
 
-function WorldMapComponent({ compact = false }: WorldMapProps) {
+function WorldMapComponent({
+  compact = false,
+  projection = 'geoMercator',
+}: WorldMapProps) {
   const { data: countryStats = [], isLoading, isError, refetch, isFetching } =
     useCountryMapStats()
   const [hoveredCountry, setHoveredCountry] = useState<HoveredCountry | null>(
@@ -88,7 +99,7 @@ function WorldMapComponent({ compact = false }: WorldMapProps) {
   if (isLoading && countryStats.length === 0) {
     return (
       <section className="w-full">
-        <Skeleton className={cn('w-full', compact ? 'h-[24rem]' : 'h-[48rem]')} />
+        <Skeleton className={cn('w-full', getMapHeightClass(compact))} />
       </section>
     )
   }
@@ -121,11 +132,12 @@ function WorldMapComponent({ compact = false }: WorldMapProps) {
       <div
         className={cn(
           'relative w-full overflow-hidden',
-          compact ? 'h-[24rem]' : 'h-[48rem]',
+          getMapHeightClass(compact),
         )}
       >
         <WorldMapRenderer
           compact={compact}
+          projection={projection}
           geography={countriesGeoData}
           shouldIncludeCountry={(country) => {
             if (country.isoNumericCode === antarcticaIsoNumericCode) {

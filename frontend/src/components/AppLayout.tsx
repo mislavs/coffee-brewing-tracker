@@ -124,11 +124,9 @@ export function AppLayout() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <header className="border-b">
+      <header className="relative z-30 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/75">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-3 px-4 py-3 sm:px-6 lg:px-8">
-          <div className="text-sm font-semibold tracking-wide">
-            Coffee Brewing Tracker
-          </div>
+          <div className="text-sm font-semibold tracking-wide">BeanMeridian</div>
           <nav className="flex flex-1 flex-wrap gap-1">
             {featureRoutes.map((route) => (
               <NavLink
@@ -157,14 +155,19 @@ export function AppLayout() {
         </div>
       </header>
       {settings.showWorldMap ? (
-        <div className="mx-auto w-full max-w-[86rem] px-2 pt-2 sm:px-4 lg:px-6">
+        <div
+          className="pointer-events-none relative left-1/2 z-0 -mt-20 h-[34rem] w-screen -translate-x-1/2 overflow-hidden"
+          aria-hidden
+        >
           <WorldMap compact />
         </div>
       ) : null}
       <div
         className={cn(
           'mx-auto flex max-w-7xl flex-col px-4 sm:px-6 lg:px-8',
-          settings.showWorldMap ? 'gap-5 pt-3 pb-6' : 'gap-6 py-6',
+          settings.showWorldMap
+            ? 'relative z-20 -mt-32 gap-5 pb-6 pt-0'
+            : 'gap-6 py-6',
         )}
       >
         <DashboardStats />

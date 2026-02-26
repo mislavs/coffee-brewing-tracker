@@ -40,6 +40,7 @@ function toWorldCountryFeature(geography: GeographyFeature): WorldCountryFeature
 
 export function DefaultWorldMapRenderer({
   compact = false,
+  projection = 'geoMercator',
   geography,
   shouldIncludeCountry,
   getCountryFill,
@@ -50,7 +51,9 @@ export function DefaultWorldMapRenderer({
 }: WorldMapRendererProps) {
   return (
     <ComposableMap
-      projectionConfig={{ scale: compact ? 190 : 220 }}
+      key={projection}
+      projection={projection}
+      projectionConfig={{ scale: compact ? 280 : 220 }}
       style={{ width: '100%', height: '100%' }}
     >
       <Geographies geography={geography}>
