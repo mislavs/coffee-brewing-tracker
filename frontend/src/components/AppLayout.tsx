@@ -1,6 +1,8 @@
-import { useCallback, useRef } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { Globe, X } from 'lucide-react'
 import { DashboardStats } from '@/components/DashboardStats'
 import { SettingsButton } from '@/components/SettingsButton'
+import { Button } from '@/components/ui/button'
 import { NavLink, Outlet } from 'react-router-dom'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { WorldMap } from '@/features/world-map/components/WorldMap'
@@ -26,13 +28,17 @@ import {
 } from '@/lib/routePreload'
 import { cn } from '@/lib/utils'
 
+const expandedMapHeightClass = 'h-[42rem] md:h-[46rem]'
+
 export function AppLayout() {
   const { settings } = useSettings()
+  const [isMapExpanded, setIsMapExpanded] = useState(false)
   const hasPrefetchedRoasters = useRef(false)
   const hasPrefetchedBeans = useRef(false)
   const hasPrefetchedBrewLog = useRef(false)
   const hasPrefetchedRecipes = useRef(false)
   const hasPrefetchedEquipment = useRef(false)
+  const shouldRenderWorldMap = settings.showWorldMap || isMapExpanded
 
   const prefetchFeature = useCallback((featurePath: string) => {
     if (featurePath === 'roasters') {
@@ -122,6 +128,23 @@ export function AppLayout() {
     }
   }, [])
 
+  useEffect(() => {
+    if (!isMapExpanded) {
+      return
+    }
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        setIsMapExpanded(false)
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [isMapExpanded])
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="relative z-30 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/75">
@@ -149,25 +172,49 @@ export function AppLayout() {
             ))}
           </nav>
           <div className="flex items-center gap-1">
+            <Button
+              type="button"
+              variant={isMapExpanded ? 'secondary' : 'ghost'}
+              size="icon"
+              aria-label={isMapExpanded ? 'Close map view' : 'Open map view'}
+              aria-expanded={isMapExpanded}
+              aria-pressed={isMapExpanded}
+              title={isMapExpanded ? 'Close map view' : 'Open map view'}
+              onClick={() => {
+                setIsMapExpanded((current) => !current)
+              }}
+            >
+              {isMapExpanded ? <X className="size-4" /> : <Globe className="size-4" />}
+            </Button>
             <SettingsButton />
             <ThemeToggle />
           </div>
         </div>
       </header>
-      {settings.showWorldMap ? (
+      {shouldRenderWorldMap ? (
         <div
-          className="pointer-events-none relative left-1/2 z-0 -mt-20 h-[34rem] w-screen -translate-x-1/2 overflow-hidden"
-          aria-hidden
+          className={cn(
+            'relative left-1/2 w-screen -translate-x-1/2 overflow-hidden origin-top transform-gpu transition-[margin-top,height] duration-[900ms] ease-in-out motion-reduce:transition-none',
+            isMapExpanded
+              ? 'pointer-events-auto z-20 mt-8 h-[calc(100dvh-6rem)]'
+              : 'pointer-events-none z-0 -mt-20 h-[34rem]',
+          )}
+          aria-hidden={!isMapExpanded}
         >
-          <WorldMap compact />
+          <WorldMap
+            compact
+            mapHeightClassName={isMapExpanded ? expandedMapHeightClass : undefined}
+          />
         </div>
       ) : null}
       <div
         className={cn(
-          'mx-auto flex max-w-7xl flex-col px-4 sm:px-6 lg:px-8',
-          settings.showWorldMap
-            ? 'relative z-20 -mt-32 gap-5 pb-6 pt-0'
-            : 'gap-6 py-6',
+          'mx-auto flex max-w-7xl flex-col px-4 transition-[opacity,max-height] duration-300 ease-out sm:px-6 lg:px-8',
+          isMapExpanded
+            ? 'pointer-events-none relative z-10 max-h-0 overflow-hidden opacity-0'
+            : settings.showWorldMap
+              ? 'relative z-20 max-h-[200rem] -mt-32 gap-5 pb-6 pt-0 opacity-100'
+              : 'max-h-[200rem] gap-6 py-6 opacity-100',
         )}
       >
         <DashboardStats />

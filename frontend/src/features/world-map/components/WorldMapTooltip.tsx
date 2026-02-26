@@ -1,8 +1,12 @@
+import { createPortal } from 'react-dom'
+
 const wholeNumberFormatter = new Intl.NumberFormat()
 const oneDecimalFormatter = new Intl.NumberFormat(undefined, {
   minimumFractionDigits: 1,
   maximumFractionDigits: 1,
 })
+const tooltipHorizontalOffsetPx = 8
+const tooltipVerticalOffsetPx = 0
 
 type WorldMapTooltipProps = {
   x: number
@@ -31,12 +35,16 @@ export function WorldMapTooltip({
   avgBrewRating,
   totalBrews,
 }: WorldMapTooltipProps) {
-  return (
+  if (typeof document === 'undefined') {
+    return null
+  }
+
+  return createPortal(
     <div
       className="pointer-events-none fixed z-50 w-56 rounded-md border bg-popover p-3 text-popover-foreground shadow-md"
       style={{
-        left: `${x + 14}px`,
-        top: `${y + 14}px`,
+        left: `${x + tooltipHorizontalOffsetPx}px`,
+        top: `${y + tooltipVerticalOffsetPx}px`,
       }}
     >
       <p className="mb-2 text-sm font-semibold">{countryName}</p>
@@ -62,6 +70,7 @@ export function WorldMapTooltip({
           <dd>{wholeNumberFormatter.format(totalBrews)}</dd>
         </div>
       </dl>
-    </div>
+    </div>,
+    document.body,
   )
 }

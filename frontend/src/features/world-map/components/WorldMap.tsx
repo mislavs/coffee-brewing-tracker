@@ -17,6 +17,7 @@ const countriesGeoData = JSON.parse(countriesGeoRaw) as Record<string, unknown>
 type WorldMapProps = {
   compact?: boolean
   projection?: WorldMapProjection
+  mapHeightClassName?: string
 }
 
 type HoveredCountry = {
@@ -30,7 +31,11 @@ type HoveredCountry = {
   y: number
 }
 
-function getMapHeightClass(compact: boolean) {
+function getMapHeightClass(compact: boolean, mapHeightClassName?: string) {
+  if (mapHeightClassName) {
+    return mapHeightClassName
+  }
+
   return compact ? 'h-[34rem]' : 'h-[48rem]'
 }
 
@@ -63,6 +68,7 @@ function getCountryFill(beanCount: number, maxBeanCount: number, isHovered: bool
 function WorldMapComponent({
   compact = false,
   projection = 'geoMercator',
+  mapHeightClassName,
 }: WorldMapProps) {
   const { data: countryStats = [], isLoading, isError, refetch, isFetching } =
     useCountryMapStats()
@@ -96,10 +102,33 @@ function WorldMapComponent({
     return statsByIsoNumericCode.get(country.isoNumericCode)
   }
 
+  function toHoveredCountry(
+    country: WorldCountryFeature,
+    pointer: { x: number; y: number },
+  ): HoveredCountry | null {
+    const stats = resolveCountryStats(country)
+    if (!stats) {
+      return null
+    }
+
+    return {
+      isoNumericCode: country.isoNumericCode,
+      countryName: stats.countryName ?? country.name,
+      beanCount: stats.beanCount ?? 0,
+      totalBagWeightGrams: stats.totalBagWeightGrams ?? 0,
+      avgBrewRating: stats.avgBrewRating,
+      totalBrews: stats.totalBrews ?? 0,
+      x: pointer.x,
+      y: pointer.y,
+    }
+  }
+
+  const mapHeightClass = getMapHeightClass(compact, mapHeightClassName)
+
   if (isLoading && countryStats.length === 0) {
     return (
       <section className="w-full">
-        <Skeleton className={cn('w-full', getMapHeightClass(compact))} />
+        <Skeleton className={cn('w-full', mapHeightClass)} />
       </section>
     )
   }
@@ -131,8 +160,8 @@ function WorldMapComponent({
       ) : null}
       <div
         className={cn(
-          'relative w-full overflow-hidden',
-          getMapHeightClass(compact),
+          'relative w-full overflow-hidden transition-[height] duration-[900ms] ease-in-out motion-reduce:transition-none',
+          mapHeightClass,
         )}
       >
         <WorldMapRenderer
@@ -156,47 +185,23 @@ function WorldMapComponent({
             hoveredCountry?.isoNumericCode === country.isoNumericCode ? 0.9 : 0.45
           }
           onCountryPointerEnter={(country, pointer) => {
-            const stats = resolveCountryStats(country)
-            if (!stats) {
-              setHoveredCountry(null)
-              return
-            }
-
-            setHoveredCountry({
-              isoNumericCode: country.isoNumericCode,
-              countryName: stats.countryName ?? country.name,
-              beanCount: stats.beanCount ?? 0,
-              totalBagWeightGrams: stats.totalBagWeightGrams ?? 0,
-              avgBrewRating: stats.avgBrewRating,
-              totalBrews: stats.totalBrews ?? 0,
-              x: pointer.x,
-              y: pointer.y,
-            })
+            setHoveredCountry(toHoveredCountry(country, pointer))
           }}
           onCountryPointerMove={(country, pointer) => {
-            const stats = resolveCountryStats(country)
-            if (!stats) {
+            const hovered = toHoveredCountry(country, pointer)
+            if (!hovered) {
               return
             }
 
             setHoveredCountry((current) => {
               if (!current || current.isoNumericCode !== country.isoNumericCode) {
-                return {
-                  isoNumericCode: country.isoNumericCode,
-                  countryName: stats.countryName ?? country.name,
-                  beanCount: stats.beanCount ?? 0,
-                  totalBagWeightGrams: stats.totalBagWeightGrams ?? 0,
-                  avgBrewRating: stats.avgBrewRating,
-                  totalBrews: stats.totalBrews ?? 0,
-                  x: pointer.x,
-                  y: pointer.y,
-                }
+                return hovered
               }
 
               return {
                 ...current,
-                x: pointer.x,
-                y: pointer.y,
+                x: hovered.x,
+                y: hovered.y,
               }
             })
           }}
