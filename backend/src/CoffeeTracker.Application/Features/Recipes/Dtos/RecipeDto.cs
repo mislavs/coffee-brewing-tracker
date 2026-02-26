@@ -5,4 +5,5 @@ public sealed record RecipeDto(
     string Name,
     string BrewerName,
     Guid BrewerId,
-    string? Description);
+    string? Description,
+    IReadOnlyList<RecipeGrindStatsDto> GrindStats);

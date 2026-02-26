@@ -1957,6 +1957,35 @@
           "description": {
             "type": "string",
             "nullable": true
+          },
+          "grindStats": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RecipeGrindStatsDto"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "RecipeGrindStatsDto": {
+        "type": "object",
+        "properties": {
+          "grinderId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "grinderName": {
+            "type": "string",
+            "nullable": true
+          },
+          "mostCommonGrindSize": {
+            "type": "string",
+            "nullable": true
+          },
+          "usageCount": {
+            "type": "integer",
+            "format": "int32"
           }
         },
         "additionalProperties": false

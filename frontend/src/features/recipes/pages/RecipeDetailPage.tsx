@@ -21,6 +21,7 @@ function RecipeDetailContent({ recipeId }: { recipeId: Guid }) {
   const { data: recipe } = useRecipe(recipeId)
   const { mutateAsync: deleteRecipe, isPending: isDeleting } = useDeleteRecipe()
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const grindStats = recipe.grindStats ?? []
 
   const confirmDelete = async () => {
     await deleteRecipe(recipeId)
@@ -54,6 +55,22 @@ function RecipeDetailContent({ recipeId }: { recipeId: Guid }) {
               {recipe.description || '—'}
             </p>
           </div>
+          {grindStats.length > 0 ? (
+            <div className="space-y-2 pt-2">
+              <p className="font-medium text-muted-foreground">
+                Most common grind setting per grinder
+              </p>
+              <div className="grid gap-2 sm:grid-cols-2">
+                {grindStats.map((stat, index) => (
+                  <StatCard
+                    key={stat.grinderId ?? `${stat.grinderName ?? 'grind-stat'}-${index}`}
+                    label={stat.grinderName ?? 'Unknown grinder'}
+                    value={`${stat.mostCommonGrindSize ?? '—'} (${formatBrewCount(stat.usageCount ?? 0)})`}
+                  />
+                ))}
+              </div>
+            </div>
+          ) : null}
         </CardContent>
         <CardFooter className="flex items-center gap-2">
           <Button asChild>
@@ -91,4 +108,17 @@ export function RecipeDetailPage() {
   }
 
   return <RecipeDetailContent recipeId={entityId.id} />
+}
+
+function StatCard({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="bg-muted/20 space-y-1 rounded-md border p-3">
+      <p className="text-muted-foreground text-xs uppercase">{label}</p>
+      <p className="font-medium">{value}</p>
+    </div>
+  )
+}
+
+function formatBrewCount(count: number) {
+  return `${count} ${count === 1 ? 'brew' : 'brews'}`
 }
