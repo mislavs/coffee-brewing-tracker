@@ -9,13 +9,14 @@
 - Audio is recorded via `MediaRecorder` API in the browser (cross-browser, works in Firefox) and sent as a file upload (`multipart/form-data`) to the backend.
 - The parse-voice endpoint is a **suggestion tool**, not a submission path. It returns parsed field values that the user reviews in the form before submitting.
 - When no AI provider is configured, the app runs normally (null object pattern); the mic button is hidden via a feature availability endpoint.
+- `POST /api/brew-logs/parse-voice` is server-gated by feature availability. If voice parsing is unavailable, the endpoint returns **501 Not Implemented** and does not invoke transcription/extraction services.
 - **Entity catalog filtering:** Only beans with `IsAvailable = true` are included in the entity catalog sent to the LLM. All brewers, grinders, recipes, and accessories are included regardless.
 
 ---
 
 ## Step 1: Backend -- AI Abstractions, Null Implementations, Parse Voice Endpoint, and Feature Availability
 
-**Goal:** The parse-voice infrastructure exists end-to-end on the backend. The endpoint accepts audio, calls the (null) services, and returns an empty result. Feature availability endpoint correctly reports the feature as disabled.
+**Goal:** The parse-voice infrastructure exists end-to-end on the backend. When providers are not configured, feature availability reports disabled and `POST /api/brew-logs/parse-voice` returns 501 without attempting AI processing.
 
 **Scope:**
 
@@ -58,7 +59,7 @@
 - Add an `AddAiServices(IConfiguration)` method in [IServiceCollectionExtensions.cs](backend/src/CoffeeTracker.Infrastructure/IServiceCollectionExtensions.cs):
   - Reads `AI:Transcription:Provider` and `AI:Extraction:Provider` from config
   - When null/empty/missing: registers `NullSpeechToTextClient` as `ISpeechToTextClient` and `NullBrewLogExtractionService` as `IBrewLogExtractionService`
-  - When a provider name is set: placeholder `throw new NotImplementedException()` (Step 2 implements the real providers)
+  - When provider names are unsupported/unimplemented: log warning and fall back to null implementations (do **not** fail startup)
   - Registers `IAiFeatureAvailability` with `IsVoiceBrewLogParsingAvailable` set based on whether both providers resolved to real implementations
 - Call `AddAiServices(builder.Configuration)` from the existing `AddInfrastructure` method
 
@@ -67,6 +68,8 @@
 - New contract `Contracts/ParseVoiceBrewLogResponse.cs` mapping from `ParseVoiceBrewLogResult`
 - Add `POST /api/brew-logs/parse-voice` to [BrewLogEndpoints.cs](backend/src/CoffeeTracker.Api/Endpoints/BrewLogEndpoints.cs):
   - Accepts `IFormFile audioFile`
+  - Validates `audioFile` is present/non-empty, has supported audio MIME type, and does not exceed configured max upload size
+  - Checks `IAiFeatureAvailability.IsVoiceBrewLogParsingAvailable`; when `false`, returns RFC7807 Problem response with status `501 Not Implemented`
   - Maps to `ParseVoiceBrewLogCommand`
   - Returns `Ok<ParseVoiceBrewLogResponse>`
   - Annotate with `.DisableAntiforgery()` and `.Accepts<IFormFile>("multipart/form-data")`
@@ -77,12 +80,12 @@
 **Tests:**
 
 - Unit tests: `ParseVoiceBrewLogValidator` -- valid audio content type passes, invalid fails, null stream fails
-- Integration tests: `ParseVoiceBrewLogHandler` -- with null services injected, returns empty transcript and empty extraction result; verify bean query filters to `IsAvailable == true`
+- Integration/API tests: `POST /api/brew-logs/parse-voice` returns 501 when feature is unavailable
 - Integration tests: `GetFeaturesHandler` -- returns `VoiceBrewLogParsing: false` when null services are registered
 
 **Verification:** `dotnet build` and `dotnet test` from solution root
 
-**Exit criteria:** `POST /api/brew-logs/parse-voice` returns 200 with empty result. `GET /api/features` returns `{ voiceBrewLogParsing: false }`. All existing tests still pass.
+**Exit criteria:** `POST /api/brew-logs/parse-voice` returns 501 when providers are not configured. `GET /api/features` returns `{ voiceBrewLogParsing: false }`. All existing tests still pass.
 
 ---
 
@@ -112,6 +115,9 @@ public sealed class TranscriptionSettings
 {
     public string? Provider { get; init; }
     public string? ModelPath { get; init; }
+    public int MaxUploadBytes { get; init; } = 10 * 1024 * 1024;
+    public int MaxAudioDurationSeconds { get; init; } = 45;
+    public int ProcessingTimeoutSeconds { get; init; } = 30;
 }
 
 public sealed class ExtractionSettings
@@ -124,15 +130,17 @@ public sealed class ExtractionSettings
 ```
 
 - Each concern (transcription/extraction) carries its own configuration -- no shared block
-- `TranscriptionSettings.ModelPath` points to the whisper.cpp GGML model file
+- `TranscriptionSettings.ModelPath` points to the whisper.cpp GGML model file; relative paths are resolved from API `ContentRootPath`
 - `ExtractionSettings.Endpoint` defaults to `https://openrouter.ai/api/v1` when `Provider` is `"OpenRouter"`
 
 **Infrastructure layer -- whisper.cpp transcription:**
 
 - New `Infrastructure/AI/WhisperCpp/WhisperCppSpeechToTextClient.cs`:
   - Implements `ISpeechToTextClient` from `Microsoft.Extensions.AI`
-  - Loads `WhisperProcessor` from the configured `ModelPath` (singleton, initialized once)
-  - Converts incoming audio stream (webm from browser) to PCM 16kHz mono float32 via FFmpeg subprocess (`ffmpeg -i pipe:0 -ar 16000 -ac 1 -f f32le pipe:1`)
+  - Resolves and validates configured `ModelPath` at startup (clear failure if file does not exist)
+  - Loads `WhisperProcessor` from the resolved model path (singleton, initialized once)
+  - Converts incoming audio stream (webm from browser) to PCM 16kHz mono float32 via FFmpeg subprocess (`ffmpeg -i pipe:0 -t <MaxAudioDurationSeconds> -ar 16000 -ac 1 -f f32le pipe:1`)
+  - Enforces cancellation + processing timeout; kills FFmpeg process if timeout/cancellation occurs
   - Feeds PCM samples to `WhisperProcessor.ProcessAsync()`
   - Returns transcript as `SpeechToTextResponse`
   - **Note:** Structured so this entire class can be replaced by an OpenAI Whisper implementation in the future -- the handler only sees `ISpeechToTextClient`
@@ -152,12 +160,14 @@ public sealed class ExtractionSettings
   - Bind `AiSettings` from `AI` config section
   - Transcription provider switch:
     - `"WhisperCpp"`: register `WhisperCppSpeechToTextClient` as `ISpeechToTextClient` (singleton, loads model once)
-    - `"OpenAI"`: *(future)* register via `openAiClient.AsSpeechToTextClient(model)` -- leave as `throw new NotImplementedException("OpenAI transcription not yet implemented")`
+    - `"OpenAI"`: *(future)* register via `openAiClient.AsSpeechToTextClient(model)` (not implemented yet)
     - null/empty: register `NullSpeechToTextClient`
+    - unsupported/unimplemented values: log warning and register `NullSpeechToTextClient`
   - Extraction provider switch:
     - `"OpenRouter"`: register `IChatClient` via `new OpenAIClient(new ApiKeyCredential(apiKey), new() { Endpoint = new Uri("https://openrouter.ai/api/v1") }).AsChatClient(model)`, register `BrewLogExtractionService` as `IBrewLogExtractionService`
-    - `"OpenAI"`: *(future)* same as OpenRouter but without custom endpoint -- leave as `throw new NotImplementedException("Direct OpenAI extraction not yet implemented")`
+    - `"OpenAI"`: *(future)* same as OpenRouter but without custom endpoint (not implemented yet)
     - null/empty: register `NullBrewLogExtractionService`
+    - unsupported/unimplemented values: log warning and register `NullBrewLogExtractionService`
   - `IAiFeatureAvailability` resolves to `true` when both are non-null implementations
 
 **Configuration (`appsettings.json` / user secrets):**
@@ -178,17 +188,18 @@ public sealed class ExtractionSettings
 }
 ```
 
-**Model file:** Download `ggml-base-q5_1.bin` (~57 MB) from Hugging Face (`ggerganov/whisper.cpp`). Document the download step. The model path is relative to the API project's working directory.
+**Model file:** Download `ggml-base-q5_1.bin` (~57 MB) from Hugging Face (`ggerganov/whisper.cpp`). Document the download step. If `ModelPath` is relative, resolve it from API `ContentRootPath`; fail startup with a clear error if missing.
 
 **Tests:**
 
 - Unit tests for `BrewLogExtractionService`: substitute `IChatClient`, verify prompt includes entity catalog with only available beans, verify JSON response is parsed into `BrewLogExtractionResult` correctly
 - Unit tests for `WhisperCppSpeechToTextClient`: verify audio conversion pipeline setup (mock FFmpeg process), verify `WhisperProcessor` invocation
+- Unit tests for `WhisperCppSpeechToTextClient`: timeout/cancellation behavior terminates FFmpeg process and returns clear error
 - Unit test: `GetFeaturesHandler` returns `VoiceBrewLogParsing: true` when real services are registered
 
 **Verification:** `dotnet build` and `dotnet test`
 
-**Exit criteria:** With providers configured and model file present, `POST /api/brew-logs/parse-voice` transcribes audio locally and returns structured extraction results. `GET /api/features` returns `{ voiceBrewLogParsing: true }`. Without config, behavior from Step 1 is unchanged (null objects, feature reports false). FFmpeg must be on PATH for transcription to work.
+**Exit criteria:** With providers configured and model file present, `POST /api/brew-logs/parse-voice` transcribes audio locally and returns structured extraction results. `GET /api/features` returns `{ voiceBrewLogParsing: true }`. Without config, behavior from Step 1 is unchanged (`POST` returns 501, feature reports false). FFmpeg must be on PATH for transcription to work.
 
 ---
 
@@ -203,8 +214,7 @@ public sealed class ExtractionSettings
 - Add manual (non-Orval) API functions in `lib/api-client.ts`:
   - `apiClient.api.features.get()` -- `GET /api/features`
   - `apiClient.api.brewLogs.parseVoice(audioBlob: Blob)` -- `POST /api/brew-logs/parse-voice` with `multipart/form-data` body (uses `FormData`, no JSON serialization, no `Content-Type` header so the browser sets the boundary automatically)
-- Add TypeScript types for `FeaturesDto` and `ParseVoiceBrewLogResponse` in `lib/api/schemas.ts` (or a dedicated `lib/api/voice-types.ts`)
-- Regenerate Orval types to pick up the new `GET /api/features` endpoint (or add types manually since parse-voice is multipart and won't auto-generate cleanly)
+- Regenerate OpenAPI spec and Orval client/types so `FeaturesDto` and `ParseVoiceBrewLogResponse` are generated from OpenAPI (single source of truth; no manual schema type definitions for voice endpoint contracts)
 
 **Hooks (`features/brew-log/hooks/`):**
 
@@ -252,13 +262,14 @@ public sealed class ExtractionSettings
 
 ## Cross-Step Risks and Mitigations
 
-- **Audio format conversion:** whisper.cpp expects PCM audio but browsers produce webm. The `WhisperCppSpeechToTextClient` converts via FFmpeg subprocess. FFmpeg must be on PATH -- document this as a prerequisite. If FFmpeg is missing, the transcription service should return a clear error.
-- **whisper.cpp model file:** The ~57 MB model file must be downloaded separately. Add a script or document the download step. Fail with a clear error at startup if the configured `ModelPath` doesn't exist.
+- **Audio format conversion / processing safety:** whisper.cpp expects PCM audio but browsers produce webm. The `WhisperCppSpeechToTextClient` converts via FFmpeg subprocess with explicit duration and processing timeouts. FFmpeg must be on PATH -- document this as a prerequisite. If FFmpeg is missing/times out, return a clear error.
+- **whisper.cpp model file:** The ~57 MB model file must be downloaded separately. Add a script or document the download step. Resolve relative paths from `ContentRootPath` and fail with a clear startup error if the configured model file doesn't exist.
 - **OpenRouter API latency:** Extraction via OpenRouter may take 2-4 seconds. The dialog shows a processing state. whisper.cpp transcription is local and fast for short clips.
 - **Entity catalog size:** If the user has many available beans/brewers, the LLM prompt could get large. GPT-4o handles 128K tokens, so this is unlikely to be an issue. Monitor token usage in logs.
 - **LLM hallucination:** The extraction service should only match entities that exist in the catalog. The structured output schema constrains the response. Unmatched references are surfaced to the user.
 - **Microsoft.Extensions.AI maturity:** `ISpeechToTextClient` is marked experimental (MEAI001). If the API changes, only the Infrastructure adapters need updating -- the handler uses the stable interface.
 - **Microphone permissions:** The browser will prompt for mic access. If denied, `useAudioRecorder` reports `isSupported: false` or an error. The dialog shows a helpful message.
+- **Feature disabled backend behavior:** Even if frontend gating fails, backend enforces availability and returns `501 Not Implemented` for `POST /api/brew-logs/parse-voice` while disabled.
 
 ## Future Provider Expansion
 
@@ -274,7 +285,7 @@ Adding a new provider requires only Infrastructure-layer changes. The handler an
 
 - [ ] `GET /api/features` returns `{ voiceBrewLogParsing: false }` when no AI config
 - [ ] `GET /api/features` returns `{ voiceBrewLogParsing: true }` when providers are configured
-- [ ] `POST /api/brew-logs/parse-voice` returns empty result with null implementations
+- [ ] `POST /api/brew-logs/parse-voice` returns `501 Not Implemented` when feature is unavailable
 - [ ] `POST /api/brew-logs/parse-voice` transcribes and extracts with providers configured
 - [ ] Entity catalog contains only available beans (`IsAvailable == true`)
 - [ ] Entity names are resolved to GUIDs correctly (beans, brewers, grinders, recipes, accessories)
