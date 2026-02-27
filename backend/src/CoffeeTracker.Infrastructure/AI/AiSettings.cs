@@ -8,6 +8,26 @@ public sealed class AiSettings
     public ExtractionSettings Extraction { get; init; } = new();
 }
 
+public static class AiProviders
+{
+    public static class Transcription
+    {
+        public const string WhisperCpp = "WhisperCpp";
+        public const string OpenAi = "OpenAI";
+    }
+
+    public static class Extraction
+    {
+        public const string OpenRouter = "OpenRouter";
+        public const string OpenAi = "OpenAI";
+    }
+}
+
+public static class AiProviderDefaults
+{
+    public const string OpenRouterEndpoint = "https://openrouter.ai/api/v1";
+}
+
 public sealed class TranscriptionSettings
 {
     public string? Provider { get; init; }
