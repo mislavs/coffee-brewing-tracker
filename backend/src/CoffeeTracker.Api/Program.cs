@@ -56,6 +56,7 @@ try
     app.MapCountryEndpoints();
     app.MapFlavorNoteEndpoints();
     app.MapRecipeEndpoints();
+    app.MapFeatureEndpoints();
     app.MapBrewLogEndpoints();
     app.MapStatsEndpoints();
 

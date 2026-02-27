@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
     <ProjectReference Include="..\CoffeeTracker.Domain\CoffeeTracker.Domain.csproj" />
@@ -9,12 +9,14 @@
     <PackageReference Include="FluentValidation" Version="*" />
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="*" />
     <PackageReference Include="MediatR" Version="*" />
+    <PackageReference Include="Microsoft.Extensions.AI.Abstractions" Version="10.3.0" />
   </ItemGroup>
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <NoWarn>$(NoWarn);MEAI001</NoWarn>
   </PropertyGroup>
 
 </Project>
