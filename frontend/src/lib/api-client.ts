@@ -17,6 +17,7 @@ import {
   getDeleteBrewLogUrl,
   getGetBrewLogByIdUrl,
   getGetBrewLogsUrl,
+  getParseVoiceBrewLogUrl,
   getUpdateBrewLogUrl,
 } from '@/lib/api/generated/brew-logs/brew-logs'
 import {
@@ -26,6 +27,7 @@ import {
   getUpdateBrewerUrl,
 } from '@/lib/api/generated/brewers/brewers'
 import { getGetCountriesUrl } from '@/lib/api/generated/countries/countries'
+import { getGetFeaturesUrl } from '@/lib/api/generated/features/features'
 import { getGetFlavorNotesUrl } from '@/lib/api/generated/flavor-notes/flavor-notes'
 import {
   getCreateGrinderUrl,
@@ -79,11 +81,13 @@ import type {
   CountryMapStatsDto,
   DashboardStatsDto,
   FlavorNoteDto,
+  FeaturesDto,
   GetBeansParams,
   GetBrewLogsParams,
   GetRecipesParams,
   GrinderDto,
   GrinderSummaryDto,
+  ParseVoiceBrewLogResponse,
   RecipeDto,
   RecipeSummaryDto,
   RoasterDto,
@@ -213,6 +217,15 @@ export const apiClient = {
           headers: jsonRequestHeaders,
           body: serializeJsonBody(request),
         }),
+      parseVoice: async (audioBlob: Blob) => {
+        const formData = new FormData()
+        formData.append('audioFile', audioBlob)
+
+        return requestJson<ParseVoiceBrewLogResponse>(getParseVoiceBrewLogUrl(), {
+          method: 'POST',
+          body: formData,
+        })
+      },
       byId: (id: Guid) => ({
         get: () =>
           requestJson<BrewLogDto>(getGetBrewLogByIdUrl(id), {
@@ -257,6 +270,12 @@ export const apiClient = {
     countries: {
       get: () =>
         requestJson<CountryDto[]>(getGetCountriesUrl(), {
+          method: 'GET',
+        }),
+    },
+    features: {
+      get: () =>
+        requestJson<FeaturesDto>(getGetFeaturesUrl(), {
           method: 'GET',
         }),
     },

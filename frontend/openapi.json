@@ -573,6 +573,66 @@
         }
       }
     },
+    "/api/brew-logs/parse-voice": {
+      "post": {
+        "tags": [
+          "BrewLogs"
+        ],
+        "operationId": "ParseVoiceBrewLog",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "audioFile": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              },
+              "encoding": {
+                "audioFile": {
+                  "style": "form"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ParseVoiceBrewLogResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "501": {
+            "description": "Not Implemented",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/countries": {
       "get": {
         "tags": [
@@ -623,6 +683,26 @@
                   "items": {
                     "$ref": "#/components/schemas/BeanSummaryDto"
                   }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/features": {
+      "get": {
+        "tags": [
+          "Features"
+        ],
+        "operationId": "GetFeatures",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FeaturesDto"
                 }
               }
             }
@@ -1876,6 +1956,15 @@
         },
         "additionalProperties": false
       },
+      "FeaturesDto": {
+        "type": "object",
+        "properties": {
+          "voiceBrewLogParsing": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
       "FlavorNoteDto": {
         "type": "object",
         "properties": {
@@ -1949,6 +2038,143 @@
         ],
         "type": "integer",
         "format": "int32"
+      },
+      "ParseVoiceBrewLogResponse": {
+        "type": "object",
+        "properties": {
+          "transcript": {
+            "type": "string",
+            "nullable": true
+          },
+          "beanId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "beanName": {
+            "type": "string",
+            "nullable": true
+          },
+          "brewerId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "brewerName": {
+            "type": "string",
+            "nullable": true
+          },
+          "grinderId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "grinderName": {
+            "type": "string",
+            "nullable": true
+          },
+          "recipeId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "recipeName": {
+            "type": "string",
+            "nullable": true
+          },
+          "accessoryIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "nullable": true
+          },
+          "accessoryNames": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "dose": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "waterAmount": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "waterTemperature": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "grindSize": {
+            "type": "string",
+            "nullable": true
+          },
+          "brewTimeSeconds": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "rating": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "notes": {
+            "type": "string",
+            "nullable": true
+          },
+          "adjustmentIdeas": {
+            "type": "string",
+            "nullable": true
+          },
+          "brewedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "unmatchedReferences": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ProblemDetails": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "detail": {
+            "type": "string",
+            "nullable": true
+          },
+          "instance": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": { }
       },
       "RecipeDto": {
         "type": "object",
@@ -2403,6 +2629,9 @@
     },
     {
       "name": "Countries"
+    },
+    {
+      "name": "Features"
     },
     {
       "name": "FlavorNotes"

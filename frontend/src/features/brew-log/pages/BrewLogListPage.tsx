@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Mic } from 'lucide-react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import {
@@ -14,6 +15,7 @@ import { Input } from '@/components/ui/input'
 import { Switch } from '@/components/ui/switch'
 import { BrewLogCard } from '@/features/brew-log/components/BrewLogCard'
 import { useBrewLogs } from '@/features/brew-log/hooks/useBrewLogs'
+import { useFeatures } from '@/features/brew-log/hooks/useFeatures'
 
 export function BrewLogListPage() {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -86,6 +88,7 @@ export function BrewLogListPage() {
     dateTo,
     includeUnavailable,
   )
+  const { data: features } = useFeatures()
 
   return (
     <Card>
@@ -94,9 +97,19 @@ export function BrewLogListPage() {
           <CardTitle>Brew Log</CardTitle>
           <CardDescription>Browse and manage your brew history.</CardDescription>
         </div>
-        <Button asChild>
-          <Link to="/brew-log/new">Log Brew</Link>
-        </Button>
+        <div className="flex items-center gap-2">
+          {features?.voiceBrewLogParsing ? (
+            <Button variant="outline" asChild>
+              <Link to="/brew-log/new?dictate=true">
+                <Mic className="size-4" />
+                Dictate brew
+              </Link>
+            </Button>
+          ) : null}
+          <Button asChild>
+            <Link to="/brew-log/new">Log Brew</Link>
+          </Button>
+        </div>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid gap-4 md:grid-cols-4">

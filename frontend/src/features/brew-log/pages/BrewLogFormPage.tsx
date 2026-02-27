@@ -1,6 +1,6 @@
 import type { Guid } from '@/lib/api-types'
 import { useState } from 'react'
-import { Navigate, useNavigate } from 'react-router-dom'
+import { Navigate, useNavigate, useSearchParams } from 'react-router-dom'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -67,6 +67,7 @@ function createInitialValues(): BrewLogFormValues {
 }
 
 function CreateBrewLogForm() {
+  const [searchParams] = useSearchParams()
   const navigate = useNavigate()
   const { mutateAsync, isPending } = useCreateBrewLog()
   const { mutateAsync: setBeanAvailability, isPending: isSettingAvailability } =
@@ -75,6 +76,7 @@ function CreateBrewLogForm() {
     beanId: Guid
     remainingQuantity: number
   } | null>(null)
+  const shouldOpenVoiceInput = searchParams.get('dictate') === 'true'
 
   const closeLowStockPrompt = () => {
     setLowStockPrompt(null)
@@ -88,6 +90,8 @@ function CreateBrewLogForm() {
         description="Record a new brew entry."
         submitLabel="Create"
         cancelHref="/brew-log"
+        showVoiceInput={shouldOpenVoiceInput}
+        initialVoiceDialogOpen={shouldOpenVoiceInput}
         isSubmitting={isPending}
         initialValues={createInitialValues()}
         onSubmit={async (values) => {
@@ -169,6 +173,7 @@ function EditBrewLogForm({ brewLogId }: { brewLogId: Guid }) {
       description="Update brew log details."
       submitLabel="Save"
       cancelHref={`/brew-log/${brewLogId}`}
+      showVoiceInput
       isSubmitting={isPending}
       initialValues={{
         ...toBrewTimeParts(brewLog.brewTimeSeconds),

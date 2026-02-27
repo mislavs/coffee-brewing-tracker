@@ -46,7 +46,10 @@ public static class BrewLogEndpoints
         group.MapPost("/parse-voice", ParseVoiceBrewLog)
             .WithName("ParseVoiceBrewLog")
             .DisableAntiforgery()
-            .Accepts<IFormFile>("multipart/form-data");
+            .Accepts<IFormFile>("multipart/form-data")
+            .Produces<ParseVoiceBrewLogResponse>(StatusCodes.Status200OK)
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status501NotImplemented);
 
         return app;
     }
@@ -145,7 +148,7 @@ public static class BrewLogEndpoints
         return TypedResults.NoContent();
     }
 
-    private static async Task<IResult> ParseVoiceBrewLog(
+    private static async Task<Results<Ok<ParseVoiceBrewLogResponse>, ProblemHttpResult>> ParseVoiceBrewLog(
         IFormFile? audioFile,
         IOptions<AiSettings> aiSettingsOptions,
         IAiFeatureAvailability aiFeatureAvailability,

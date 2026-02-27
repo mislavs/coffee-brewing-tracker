@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm, useWatch } from 'react-hook-form'
 import { Link } from 'react-router-dom'
@@ -22,6 +22,8 @@ import {
   BrewParametersSection,
   ResultsSection,
 } from '@/features/brew-log/components/BrewLogFormSections'
+import { VoiceInputButton } from '@/features/brew-log/components/VoiceInputButton'
+import { VoiceInputDialog } from '@/features/brew-log/components/VoiceInputDialog'
 import {
   toIdNameOptions,
 } from '@/features/brew-log/components/brewLogFormShared'
@@ -32,6 +34,7 @@ import { useBeans } from '@/features/beans/hooks/useBeans'
 import { useRecipes } from '@/features/recipes/hooks/useRecipes'
 import { useBrewers } from '@/features/equipment/hooks/useBrewers'
 import { useGrinders } from '@/features/equipment/hooks/useGrinders'
+import type { ParseVoiceBrewLogResponse } from '@/lib/api/schemas'
 
 type BrewLogFormCardProps = {
   title: string
@@ -41,6 +44,8 @@ type BrewLogFormCardProps = {
   onSubmit: (values: BrewLogFormValues) => Promise<void>
   isSubmitting: boolean
   cancelHref: string
+  showVoiceInput?: boolean
+  initialVoiceDialogOpen?: boolean
 }
 
 export function BrewLogFormCard({
@@ -51,7 +56,10 @@ export function BrewLogFormCard({
   onSubmit,
   isSubmitting,
   cancelHref,
+  showVoiceInput = false,
+  initialVoiceDialogOpen = false,
 }: BrewLogFormCardProps) {
+  const [voiceDialogOpen, setVoiceDialogOpen] = useState(initialVoiceDialogOpen)
   const form = useForm<BrewLogFormInput, undefined, BrewLogFormValues>({
     resolver: zodResolver(brewLogFormSchema),
     defaultValues: initialValues,
@@ -95,6 +103,37 @@ export function BrewLogFormCard({
     }
   })
 
+  const handleVoiceFill = (result: ParseVoiceBrewLogResponse) => {
+    const validated = { shouldValidate: true } as const
+    const setValidatedValue = (
+      field: keyof BrewLogFormValues,
+      value: string | number | string[] | undefined,
+    ) => {
+      form.setValue(field as never, value as never, validated)
+    }
+
+    if (result.beanId) setValidatedValue('beanId', result.beanId)
+    if (result.brewerId) setValidatedValue('brewerId', result.brewerId)
+    if (result.grinderId) setValidatedValue('grinderId', result.grinderId)
+    if (result.recipeId) setValidatedValue('recipeId', result.recipeId)
+    if (result.accessoryIds) setValidatedValue('accessoryIds', result.accessoryIds)
+    if (result.dose != null) setValidatedValue('dose', result.dose)
+    if (result.waterAmount != null) setValidatedValue('waterAmount', result.waterAmount)
+    if (result.waterTemperature != null) {
+      setValidatedValue('waterTemperature', result.waterTemperature)
+    }
+    if (result.grindSize) setValidatedValue('grindSize', result.grindSize)
+    if (result.brewTimeSeconds != null) {
+      setValidatedValue('brewTimeMinutes', Math.floor(result.brewTimeSeconds / 60))
+      setValidatedValue('brewTimeSeconds', result.brewTimeSeconds % 60)
+    }
+    if (result.rating != null) setValidatedValue('rating', result.rating)
+    if (result.notes) setValidatedValue('tastingNotes', result.notes)
+    if (result.adjustmentIdeas) {
+      setValidatedValue('adjustmentIdeas', result.adjustmentIdeas)
+    }
+  }
+
   return (
     <Card>
       <CardHeader>
@@ -123,6 +162,12 @@ export function BrewLogFormCard({
               <Button type="submit" disabled={isSubmitting}>
                 {isSubmitting ? 'Saving...' : submitLabel}
               </Button>
+              {showVoiceInput ? (
+                <VoiceInputButton
+                  onClick={() => setVoiceDialogOpen(true)}
+                  disabled={isSubmitting}
+                />
+              ) : null}
               <Button type="button" variant="outline" asChild>
                 <Link to={cancelHref}>Cancel</Link>
               </Button>
@@ -130,6 +175,13 @@ export function BrewLogFormCard({
           </CardFooter>
         </form>
       </CardContent>
+      {showVoiceInput ? (
+        <VoiceInputDialog
+          open={voiceDialogOpen}
+          onOpenChange={setVoiceDialogOpen}
+          onFillForm={handleVoiceFill}
+        />
+      ) : null}
     </Card>
   )
 }
