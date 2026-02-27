@@ -5,7 +5,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CoffeeTracker.Application.Features.BrewLog.Queries;
 
-public sealed record GetBrewLogsListQuery(string? Search, DateTime? DateFrom, DateTime? DateTo)
+public sealed record GetBrewLogsListQuery(
+    string? Search,
+    DateTime? DateFrom,
+    DateTime? DateTo,
+    bool IncludeUnavailableBeans = false)
     : IRequest<IReadOnlyList<BrewLogSummaryDto>>;
 
 public sealed class GetBrewLogsListHandler(ApplicationDbContext dbContext)
@@ -18,6 +22,11 @@ public sealed class GetBrewLogsListHandler(ApplicationDbContext dbContext)
         var query = dbContext.BrewLogEntries
             .AsNoTracking()
             .AsQueryable();
+
+        if (!request.IncludeUnavailableBeans)
+        {
+            query = query.Where(entity => entity.Bean.IsAvailable);
+        }
 
         if (!string.IsNullOrWhiteSpace(request.Search))
         {

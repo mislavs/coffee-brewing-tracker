@@ -7,9 +7,15 @@ type BrewLogListFilters = {
   search?: string
   dateFrom?: string
   dateTo?: string
+  includeUnavailableBeans?: boolean
 }
 
-export function useBrewLogs(search?: string, dateFrom?: string, dateTo?: string) {
+export function useBrewLogs(
+  search?: string,
+  dateFrom?: string,
+  dateTo?: string,
+  includeUnavailableBeans = false,
+) {
   const normalizedSearch = search?.trim() ?? ''
   const normalizedDateFrom = dateFrom?.trim() ?? ''
   const normalizedDateTo = dateTo?.trim() ?? ''
@@ -24,6 +30,9 @@ export function useBrewLogs(search?: string, dateFrom?: string, dateTo?: string)
   if (normalizedDateTo) {
     params.dateTo = normalizedDateTo
   }
+  if (includeUnavailableBeans) {
+    params.includeUnavailableBeans = true
+  }
 
   return useQuery({
     queryKey: brewLogQueryKeys.all(params),
@@ -33,6 +42,7 @@ export function useBrewLogs(search?: string, dateFrom?: string, dateTo?: string)
           search: normalizedSearch || undefined,
           dateFrom: normalizedDateFrom ? new Date(normalizedDateFrom) : undefined,
           dateTo: normalizedDateTo ? new Date(normalizedDateTo) : undefined,
+          includeUnavailableBeans: includeUnavailableBeans || undefined,
         },
       })) ?? [],
     placeholderData: keepPreviousData,

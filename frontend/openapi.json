@@ -434,6 +434,13 @@
               "type": "string",
               "format": "date-time"
             }
+          },
+          {
+            "name": "includeUnavailableBeans",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
           }
         ],
         "responses": {

@@ -36,10 +36,13 @@ public static class BrewLogEndpoints
         string? search,
         DateTime? dateFrom,
         DateTime? dateTo,
+        bool? includeUnavailableBeans,
         ISender sender,
         CancellationToken cancellationToken)
     {
-        var brewLogs = await sender.Send(new GetBrewLogsListQuery(search, dateFrom, dateTo), cancellationToken);
+        var brewLogs = await sender.Send(
+            new GetBrewLogsListQuery(search, dateFrom, dateTo, includeUnavailableBeans ?? false),
+            cancellationToken);
         return TypedResults.Ok(brewLogs);
     }
 

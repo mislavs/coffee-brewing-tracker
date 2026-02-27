@@ -11,6 +11,7 @@ import {
 import { BrewLogCardSkeleton } from '@/components/skeletons/BrewLogCardSkeleton'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Input } from '@/components/ui/input'
+import { Switch } from '@/components/ui/switch'
 import { BrewLogCard } from '@/features/brew-log/components/BrewLogCard'
 import { useBrewLogs } from '@/features/brew-log/hooks/useBrewLogs'
 
@@ -19,6 +20,7 @@ export function BrewLogListPage() {
   const search = searchParams.get('search') ?? ''
   const dateFrom = searchParams.get('dateFrom') ?? ''
   const dateTo = searchParams.get('dateTo') ?? ''
+  const includeUnavailable = searchParams.get('includeUnavailable') === 'true'
   const [searchDraft, setSearchDraft] = useState(search)
 
   useEffect(() => {
@@ -62,7 +64,28 @@ export function BrewLogListPage() {
     )
   }
 
-  const { data: brewLogs = [], isPending } = useBrewLogs(search, dateFrom, dateTo)
+  const handleToggleUnavailable = (checked: boolean) => {
+    setSearchParams(
+      (previous) => {
+        const next = new URLSearchParams(previous)
+        if (checked) {
+          next.set('includeUnavailable', 'true')
+        } else {
+          next.delete('includeUnavailable')
+        }
+
+        return next
+      },
+      { replace: true },
+    )
+  }
+
+  const { data: brewLogs = [], isPending } = useBrewLogs(
+    search,
+    dateFrom,
+    dateTo,
+    includeUnavailable,
+  )
 
   return (
     <Card>
@@ -76,7 +99,7 @@ export function BrewLogListPage() {
         </Button>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-4">
           <div className="space-y-2 md:col-span-1">
             <label htmlFor="brew-log-search" className="text-sm font-medium">
               Search by bean
@@ -109,6 +132,22 @@ export function BrewLogListPage() {
               value={dateTo || undefined}
               onChange={(nextValue) => setDateFilter('dateTo', nextValue)}
             />
+          </div>
+
+          <div className="space-y-2">
+            <label htmlFor="brew-log-include-unavailable" className="text-sm font-medium">
+              Availability
+            </label>
+            <div className="flex items-center gap-3 pt-2">
+              <Switch
+                id="brew-log-include-unavailable"
+                checked={includeUnavailable}
+                onCheckedChange={handleToggleUnavailable}
+              />
+              <label htmlFor="brew-log-include-unavailable" className="text-sm font-medium">
+                Show unavailable beans
+              </label>
+            </div>
           </div>
         </div>
 

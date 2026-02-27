@@ -198,6 +198,7 @@ export const apiClient = {
                   search: queryParameters.search,
                   dateFrom: toIsoDateQueryValue(queryParameters.dateFrom),
                   dateTo: toIsoDateQueryValue(queryParameters.dateTo),
+                  includeUnavailableBeans: queryParameters.includeUnavailableBeans,
                 }
               : undefined,
           ),

@@ -111,6 +111,64 @@ public class GetBrewLogsListHandlerTests(IntegrationTestFactory factory) : Integ
         result.Single().BrewedAt.Should().Be(new DateTime(2026, 2, 10, 10, 0, 0, DateTimeKind.Utc));
     }
 
+    [Fact]
+    public async Task Handle_WhenBeanIsUnavailable_ExcludesItByDefaultAndIncludesItWhenRequested()
+    {
+        // Arrange
+        var roaster = Roaster.Create("Roaster availability", null, null);
+        await Insert(roaster);
+        var brewer = Brewer.Create("Brewer availability");
+        var grinder = Grinder.Create("Grinder availability");
+        await Insert(brewer);
+        await Insert(grinder);
+
+        var availableBean = Bean.Create(
+            "Available Bean",
+            roaster.Id,
+            OriginType.SingleOrigin,
+            null,
+            null,
+            null,
+            RoastProfile.Filter,
+            null,
+            null,
+            250m,
+            null);
+        var unavailableBean = Bean.Create(
+            "Unavailable Bean",
+            roaster.Id,
+            OriginType.SingleOrigin,
+            null,
+            null,
+            null,
+            RoastProfile.Filter,
+            null,
+            null,
+            250m,
+            null);
+        unavailableBean.SetAvailability(false);
+        await InsertMany([availableBean, unavailableBean]);
+
+        await InsertMany(
+        [
+            BrewLogEntry.Create(availableBean.Id, brewer.Id, grinder.Id, null, 18m, 300m, null, "10clicks", null, BrewRating.Good, null, null, DateTime.UtcNow.AddDays(-1)),
+            BrewLogEntry.Create(unavailableBean.Id, brewer.Id, grinder.Id, null, 18m, 300m, null, "12clicks", null, BrewRating.Good, null, null, DateTime.UtcNow)
+        ]);
+
+        // Act
+        var defaultResult = await Send(new GetBrewLogsListQuery(null, null, null));
+        var includeUnavailableResult = await Send(new GetBrewLogsListQuery(null, null, null, true));
+
+        // Assert
+        defaultResult.Should().ContainSingle();
+        defaultResult.Single().BeanName.Should().Be("Available Bean");
+
+        includeUnavailableResult.Should().HaveCount(2);
+        includeUnavailableResult.Select(entry => entry.BeanName)
+            .Should()
+            .Contain(["Available Bean", "Unavailable Bean"]);
+    }
+
     private async Task<(Bean Bean, Brewer Brewer, Grinder Grinder)> SeedRequiredEntities(string suffix)
     {
         var roaster = Roaster.Create($"Roaster {suffix}", null, null);
