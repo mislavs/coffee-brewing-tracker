@@ -114,6 +114,22 @@
   --sidebar-ring: hsl(24.3 36.9% 54.3%);
 }
 
+@keyframes ripple {
+  0% {
+    transform: scale(0.85);
+    opacity: 0;
+  }
+
+  15% {
+    opacity: 0.5;
+  }
+
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

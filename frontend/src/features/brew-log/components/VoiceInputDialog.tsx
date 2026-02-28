@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { AlertTriangle, Loader2, Mic, Square } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
@@ -27,6 +27,8 @@ export function VoiceInputDialog({
   onFillForm,
 }: VoiceInputDialogProps) {
   const [state, setState] = useState<VoiceDialogState>('idle')
+  const shouldParseAudioRef = useRef(true)
+  const wasOpenRef = useRef(false)
   const [result, setResult] = useState<ParseVoiceBrewLogResponse | undefined>(
     undefined,
   )
@@ -35,6 +37,7 @@ export function VoiceInputDialog({
   const {
     isRecording,
     isSupported,
+    audioLevel,
     audioBlob,
     error: recorderError,
     startRecording,
@@ -45,30 +48,41 @@ export function VoiceInputDialog({
     useParseVoiceBrewLog()
 
   useEffect(() => {
-    if (!open) {
+    if (open && !wasOpenRef.current) {
+      shouldParseAudioRef.current = true
+      queueMicrotask(() => {
+        setState('idle')
+        setResult(undefined)
+        setErrorMessage(undefined)
+      })
+      resetRecorder()
+      resetParseVoice()
+    }
+
+    if (!open && wasOpenRef.current) {
       if (isRecording) {
         stopRecording()
       }
 
       resetRecorder()
-      setState('idle')
-      setResult(undefined)
-      setErrorMessage(undefined)
+      queueMicrotask(() => {
+        setResult(undefined)
+        setErrorMessage(undefined)
+      })
       resetParseVoice()
     }
-  }, [open])
+
+    wasOpenRef.current = open
+  }, [isRecording, open, resetParseVoice, resetRecorder, stopRecording])
 
   useEffect(() => {
-    if (!recorderError) {
+    if (!open || !audioBlob) {
       return
     }
 
-    setErrorMessage(recorderError)
-    setState('error')
-  }, [recorderError])
-
-  useEffect(() => {
-    if (!audioBlob) {
+    if (!shouldParseAudioRef.current) {
+      resetRecorder()
+      shouldParseAudioRef.current = true
       return
     }
 
@@ -105,7 +119,7 @@ export function VoiceInputDialog({
     return () => {
       cancelled = true
     }
-  }, [audioBlob])
+  }, [audioBlob, open, parseVoiceAsync, resetRecorder])
 
   const matchedFields = useMemo(() => {
     if (!result) {
@@ -160,6 +174,7 @@ export function VoiceInputDialog({
   }, [result])
 
   const start = async () => {
+    shouldParseAudioRef.current = true
     const recordingStarted = await startRecording()
     if (recordingStarted) {
       setState('recording')
@@ -167,8 +182,23 @@ export function VoiceInputDialog({
   }
 
   const stop = () => {
+    shouldParseAudioRef.current = true
     stopRecording()
   }
+
+  const cancel = () => {
+    shouldParseAudioRef.current = false
+    stopRecording()
+    onOpenChange(false)
+  }
+
+  const viewState: VoiceDialogState = recorderError ? 'error' : state
+  const currentErrorMessage = recorderError ?? errorMessage
+
+  const isSpeaking = audioLevel > 0.05
+  const micBubbleScale = isSpeaking
+    ? 1 + Math.min(0.14, Math.max(0, audioLevel - 0.05) * 0.3)
+    : 1
 
   const retry = () => {
     resetRecorder()
@@ -193,7 +223,7 @@ export function VoiceInputDialog({
           </DialogDescription>
         </DialogHeader>
 
-        {state === 'idle' && (
+        {viewState === 'idle' && (
           <div className="flex flex-col items-center justify-center gap-4 py-4 text-center">
             <div className="rounded-full bg-muted p-4">
               <Mic className="size-8" />
@@ -212,20 +242,61 @@ export function VoiceInputDialog({
           </div>
         )}
 
-        {state === 'recording' && (
+        {viewState === 'recording' && (
           <div className="flex flex-col items-center justify-center gap-4 py-4 text-center">
-            <div className="rounded-full bg-red-100 p-4 text-red-700 animate-pulse">
-              <Mic className="size-8" />
+            <div className="relative flex size-16 items-center justify-center">
+              <div
+                aria-hidden
+                className="pointer-events-none absolute inset-0 transition-opacity duration-700 ease-out"
+                style={{ opacity: isSpeaking ? 1 : 0 }}
+              >
+                <>
+                  <span
+                    className="pointer-events-none absolute inset-0 rounded-full border-2 border-red-400/70 bg-transparent"
+                    style={{
+                      animation: 'ripple 2.4s cubic-bezier(0.22, 1, 0.36, 1) infinite',
+                    }}
+                  />
+                  <span
+                    className="pointer-events-none absolute inset-0 rounded-full border-2 border-red-400/70 bg-transparent"
+                    style={{
+                      animation:
+                        'ripple 2.4s cubic-bezier(0.22, 1, 0.36, 1) 0.8s infinite',
+                    }}
+                  />
+                  <span
+                    className="pointer-events-none absolute inset-0 rounded-full border-2 border-red-400/70 bg-transparent"
+                    style={{
+                      animation:
+                        'ripple 2.4s cubic-bezier(0.22, 1, 0.36, 1) 1.6s infinite',
+                    }}
+                  />
+                </>
+              </div>
+              <div
+                className="relative z-10 rounded-full bg-red-100 p-4 text-red-700 transition-transform duration-150 ease-out"
+                style={{
+                  transform: `scale(${micBubbleScale})`,
+                  willChange: 'transform',
+                }}
+              >
+                <Mic className="size-8" />
+              </div>
             </div>
             <p className="text-sm font-medium">Listening...</p>
-            <Button variant="destructive" onClick={stop}>
-              <Square className="mr-2 size-4" />
-              Stop
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button variant="outline" onClick={cancel}>
+                Cancel
+              </Button>
+              <Button variant="destructive" onClick={stop}>
+                <Square className="mr-2 size-4" />
+                Stop
+              </Button>
+            </div>
           </div>
         )}
 
-        {state === 'processing' && (
+        {viewState === 'processing' && (
           <div className="flex flex-col items-center justify-center gap-4 py-8 text-center">
             <Loader2 className="size-8 animate-spin text-muted-foreground" />
             <p className="text-sm text-muted-foreground">
@@ -234,7 +305,7 @@ export function VoiceInputDialog({
           </div>
         )}
 
-        {state === 'result' && result && (
+        {viewState === 'result' && result && (
           <div className="space-y-4">
             <blockquote className="border-l-2 pl-3 text-sm text-muted-foreground">
               {result.transcript?.trim() || 'No transcript returned.'}
@@ -273,11 +344,11 @@ export function VoiceInputDialog({
           </div>
         )}
 
-        {state === 'error' && (
+        {viewState === 'error' && (
           <div className="flex flex-col items-center justify-center gap-4 py-4 text-center">
             <AlertTriangle className="size-8 text-destructive" />
             <p className="text-sm text-destructive">
-              {errorMessage ?? 'Something went wrong while parsing audio.'}
+              {currentErrorMessage ?? 'Something went wrong while parsing audio.'}
             </p>
             <Button variant="outline" onClick={retry}>
               Try again
@@ -285,7 +356,7 @@ export function VoiceInputDialog({
           </div>
         )}
 
-        {state === 'result' && result && (
+        {viewState === 'result' && result && (
           <DialogFooter>
             <Button
               variant="outline"

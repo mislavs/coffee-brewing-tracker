@@ -63,9 +63,6 @@ export function RoasterFormCard({
   })
   const [selectedLogoFile, setSelectedLogoFile] = useState<File | null>(null)
   const { data: countries = [] } = useCountries()
-  const [selectedLogoPreviewUrl, setSelectedLogoPreviewUrl] = useState<string | null>(
-    null,
-  )
   const [removeExistingLogo, setRemoveExistingLogo] = useState(false)
   const countryOptions = useMemo(
     () =>
@@ -83,19 +80,18 @@ export function RoasterFormCard({
     [countries],
   )
 
+  const selectedLogoPreviewUrl = useMemo(
+    () => (selectedLogoFile ? URL.createObjectURL(selectedLogoFile) : null),
+    [selectedLogoFile],
+  )
+
   useEffect(() => {
-    if (!selectedLogoFile) {
-      setSelectedLogoPreviewUrl(null)
-      return
-    }
-
-    const objectUrl = URL.createObjectURL(selectedLogoFile)
-    setSelectedLogoPreviewUrl(objectUrl)
-
     return () => {
-      URL.revokeObjectURL(objectUrl)
+      if (selectedLogoPreviewUrl) {
+        URL.revokeObjectURL(selectedLogoPreviewUrl)
+      }
     }
-  }, [selectedLogoFile])
+  }, [selectedLogoPreviewUrl])
 
   const submitForm = form.handleSubmit(async (values) => {
     form.clearErrors('root.serverError')
