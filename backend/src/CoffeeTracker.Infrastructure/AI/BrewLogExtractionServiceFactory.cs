@@ -7,14 +7,10 @@ using System.ClientModel;
 namespace CoffeeTracker.Infrastructure.AI;
 
 public sealed class BrewLogExtractionServiceFactory(
-    IOptions<AiSettings> aiSettings,
-    ILogger<BrewLogExtractionServiceFactory> logger,
-    ILogger<BrewLogExtractionService> extractionLogger) : IBrewLogExtractionServiceFactory
+    IOptions<AiSettings> _aiSettings,
+    ILogger<BrewLogExtractionServiceFactory> _logger,
+    ILogger<BrewLogExtractionService> _extractionLogger) : IBrewLogExtractionServiceFactory
 {
-    private readonly IOptions<AiSettings> _aiSettings = aiSettings ?? throw new ArgumentNullException(nameof(aiSettings));
-    private readonly ILogger<BrewLogExtractionServiceFactory> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-    private readonly ILogger<BrewLogExtractionService> _extractionLogger = extractionLogger ?? throw new ArgumentNullException(nameof(extractionLogger));
-
     public IBrewLogExtractionService Create()
     {
         var settings = _aiSettings.Value;

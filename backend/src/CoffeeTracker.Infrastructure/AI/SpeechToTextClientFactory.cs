@@ -7,18 +7,12 @@ using Microsoft.Extensions.Options;
 namespace CoffeeTracker.Infrastructure.AI;
 
 public sealed class SpeechToTextClientFactory(
-    IOptions<AiSettings> aiSettings,
-    ILogger<SpeechToTextClientFactory> logger,
-    ILogger<WhisperCppSpeechToTextClient> whisperLogger,
-    IAudioTranscodingService audioTranscodingService,
-    IHostEnvironment hostEnvironment) : ISpeechToTextClientFactory
+    IOptions<AiSettings> _aiSettings,
+    ILogger<SpeechToTextClientFactory> _logger,
+    ILogger<WhisperCppSpeechToTextClient> _whisperLogger,
+    IAudioTranscodingService _audioTranscodingService,
+    IHostEnvironment _hostEnvironment) : ISpeechToTextClientFactory
 {
-    private readonly IOptions<AiSettings> _aiSettings = aiSettings ?? throw new ArgumentNullException(nameof(aiSettings));
-    private readonly ILogger<SpeechToTextClientFactory> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-    private readonly ILogger<WhisperCppSpeechToTextClient> _whisperLogger = whisperLogger ?? throw new ArgumentNullException(nameof(whisperLogger));
-    private readonly IAudioTranscodingService _audioTranscodingService = audioTranscodingService ?? throw new ArgumentNullException(nameof(audioTranscodingService));
-    private readonly IHostEnvironment _hostEnvironment = hostEnvironment ?? throw new ArgumentNullException(nameof(hostEnvironment));
-
     public ISpeechToTextClient Create()
     {
         var settings = _aiSettings.Value;
