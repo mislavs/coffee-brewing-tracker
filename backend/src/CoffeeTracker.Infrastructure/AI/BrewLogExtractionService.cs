@@ -33,19 +33,43 @@ public sealed class BrewLogExtractionService(
             },
             cancellationToken);
 
-        if (string.IsNullOrWhiteSpace(response.Text))
+        var rawText = response.Text;
+        logger.LogDebug("LLM raw response: {RawResponse}", rawText);
+
+        if (string.IsNullOrWhiteSpace(rawText))
         {
+            logger.LogWarning("LLM returned empty response for brew log extraction.");
             return BrewLogExtractionResult.Empty;
+        }
+
+        var jsonText = StripMarkdownCodeFences(rawText);
+        if (jsonText != rawText)
+        {
+            logger.LogDebug("Stripped markdown code fences from LLM response.");
         }
 
         try
         {
-            var result = JsonSerializer.Deserialize<BrewLogExtractionResult>(response.Text, JsonSerializerOptions);
-            return result is null ? BrewLogExtractionResult.Empty : Normalize(result);
+            var result = JsonSerializer.Deserialize<BrewLogExtractionResult>(jsonText, JsonSerializerOptions);
+            if (result is null)
+            {
+                logger.LogWarning("LLM response deserialized to null.");
+                return BrewLogExtractionResult.Empty;
+            }
+
+            var normalized = Normalize(result);
+            logger.LogInformation(
+                "Brew log extraction completed. Matched bean: {BeanName}, brewer: {BrewerName}, grinder: {GrinderName}. Unmatched references: {UnmatchedCount}.",
+                normalized.BeanName,
+                normalized.BrewerName,
+                normalized.GrinderName,
+                normalized.UnmatchedReferences.Count);
+
+            return normalized;
         }
         catch (JsonException jsonException)
         {
-            logger.LogWarning(jsonException, "Failed to parse brew extraction JSON response.");
+            logger.LogWarning(jsonException, "Failed to parse brew extraction JSON response. Raw text: {RawResponse}", rawText);
             return BrewLogExtractionResult.Empty with
             {
                 UnmatchedReferences = [$"Could not parse AI extraction response: {jsonException.Message}"]
@@ -76,6 +100,33 @@ public sealed class BrewLogExtractionService(
             result.BrewedAt,
             result.UnmatchedReferences ?? []);
 
+    internal static string StripMarkdownCodeFences(string text)
+    {
+        var span = text.AsSpan().Trim();
+
+        if (!span.StartsWith("```"))
+        {
+            return span.ToString();
+        }
+
+        // Skip the opening ``` plus any language tag (e.g. "json") up to the first newline
+        var rest = span[3..];
+        var newlineIndex = rest.IndexOf('\n');
+        if (newlineIndex < 0)
+        {
+            return span.ToString();
+        }
+
+        var body = rest[(newlineIndex + 1)..];
+
+        if (body.EndsWith("```"))
+        {
+            body = body[..^3];
+        }
+
+        return body.Trim().ToString();
+    }
+
     private static string BuildSystemPrompt(EntityCatalog catalog)
     {
         var builder = new StringBuilder();
@@ -96,15 +147,15 @@ public sealed class BrewLogExtractionService(
             - Use these keys exactly:
               beanId, beanName, brewerId, brewerName, grinderId, grinderName, recipeId, recipeName,
               accessoryIds, accessoryNames, dose, waterAmount, waterTemperature, grindSize,
-              brewTimeSeconds, rating, notes, adjustmentIdeas, brewedAt, unmatchedReferences
+              brewTimeSeconds, notes, adjustmentIdeas, unmatchedReferences
             - Null/defaults:
               - Unknown scalar fields => null
               - accessoryIds, accessoryNames, unmatchedReferences => [] (never null)
             - Types/formats:
               - Id fields => UUID strings or null
-              - brewTimeSeconds, rating => integers or null
+              - brewTimeSeconds => integers or null
               - dose, waterAmount, waterTemperature => numbers or null
-              - brewedAt => ISO-8601 datetime string or null
+              - grindSize, notes, adjustmentIdeas => strings or null (never arrays)
 
             Entity catalog:
             """);

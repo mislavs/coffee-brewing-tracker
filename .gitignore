@@ -43,5 +43,8 @@ pnpm-debug.log*
 # Environment files
 .env.local
 
+# Local AI model files
+backend/models/*.bin
+
 # Kiota generated API client
 frontend/src/lib/api/generated/

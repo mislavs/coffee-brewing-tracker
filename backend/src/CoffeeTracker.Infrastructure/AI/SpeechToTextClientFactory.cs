@@ -1,5 +1,6 @@
 using CoffeeTracker.Infrastructure.AI.WhisperCpp;
 using Microsoft.Extensions.AI;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -9,12 +10,14 @@ public sealed class SpeechToTextClientFactory(
     IOptions<AiSettings> aiSettings,
     ILogger<SpeechToTextClientFactory> logger,
     ILogger<WhisperCppSpeechToTextClient> whisperLogger,
-    IAudioTranscodingService audioTranscodingService) : ISpeechToTextClientFactory
+    IAudioTranscodingService audioTranscodingService,
+    IHostEnvironment hostEnvironment) : ISpeechToTextClientFactory
 {
     private readonly IOptions<AiSettings> _aiSettings = aiSettings ?? throw new ArgumentNullException(nameof(aiSettings));
     private readonly ILogger<SpeechToTextClientFactory> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     private readonly ILogger<WhisperCppSpeechToTextClient> _whisperLogger = whisperLogger ?? throw new ArgumentNullException(nameof(whisperLogger));
     private readonly IAudioTranscodingService _audioTranscodingService = audioTranscodingService ?? throw new ArgumentNullException(nameof(audioTranscodingService));
+    private readonly IHostEnvironment _hostEnvironment = hostEnvironment ?? throw new ArgumentNullException(nameof(hostEnvironment));
 
     public ISpeechToTextClient Create()
     {
@@ -30,7 +33,7 @@ public sealed class SpeechToTextClientFactory(
         {
             var modelPath = ResolveWhisperModelPath(
                 settings.Transcription.ModelPath,
-                Directory.GetCurrentDirectory());
+                _hostEnvironment.ContentRootPath);
 
             return new WhisperCppSpeechToTextClient(
                 modelPath,

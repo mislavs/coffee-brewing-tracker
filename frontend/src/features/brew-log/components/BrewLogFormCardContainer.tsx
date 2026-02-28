@@ -136,9 +136,17 @@ export function BrewLogFormCard({
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>{title}</CardTitle>
-        <CardDescription>{description}</CardDescription>
+      <CardHeader className="flex flex-row items-start justify-between gap-4">
+        <div className="space-y-1.5">
+          <CardTitle>{title}</CardTitle>
+          <CardDescription>{description}</CardDescription>
+        </div>
+        {showVoiceInput ? (
+          <VoiceInputButton
+            onClick={() => setVoiceDialogOpen(true)}
+            disabled={isSubmitting}
+          />
+        ) : null}
       </CardHeader>
       <CardContent>
         <form className="space-y-6" onSubmit={submitForm}>
@@ -162,12 +170,6 @@ export function BrewLogFormCard({
               <Button type="submit" disabled={isSubmitting}>
                 {isSubmitting ? 'Saving...' : submitLabel}
               </Button>
-              {showVoiceInput ? (
-                <VoiceInputButton
-                  onClick={() => setVoiceDialogOpen(true)}
-                  disabled={isSubmitting}
-                />
-              ) : null}
               <Button type="button" variant="outline" asChild>
                 <Link to={cancelHref}>Cancel</Link>
               </Button>
