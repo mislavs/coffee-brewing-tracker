@@ -39,7 +39,12 @@ public sealed class BrewLogExtractionServiceFactory(
                     Endpoint = endpoint
                 });
 
-            var chatClient = openAiClient.GetChatClient(settings.Extraction.Model).AsIChatClient();
+            var chatClient = openAiClient
+                .GetChatClient(settings.Extraction.Model)
+                .AsIChatClient()
+                .AsBuilder()
+                .UseOpenTelemetry()
+                .Build();
             return new BrewLogExtractionService(chatClient, _extractionLogger);
         }
 

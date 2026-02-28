@@ -16,7 +16,8 @@ var migrations = builder.AddProject<Projects.CoffeeTracker_MigrationService>("mi
 var api = builder.AddProject<Projects.CoffeeTracker_Api>("api")
     .WithReference(appDb, "DefaultConnection")
     .WaitFor(migrations)
-    .WithHttpHealthCheck("/health");
+    .WithHttpHealthCheck("/health")
+    .WithEnvironment("OTEL_INSTRUMENTATION_GENAI_CAPTURE_MESSAGE_CONTENT", "true");
 
 builder.AddViteApp("frontend", "../../../frontend")
     .WithReference(api)

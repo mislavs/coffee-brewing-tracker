@@ -61,6 +61,7 @@ public static class Extensions
             {
                 tracing.AddSource(builder.Environment.ApplicationName)
                     .AddSource("CoffeeTracker.Infrastructure.AI")
+                    .AddSource("Experimental.Microsoft.Extensions.AI")
                     .AddAspNetCoreInstrumentation(options =>
                         // Exclude health check requests from tracing.
                         options.Filter = context =>
