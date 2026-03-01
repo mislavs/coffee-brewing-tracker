@@ -4,7 +4,7 @@ import { RecipeFormCard } from '@/features/recipes/components/RecipeFormCard'
 import { useCreateRecipe } from '@/features/recipes/hooks/useCreateRecipe'
 import { useRecipe } from '@/features/recipes/hooks/useRecipe'
 import { useUpdateRecipe } from '@/features/recipes/hooks/useUpdateRecipe'
-import { normalizeOptional } from '@/features/recipes/recipeFormSchema'
+import { normalizeOptional } from '@/lib/formUtils'
 import { useEntityFormId } from '@/lib/useEntityFormId'
 
 function CreateRecipeForm() {

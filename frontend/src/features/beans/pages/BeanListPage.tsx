@@ -1,4 +1,3 @@
-import { useEffect, useState, useTransition } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import {
@@ -21,6 +20,7 @@ import { Switch } from '@/components/ui/switch'
 import { BeanCard } from '@/features/beans/components/BeanCard'
 import { useBeans } from '@/features/beans/hooks/useBeans'
 import { useCountryMapStats } from '@/features/world-map/hooks/useCountryMapStats'
+import { useDebouncedSearchParam } from '@/hooks/useDebouncedSearchParam'
 
 const allCountriesValue = '__all_countries__'
 
@@ -29,13 +29,12 @@ export function BeanListPage() {
   const search = searchParams.get('search') ?? ''
   const showUnavailable = searchParams.get('showUnavailable') === 'true'
   const countryId = searchParams.get('country') ?? ''
-  const [searchDraft, setSearchDraft] = useState(search)
-  const [, startTransition] = useTransition()
+  const [searchDraft, setSearchDraft] = useDebouncedSearchParam({
+    paramName: 'search',
+    value: search,
+    setSearchParams,
+  })
   const { data: countryStats = [] } = useCountryMapStats()
-
-  useEffect(() => {
-    setSearchDraft(search)
-  }, [search])
 
   function handleToggleUnavailable(checked: boolean) {
     setSearchParams((previous) => {
@@ -49,26 +48,6 @@ export function BeanListPage() {
       return next
     }, { replace: true })
   }
-
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      const normalized = searchDraft.trim()
-      startTransition(() => {
-        setSearchParams((previous) => {
-          const next = new URLSearchParams(previous)
-          if (normalized) {
-            next.set('search', normalized)
-          } else {
-            next.delete('search')
-          }
-
-          return next
-        }, { replace: true })
-      })
-    }, 300)
-
-    return () => clearTimeout(timeoutId)
-  }, [searchDraft, setSearchParams, startTransition])
 
   const { data: beans = [], isPending } = useBeans(
     search,

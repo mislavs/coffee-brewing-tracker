@@ -49,13 +49,14 @@ export function initializeTelemetry(
 
   const attributes = parseDelimitedValues(resourceAttributes)
   attributes[ATTR_SERVICE_NAME] = serviceName.trim() || 'frontend'
+  const spanProcessors = [new SimpleSpanProcessor(exporter)]
+  if (import.meta.env.DEV) {
+    spanProcessors.unshift(new SimpleSpanProcessor(new ConsoleSpanExporter()))
+  }
 
   const provider = new WebTracerProvider({
     resource: resourceFromAttributes(attributes),
-    spanProcessors: [
-      new SimpleSpanProcessor(new ConsoleSpanExporter()),
-      new SimpleSpanProcessor(exporter),
-    ],
+    spanProcessors,
   })
 
   provider.register({

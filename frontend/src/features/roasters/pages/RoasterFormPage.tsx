@@ -6,7 +6,7 @@ import { useDeleteRoasterLogo } from '@/features/roasters/hooks/useDeleteRoaster
 import { useRoaster } from '@/features/roasters/hooks/useRoaster'
 import { useUploadRoasterLogo } from '@/features/roasters/hooks/useUploadRoasterLogo'
 import { useUpdateRoaster } from '@/features/roasters/hooks/useUpdateRoaster'
-import { normalizeOptional } from '@/features/roasters/roasterFormSchema'
+import { normalizeOptional } from '@/lib/formUtils'
 import { resolveRoasterLogoUrl } from '@/features/roasters/roasterPresentation'
 import { useEntityFormId } from '@/lib/useEntityFormId'
 

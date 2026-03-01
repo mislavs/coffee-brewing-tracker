@@ -1,8 +1,7 @@
 import type { Guid } from '@/lib/api-types'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
 import { roasterQueryKeys } from '@/features/roasters/queryKeys'
 import { apiClient } from '@/lib/api-client'
+import { useEntityMutation } from '@/lib/useEntityMutation'
 
 type UploadRoasterLogoInput = {
   id: Guid
@@ -10,17 +9,13 @@ type UploadRoasterLogoInput = {
 }
 
 export function useUploadRoasterLogo() {
-  const queryClient = useQueryClient()
-
-  return useMutation({
+  return useEntityMutation<UploadRoasterLogoInput>({
     mutationFn: ({ id, file }: UploadRoasterLogoInput) =>
       apiClient.api.roasters.byId(id).logo.put(file),
-    onSuccess: async (_data, variables) => {
-      await queryClient.invalidateQueries({ queryKey: roasterQueryKeys.all })
-      await queryClient.invalidateQueries({
-        queryKey: roasterQueryKeys.detail(variables.id),
-      })
-      toast.success('Roaster logo updated.')
-    },
+    invalidateKeys: (variables) => [
+      roasterQueryKeys.all,
+      roasterQueryKeys.detail(variables.id),
+    ],
+    successMessage: 'Roaster logo updated.',
   })
 }

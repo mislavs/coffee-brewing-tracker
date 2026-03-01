@@ -8,6 +8,7 @@ import type {
   WorldCountryFeature,
   WorldMapRendererProps,
 } from '@/features/world-map/components/renderers/types'
+import { normalizeIsoNumericCode } from '@/features/world-map/worldMapUtils'
 
 type GeographyFeature = {
   id?: string | number
@@ -15,19 +16,6 @@ type GeographyFeature = {
   properties?: {
     name?: string
   }
-}
-
-function normalizeIsoNumericCode(value: string | number | null | undefined) {
-  if (value === null || value === undefined) {
-    return ''
-  }
-
-  const normalizedValue = String(value).trim()
-  if (!normalizedValue) {
-    return ''
-  }
-
-  return normalizedValue.padStart(3, '0')
 }
 
 function toWorldCountryFeature(geography: GeographyFeature): WorldCountryFeature {
@@ -64,9 +52,9 @@ export function DefaultWorldMapRenderer({
             .filter(({ country }) =>
               shouldIncludeCountry ? shouldIncludeCountry(country) : true,
             )
-            .map(({ geo, country }) => (
+            .map(({ geo, country }, index) => (
               <Geography
-                key={country.key}
+                key={`${country.key}-${country.isoNumericCode}-${index}`}
                 geography={geo}
                 fill={getCountryFill(country)}
                 stroke="var(--border)"

@@ -1,27 +1,16 @@
-import { API_URL } from '@/lib/config'
+import { resolveApiUrl } from '@/lib/api/request'
+import { formatPricePerKg as formatBeanPricePerKg } from '@/features/beans/formatters'
 
 export function resolveRoasterLogoUrl(logoUrl: string | null | undefined) {
   if (!logoUrl) {
     return null
   }
 
-  if (logoUrl.startsWith('http://') || logoUrl.startsWith('https://')) {
-    return logoUrl
-  }
-
-  if (logoUrl.startsWith('/')) {
-    return `${API_URL}${logoUrl}`
-  }
-
-  return `${API_URL}/${logoUrl}`
+  return resolveApiUrl(logoUrl)
 }
 
 export function formatPricePerKg(value: number | null | undefined) {
-  if (value == null) {
-    return 'No price data'
-  }
-
-  return `${value.toFixed(2)} € / kg`
+  return formatBeanPricePerKg(value, 'No price data')
 }
 
 export function getInitials(name: string | null | undefined) {

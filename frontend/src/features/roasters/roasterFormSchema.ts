@@ -19,12 +19,3 @@ export const roasterFormSchema = z.object({
 })
 
 export type RoasterFormValues = z.infer<typeof roasterFormSchema>
-
-export function normalizeOptional(value: string | undefined) {
-  if (!value) {
-    return undefined
-  }
-
-  const trimmed = value.trim()
-  return trimmed.length > 0 ? trimmed : undefined
-}

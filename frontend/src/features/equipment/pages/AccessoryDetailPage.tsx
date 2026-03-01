@@ -16,12 +16,7 @@ import { useEntityFormId } from '@/lib/useEntityFormId'
 
 function AccessoryDetailContent({ accessoryId }: { accessoryId: Guid }) {
   const { data: accessory } = useAccessory(accessoryId)
-  const compatibleBrewers =
-    (
-      accessory as {
-        compatibleBrewers?: { id?: string | null; name?: string | null }[] | null
-      }
-    ).compatibleBrewers ?? []
+  const compatibleBrewers = accessory.compatibleBrewers ?? []
 
   return (
     <Card>

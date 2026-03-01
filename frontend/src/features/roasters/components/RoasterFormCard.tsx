@@ -26,6 +26,7 @@ import {
   roasterFormSchema,
   type RoasterFormValues,
 } from '@/features/roasters/roasterFormSchema'
+import { FieldErrorText } from '@/components/FieldErrorText'
 
 type RoasterFormCardProps = {
   title: string
@@ -122,11 +123,7 @@ export function RoasterFormCard({
               Name
             </label>
             <Input id="name" {...form.register('name')} />
-            {form.formState.errors.name && (
-              <p className="text-sm text-destructive">
-                {form.formState.errors.name.message}
-              </p>
-            )}
+            <FieldErrorText message={form.formState.errors.name?.message} />
           </div>
 
           <div className="space-y-2">
@@ -134,11 +131,7 @@ export function RoasterFormCard({
               City
             </label>
             <Input id="city" {...form.register('city')} />
-            {form.formState.errors.city && (
-              <p className="text-sm text-destructive">
-                {form.formState.errors.city.message}
-              </p>
-            )}
+            <FieldErrorText message={form.formState.errors.city?.message} />
           </div>
 
           <div className="space-y-2">
@@ -169,11 +162,7 @@ export function RoasterFormCard({
                 </Select>
               )}
             />
-            {form.formState.errors.countryId && (
-              <p className="text-sm text-destructive">
-                {form.formState.errors.countryId.message}
-              </p>
-            )}
+            <FieldErrorText message={form.formState.errors.countryId?.message} />
           </div>
 
           <ImageUpload
@@ -199,11 +188,7 @@ export function RoasterFormCard({
             disabled={isSubmitting}
           />
 
-          {form.formState.errors.root?.serverError && (
-            <p className="text-sm text-destructive">
-              {form.formState.errors.root.serverError.message}
-            </p>
-          )}
+          <FieldErrorText message={form.formState.errors.root?.serverError?.message} />
 
           <CardFooter className="px-0 pb-0">
             <div className="flex items-center gap-2">

@@ -33,9 +33,10 @@ export function useBrewLogs(
   if (includeUnavailableBeans) {
     params.includeUnavailableBeans = true
   }
+  const hasFilters = Object.keys(params).length > 0
 
   return useQuery({
-    queryKey: brewLogQueryKeys.all(params),
+    queryKey: brewLogQueryKeys.all(hasFilters ? params : undefined),
     queryFn: async (): Promise<BrewLogSummaryDto[]> =>
       (await apiClient.api.brewLogs.get({
         queryParameters: {

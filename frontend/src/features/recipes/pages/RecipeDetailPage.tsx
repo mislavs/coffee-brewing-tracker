@@ -3,6 +3,7 @@ import type { Guid } from '@/lib/api-types'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { DeleteConfirmationDialog } from '@/components/DeleteConfirmationDialog'
 import { DetailField } from '@/components/DetailField'
+import { StatCard } from '@/components/StatCard'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -108,15 +109,6 @@ export function RecipeDetailPage() {
   }
 
   return <RecipeDetailContent recipeId={entityId.id} />
-}
-
-function StatCard({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="bg-muted/20 space-y-1 rounded-md border p-3">
-      <p className="text-muted-foreground text-xs uppercase">{label}</p>
-      <p className="font-medium">{value}</p>
-    </div>
-  )
 }
 
 function formatBrewCount(count: number) {

@@ -9,6 +9,7 @@ import type {
 } from '@/features/world-map/components/renderers/types'
 import { useCountryMapStats } from '@/features/world-map/hooks/useCountryMapStats'
 import { WorldMapTooltip } from '@/features/world-map/components/WorldMapTooltip'
+import { normalizeIsoNumericCode } from '@/features/world-map/worldMapUtils'
 import { cn } from '@/lib/utils'
 
 const antarcticaIsoNumericCode = '010'
@@ -44,19 +45,6 @@ function getMapHeightClass(compact: boolean, mapHeightClassName?: string) {
   }
 
   return compact ? 'h-[34rem]' : 'h-[48rem]'
-}
-
-function normalizeIsoNumericCode(value: string | number | null | undefined) {
-  if (value === null || value === undefined) {
-    return ''
-  }
-
-  const normalizedValue = String(value).trim()
-  if (!normalizedValue) {
-    return ''
-  }
-
-  return normalizedValue.padStart(3, '0')
 }
 
 function getCountryFill(beanCount: number, maxBeanCount: number, isHovered: boolean) {

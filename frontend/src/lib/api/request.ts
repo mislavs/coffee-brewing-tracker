@@ -7,7 +7,7 @@ import {
 } from '@opentelemetry/api'
 import { API_URL } from '@/lib/config'
 
-function resolveApiUrl(path: string) {
+export function resolveApiUrl(path: string) {
   if (path.startsWith('http://') || path.startsWith('https://')) {
     return path
   }

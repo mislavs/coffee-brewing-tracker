@@ -1,20 +1,7 @@
 import { z } from 'zod'
 import type { DateOnly } from '@/lib/api-types'
-
-const guidPattern =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
-
-const optionalTrimmedStringSchema = z.preprocess(
-  (value) => {
-    if (typeof value !== 'string') {
-      return value
-    }
-
-    const trimmed = value.trim()
-    return trimmed.length > 0 ? trimmed : undefined
-  },
-  z.string().optional(),
-)
+import { guidPattern } from '@/lib/guid'
+import { optionalTrimmedStringSchema } from '@/lib/zodUtils'
 
 const optionalPositiveNumberSchema = z.preprocess((value) => {
   if (value === '' || value === null || value === undefined) {

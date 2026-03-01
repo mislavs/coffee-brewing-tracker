@@ -16,6 +16,7 @@ import {
   grinderFormSchema,
   type GrinderFormValues,
 } from '@/features/equipment/grinderFormSchema'
+import { FieldErrorText } from '@/components/FieldErrorText'
 
 type GrinderFormCardProps = {
   title: string
@@ -64,18 +65,10 @@ export function GrinderFormCard({
               Name
             </label>
             <Input id="name" {...form.register('name')} />
-            {form.formState.errors.name && (
-              <p className="text-sm text-destructive">
-                {form.formState.errors.name.message}
-              </p>
-            )}
+            <FieldErrorText message={form.formState.errors.name?.message} />
           </div>
 
-          {form.formState.errors.root?.serverError && (
-            <p className="text-sm text-destructive">
-              {form.formState.errors.root.serverError.message}
-            </p>
-          )}
+          <FieldErrorText message={form.formState.errors.root?.serverError?.message} />
 
           <CardFooter className="px-0 pb-0">
             <div className="flex items-center gap-2">

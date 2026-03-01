@@ -15,12 +15,3 @@ export const recipeFormSchema = z.object({
 })
 
 export type RecipeFormValues = z.infer<typeof recipeFormSchema>
-
-export function normalizeOptional(value: string | undefined) {
-  if (!value) {
-    return undefined
-  }
-
-  const trimmed = value.trim()
-  return trimmed.length > 0 ? trimmed : undefined
-}

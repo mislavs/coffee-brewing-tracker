@@ -42,9 +42,12 @@ export function formatPrice(value: number | null | undefined) {
   return `${formatDecimal(value, 2)} €`
 }
 
-export function formatPricePerKg(value: number | null | undefined) {
+export function formatPricePerKg(
+  value: number | null | undefined,
+  fallback = '—',
+) {
   if (value === null || value === undefined) {
-    return '—'
+    return fallback
   }
 
   return `${formatDecimal(value, 2)} € / kg`

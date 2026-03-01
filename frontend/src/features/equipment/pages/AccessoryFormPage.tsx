@@ -45,12 +45,7 @@ function EditAccessoryForm({ accessoryId }: { accessoryId: Guid }) {
   const navigate = useNavigate()
   const { data: accessory } = useAccessory(accessoryId)
   const { mutateAsync, isPending } = useUpdateAccessory()
-  const compatibleBrewers =
-    (
-      accessory as {
-        compatibleBrewers?: { id?: string | null }[] | null
-      }
-    ).compatibleBrewers ?? []
+  const compatibleBrewers = accessory.compatibleBrewers ?? []
 
   return (
     <AccessoryFormCard

@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useDashboardStats } from '@/hooks/useDashboardStats'
 import { useSettings } from '@/hooks/useSettings'
+import { StatCard } from '@/components/StatCard'
 
 const wholeNumberFormatter = new Intl.NumberFormat()
 
@@ -57,32 +58,23 @@ export function DashboardStats() {
   return (
     <section className="rounded-lg border bg-card p-4">
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        <StatItem
+        <StatCard
           label="Total brews"
           value={wholeNumberFormatter.format(totalBrews)}
         />
-        <StatItem
+        <StatCard
           label="Coffee available"
           value={`${wholeNumberFormatter.format(coffeeAvailableGrams)} g`}
         />
-        <StatItem
+        <StatCard
           label="Beans explored"
           value={wholeNumberFormatter.format(beansExplored)}
         />
-        <StatItem
+        <StatCard
           label="Coffee consumed"
           value={`${wholeNumberFormatter.format(totalCoffeeConsumedGrams)} g`}
         />
       </div>
     </section>
-  )
-}
-
-function StatItem({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="space-y-1 rounded-md border bg-muted/20 p-3">
-      <p className="text-muted-foreground text-xs uppercase">{label}</p>
-      <p className="text-sm font-semibold">{value}</p>
-    </div>
   )
 }

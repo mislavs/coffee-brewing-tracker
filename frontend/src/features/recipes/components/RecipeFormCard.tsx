@@ -19,20 +19,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { Textarea } from '@/components/ui/textarea'
+import { FieldErrorText } from '@/components/FieldErrorText'
 import { useBrewers } from '@/features/equipment/hooks/useBrewers'
 import { applyRecipeFormServerErrors } from '@/features/recipes/mapApiValidationErrors'
 import {
   recipeFormSchema,
   type RecipeFormValues,
 } from '@/features/recipes/recipeFormSchema'
-
-function FieldErrorText({ message }: { message?: string }) {
-  if (!message) {
-    return null
-  }
-
-  return <p className="text-sm text-destructive">{message}</p>
-}
 
 type RecipeFormCardProps = {
   title: string
@@ -129,10 +123,9 @@ export function RecipeFormCard({
             <label htmlFor="description" className="text-sm font-medium">
               Description
             </label>
-            <textarea
+            <Textarea
               id="description"
               rows={5}
-              className="border-input placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 dark:hover:bg-input/50 flex w-full rounded-md border bg-transparent px-3 py-2 text-sm shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50"
               {...form.register('description')}
             />
             <FieldErrorText message={form.formState.errors.description?.message} />

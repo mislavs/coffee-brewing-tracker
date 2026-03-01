@@ -32,46 +32,70 @@ function parseTab(value: string | null): EquipmentTab {
   return 'brewers'
 }
 
-function BrewerList() {
-  const { data: brewers = [], isPending } = useBrewers()
+type EquipmentEntity = {
+  id?: string | null
+  name?: string | null
+}
+
+type EquipmentEntityCardListProps = {
+  title: string
+  description: string
+  addLabel: string
+  addHref: string
+  detailHrefPrefix: string
+  unnamedLabel: string
+  emptyMessage: string
+  itemKeyPrefix: string
+  items: EquipmentEntity[]
+  isPending: boolean
+}
+
+function EquipmentEntityCardList({
+  title,
+  description,
+  addLabel,
+  addHref,
+  detailHrefPrefix,
+  unnamedLabel,
+  emptyMessage,
+  itemKeyPrefix,
+  items,
+  isPending,
+}: EquipmentEntityCardListProps) {
+  const getName = (item: EquipmentEntity) => item.name ?? unnamedLabel
 
   return (
     <Card>
       <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <CardTitle>Brewers</CardTitle>
-          <CardDescription>Browse and manage your brewers.</CardDescription>
+          <CardTitle>{title}</CardTitle>
+          <CardDescription>{description}</CardDescription>
         </div>
         <Button asChild>
-          <Link to="/equipment/brewers/new">Add Brewer</Link>
+          <Link to={addHref}>{addLabel}</Link>
         </Button>
       </CardHeader>
       <CardContent>
-        {isPending && brewers.length === 0 ? (
+        {isPending && items.length === 0 ? (
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {Array.from({ length: 4 }).map((_, index) => (
-              <CardSkeleton key={`brewer-card-skeleton-${index}`} badgeCount={0} />
+              <CardSkeleton key={`${itemKeyPrefix}-card-skeleton-${index}`} badgeCount={0} />
             ))}
           </div>
-        ) : brewers.length === 0 ? (
-          <p className="py-8 text-center text-muted-foreground">
-            No brewers yet. Add your first brewer to get started.
-          </p>
+        ) : items.length === 0 ? (
+          <p className="py-8 text-center text-muted-foreground">{emptyMessage}</p>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-            {brewers.map((brewer) => (
-              <Card key={brewer.id ?? brewer.name ?? 'brewer'} className="h-full">
+            {items.map((item) => (
+              <Card key={item.id ?? item.name ?? itemKeyPrefix} className="h-full">
                 <CardHeader>
                   <CardTitle className="text-base">
-                    {brewer.id ? (
-                      <Link
-                        to={`/equipment/brewers/${brewer.id}`}
-                        className="hover:underline"
-                      >
-                        {brewer.name ?? 'Unnamed brewer'}
+                    {item.id ? (
+                      <Link to={`${detailHrefPrefix}/${item.id}`} className="hover:underline">
+                        {getName(item)}
                       </Link>
                     ) : (
-                      (brewer.name ?? 'Unnamed brewer')
+                      getName(item)
                     )}
                   </CardTitle>
                 </CardHeader>
@@ -84,55 +108,41 @@ function BrewerList() {
   )
 }
 
+function BrewerList() {
+  const { data: brewers = [], isPending } = useBrewers()
+
+  return (
+    <EquipmentEntityCardList
+      title="Brewers"
+      description="Browse and manage your brewers."
+      addLabel="Add Brewer"
+      addHref="/equipment/brewers/new"
+      detailHrefPrefix="/equipment/brewers"
+      unnamedLabel="Unnamed brewer"
+      emptyMessage="No brewers yet. Add your first brewer to get started."
+      itemKeyPrefix="brewer"
+      items={brewers}
+      isPending={isPending}
+    />
+  )
+}
+
 function GrinderList() {
   const { data: grinders = [], isPending } = useGrinders()
 
   return (
-    <Card>
-      <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <CardTitle>Grinders</CardTitle>
-          <CardDescription>Browse and manage your grinders.</CardDescription>
-        </div>
-        <Button asChild>
-          <Link to="/equipment/grinders/new">Add Grinder</Link>
-        </Button>
-      </CardHeader>
-      <CardContent>
-        {isPending && grinders.length === 0 ? (
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-            {Array.from({ length: 4 }).map((_, index) => (
-              <CardSkeleton key={`grinder-card-skeleton-${index}`} badgeCount={0} />
-            ))}
-          </div>
-        ) : grinders.length === 0 ? (
-          <p className="py-8 text-center text-muted-foreground">
-            No grinders yet. Add your first grinder to get started.
-          </p>
-        ) : (
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-            {grinders.map((grinder) => (
-              <Card key={grinder.id ?? grinder.name ?? 'grinder'} className="h-full">
-                <CardHeader>
-                  <CardTitle className="text-base">
-                    {grinder.id ? (
-                      <Link
-                        to={`/equipment/grinders/${grinder.id}`}
-                        className="hover:underline"
-                      >
-                        {grinder.name ?? 'Unnamed grinder'}
-                      </Link>
-                    ) : (
-                      (grinder.name ?? 'Unnamed grinder')
-                    )}
-                  </CardTitle>
-                </CardHeader>
-              </Card>
-            ))}
-          </div>
-        )}
-      </CardContent>
-    </Card>
+    <EquipmentEntityCardList
+      title="Grinders"
+      description="Browse and manage your grinders."
+      addLabel="Add Grinder"
+      addHref="/equipment/grinders/new"
+      detailHrefPrefix="/equipment/grinders"
+      unnamedLabel="Unnamed grinder"
+      emptyMessage="No grinders yet. Add your first grinder to get started."
+      itemKeyPrefix="grinder"
+      items={grinders}
+      isPending={isPending}
+    />
   )
 }
 

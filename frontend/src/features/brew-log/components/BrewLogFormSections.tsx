@@ -8,6 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { Textarea } from '@/components/ui/textarea'
 import type {
   BrewLogFormInput,
   BrewLogFormValues,
@@ -20,7 +21,6 @@ import {
 import { EmojiRatingPicker } from '@/features/brew-log/components/EmojiRatingPicker'
 import {
   getFieldErrorMessage,
-  textareaFieldClassName,
   type IdNameOption,
 } from '@/features/brew-log/components/brewLogFormShared'
 
@@ -320,10 +320,9 @@ export function ResultsSection({ form }: FormSectionProps) {
         <label htmlFor="tastingNotes" className="text-sm font-medium">
           Notes
         </label>
-        <textarea
+        <Textarea
           id="tastingNotes"
           rows={4}
-          className={textareaFieldClassName}
           {...form.register('tastingNotes')}
         />
         <FieldErrorText message={form.formState.errors.tastingNotes?.message} />
@@ -333,10 +332,9 @@ export function ResultsSection({ form }: FormSectionProps) {
         <label htmlFor="adjustmentIdeas" className="text-sm font-medium">
           Adjustment ideas
         </label>
-        <textarea
+        <Textarea
           id="adjustmentIdeas"
           rows={4}
-          className={textareaFieldClassName}
           {...form.register('adjustmentIdeas')}
         />
         <FieldErrorText message={form.formState.errors.adjustmentIdeas?.message} />

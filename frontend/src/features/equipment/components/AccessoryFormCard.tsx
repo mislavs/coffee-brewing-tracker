@@ -15,8 +15,10 @@ import {
   accessoryFormSchema,
   type AccessoryFormValues,
 } from '@/features/equipment/accessoryFormSchema'
+import { FieldErrorText } from '@/components/FieldErrorText'
 import { BrewerMultiSelect } from '@/features/equipment/components/BrewerMultiSelect'
 import { applyAccessoryFormServerErrors } from '@/features/equipment/mapApiValidationErrors'
+import { getFieldErrorMessage } from '@/lib/formUtils'
 
 type AccessoryFormCardProps = {
   title: string
@@ -26,15 +28,6 @@ type AccessoryFormCardProps = {
   onSubmit: (values: AccessoryFormValues) => Promise<void>
   isSubmitting: boolean
   cancelHref: string
-}
-
-function getFieldErrorMessage(error: unknown) {
-  if (!error || typeof error !== 'object') {
-    return undefined
-  }
-
-  const errorRecord = error as { message?: unknown }
-  return typeof errorRecord.message === 'string' ? errorRecord.message : undefined
 }
 
 export function AccessoryFormCard({
@@ -74,11 +67,7 @@ export function AccessoryFormCard({
               Name
             </label>
             <Input id="name" {...form.register('name')} />
-            {form.formState.errors.name && (
-              <p className="text-sm text-destructive">
-                {form.formState.errors.name.message}
-              </p>
-            )}
+            <FieldErrorText message={form.formState.errors.name?.message} />
           </div>
 
           <div className="space-y-2">
@@ -93,18 +82,12 @@ export function AccessoryFormCard({
                 />
               )}
             />
-            {getFieldErrorMessage(form.formState.errors.brewerIds) && (
-              <p className="text-sm text-destructive">
-                {getFieldErrorMessage(form.formState.errors.brewerIds)}
-              </p>
-            )}
+            <FieldErrorText
+              message={getFieldErrorMessage(form.formState.errors.brewerIds)}
+            />
           </div>
 
-          {form.formState.errors.root?.serverError && (
-            <p className="text-sm text-destructive">
-              {form.formState.errors.root.serverError.message}
-            </p>
-          )}
+          <FieldErrorText message={form.formState.errors.root?.serverError?.message} />
 
           <CardFooter className="px-0 pb-0">
             <div className="flex items-center gap-2">

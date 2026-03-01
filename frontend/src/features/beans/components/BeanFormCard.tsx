@@ -45,20 +45,15 @@ import { useRoasters } from '@/features/roasters/hooks/useRoasters'
 import { useCreateRoaster } from '@/features/roasters/hooks/useCreateRoaster'
 import { RoasterFormCard } from '@/features/roasters/components/RoasterFormCard'
 import {
+  getFieldErrorMessage,
   normalizeOptional,
+} from '@/lib/formUtils'
+import { FieldErrorText } from '@/components/FieldErrorText'
+import {
   type RoasterFormValues,
 } from '@/features/roasters/roasterFormSchema'
 
 const createRoasterValue = '__create_roaster__'
-
-function getFieldErrorMessage(error: unknown) {
-  if (!error || typeof error !== 'object') {
-    return undefined
-  }
-
-  const errorRecord = error as { message?: unknown }
-  return typeof errorRecord.message === 'string' ? errorRecord.message : undefined
-}
 
 function toDistinctOptions(values: (string | null | undefined)[]) {
   const distinct: string[] = []
@@ -80,14 +75,6 @@ function toDistinctOptions(values: (string | null | undefined)[]) {
   }
 
   return distinct
-}
-
-function FieldErrorText({ message }: { message?: string }) {
-  if (!message) {
-    return null
-  }
-
-  return <p className="text-sm text-destructive">{message}</p>
 }
 
 type BeanFormCardProps = {

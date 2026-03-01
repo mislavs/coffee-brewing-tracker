@@ -1,71 +1,22 @@
-export const loadRoasterDetailPage = () =>
-  import('@/features/roasters/pages/RoasterDetailPage')
-
-export const loadRoasterFormPage = () =>
-  import('@/features/roasters/pages/RoasterFormPage')
-
-export const loadBeanDetailPage = () =>
-  import('@/features/beans/pages/BeanDetailPage')
-
-export const loadBeanFormPage = () => import('@/features/beans/pages/BeanFormPage')
-
-export const loadRecipeDetailPage = () =>
-  import('@/features/recipes/pages/RecipeDetailPage')
-
-export const loadRecipeFormPage = () =>
-  import('@/features/recipes/pages/RecipeFormPage')
-
-export const loadBrewLogDetailPage = () =>
-  import('@/features/brew-log/pages/BrewLogDetailPage')
-
-export const loadBrewLogFormPage = () =>
-  import('@/features/brew-log/pages/BrewLogFormPage')
-
-export const loadEquipmentPage = () =>
-  import('@/features/equipment/pages/EquipmentPage')
-
-export const loadBrewerDetailPage = () =>
-  import('@/features/equipment/pages/BrewerDetailPage')
-
-export const loadBrewerFormPage = () =>
-  import('@/features/equipment/pages/BrewerFormPage')
-
-export const loadGrinderDetailPage = () =>
-  import('@/features/equipment/pages/GrinderDetailPage')
-
-export const loadGrinderFormPage = () =>
-  import('@/features/equipment/pages/GrinderFormPage')
-
-export const loadAccessoryDetailPage = () =>
-  import('@/features/equipment/pages/AccessoryDetailPage')
-
-export const loadAccessoryFormPage = () =>
-  import('@/features/equipment/pages/AccessoryFormPage')
-
-export function preloadRoasterFeatureRoutes() {
-  void Promise.all([loadRoasterDetailPage(), loadRoasterFormPage()])
-}
-
-export function preloadBeanFeatureRoutes() {
-  void Promise.all([loadBeanDetailPage(), loadBeanFormPage()])
-}
-
-export function preloadRecipeFeatureRoutes() {
-  void Promise.all([loadRecipeDetailPage(), loadRecipeFormPage()])
-}
-
-export function preloadBrewLogFeatureRoutes() {
-  void Promise.all([loadBrewLogDetailPage(), loadBrewLogFormPage()])
-}
-
-export function preloadEquipmentFeatureRoutes() {
-  void Promise.all([
-    loadEquipmentPage(),
-    loadBrewerDetailPage(),
-    loadBrewerFormPage(),
-    loadGrinderDetailPage(),
-    loadGrinderFormPage(),
-    loadAccessoryDetailPage(),
-    loadAccessoryFormPage(),
-  ])
-}
+export {
+  loadAccessoryDetailPage,
+  loadAccessoryFormPage,
+  loadBeanDetailPage,
+  loadBeanFormPage,
+  loadBrewLogDetailPage,
+  loadBrewLogFormPage,
+  loadBrewerDetailPage,
+  loadBrewerFormPage,
+  loadEquipmentPage,
+  loadGrinderDetailPage,
+  loadGrinderFormPage,
+  loadRecipeDetailPage,
+  loadRecipeFormPage,
+  loadRoasterDetailPage,
+  loadRoasterFormPage,
+  preloadBeanFeatureRoutes,
+  preloadBrewLogFeatureRoutes,
+  preloadEquipmentFeatureRoutes,
+  preloadRecipeFeatureRoutes,
+  preloadRoasterFeatureRoutes,
+} from '@/lib/routeRegistry'

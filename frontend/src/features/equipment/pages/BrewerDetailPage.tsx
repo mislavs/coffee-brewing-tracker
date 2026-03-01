@@ -15,12 +15,7 @@ import { useEntityFormId } from '@/lib/useEntityFormId'
 
 function BrewerDetailContent({ brewerId }: { brewerId: Guid }) {
   const { data: brewer } = useBrewer(brewerId)
-  const accessories =
-    (
-      brewer as {
-        accessories?: { id?: string | null; name?: string | null }[] | null
-      }
-    ).accessories ?? []
+  const accessories = brewer.accessories ?? []
 
   return (
     <Card>

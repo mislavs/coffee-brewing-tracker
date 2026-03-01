@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react'
 import { Mic } from 'lucide-react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
@@ -16,6 +15,7 @@ import { Switch } from '@/components/ui/switch'
 import { BrewLogCard } from '@/features/brew-log/components/BrewLogCard'
 import { useBrewLogs } from '@/features/brew-log/hooks/useBrewLogs'
 import { useFeatures } from '@/features/brew-log/hooks/useFeatures'
+import { useDebouncedSearchParam } from '@/hooks/useDebouncedSearchParam'
 
 export function BrewLogListPage() {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -23,32 +23,11 @@ export function BrewLogListPage() {
   const dateFrom = searchParams.get('dateFrom') ?? ''
   const dateTo = searchParams.get('dateTo') ?? ''
   const includeUnavailable = searchParams.get('includeUnavailable') === 'true'
-  const [searchDraft, setSearchDraft] = useState(search)
-
-  useEffect(() => {
-    setSearchDraft(search)
-  }, [search])
-
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      const normalized = searchDraft.trim()
-      setSearchParams(
-        (previous) => {
-          const next = new URLSearchParams(previous)
-          if (normalized) {
-            next.set('search', normalized)
-          } else {
-            next.delete('search')
-          }
-
-          return next
-        },
-        { replace: true },
-      )
-    }, 300)
-
-    return () => clearTimeout(timeoutId)
-  }, [searchDraft, setSearchParams])
+  const [searchDraft, setSearchDraft] = useDebouncedSearchParam({
+    paramName: 'search',
+    value: search,
+    setSearchParams,
+  })
 
   const setDateFilter = (name: 'dateFrom' | 'dateTo', nextIsoDate: string | undefined) => {
     setSearchParams(

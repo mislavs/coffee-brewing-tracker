@@ -1,21 +1,9 @@
 import type { Guid } from '@/lib/api-types'
 import { z } from 'zod'
 import type { CreateBrewLogRequest } from '@/lib/api/schemas'
-
-const guidPattern =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
-
-const optionalTrimmedStringSchema = z.preprocess(
-  (value) => {
-    if (typeof value !== 'string') {
-      return value
-    }
-
-    const trimmed = value.trim()
-    return trimmed.length > 0 ? trimmed : undefined
-  },
-  z.string().optional(),
-)
+import { normalizeOptional } from '@/lib/formUtils'
+import { guidPattern } from '@/lib/guid'
+import { optionalTrimmedStringSchema } from '@/lib/zodUtils'
 
 const requiredPositiveNumberSchema = (message: string) =>
   z.preprocess(
@@ -104,15 +92,6 @@ export const brewLogFormSchema = z.object({
 
 export type BrewLogFormInput = z.input<typeof brewLogFormSchema>
 export type BrewLogFormValues = z.output<typeof brewLogFormSchema>
-
-function normalizeOptional(value: string | undefined) {
-  if (!value) {
-    return undefined
-  }
-
-  const trimmed = value.trim()
-  return trimmed.length > 0 ? trimmed : undefined
-}
 
 export function normalizeBrewLogFormValues(
   values: BrewLogFormValues,
