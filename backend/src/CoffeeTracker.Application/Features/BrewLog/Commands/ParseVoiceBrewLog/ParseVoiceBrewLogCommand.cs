@@ -8,8 +8,7 @@ using Microsoft.Extensions.AI;
 namespace CoffeeTracker.Application.Features.BrewLog.Commands.ParseVoiceBrewLog;
 
 public sealed record ParseVoiceBrewLogCommand(
-    Stream AudioStream,
-    string ContentType) : IRequest<ParseVoiceBrewLogResult>;
+    Stream AudioStream) : IRequest<ParseVoiceBrewLogResult>;
 
 public sealed class ParseVoiceBrewLogHandler(
     ApplicationDbContext dbContext,

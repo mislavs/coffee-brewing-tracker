@@ -7,16 +7,11 @@ public class ParseVoiceBrewLogValidatorTests
 {
     private readonly ParseVoiceBrewLogValidator _sut = new();
 
-    [Theory]
-    [InlineData("audio/webm")]
-    [InlineData("audio/ogg")]
-    [InlineData("audio/wav")]
-    [InlineData("audio/mp4")]
-    [InlineData("audio/mpeg")]
-    public void Validate_WhenContentTypeIsSupported_ShouldNotHaveValidationError(string contentType)
+    [Fact]
+    public void Validate_WhenAudioStreamIsNotNull_ShouldNotHaveValidationError()
     {
         // Arrange
-        var command = new ParseVoiceBrewLogCommand(new MemoryStream([1, 2, 3]), contentType);
+        var command = new ParseVoiceBrewLogCommand(new MemoryStream([1, 2, 3]));
 
         // Act
         var result = _sut.TestValidate(command);
@@ -26,23 +21,10 @@ public class ParseVoiceBrewLogValidatorTests
     }
 
     [Fact]
-    public void Validate_WhenContentTypeIsUnsupported_ShouldHaveValidationError()
-    {
-        // Arrange
-        var command = new ParseVoiceBrewLogCommand(new MemoryStream([1, 2, 3]), "text/plain");
-
-        // Act
-        var result = _sut.TestValidate(command);
-
-        // Assert
-        result.ShouldHaveValidationErrorFor(entry => entry.ContentType);
-    }
-
-    [Fact]
     public void Validate_WhenAudioStreamIsNull_ShouldHaveValidationError()
     {
         // Arrange
-        var command = new ParseVoiceBrewLogCommand(null!, "audio/webm");
+        var command = new ParseVoiceBrewLogCommand(null!);
 
         // Act
         var result = _sut.TestValidate(command);

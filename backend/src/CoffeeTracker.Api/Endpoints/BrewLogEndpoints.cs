@@ -7,6 +7,7 @@ using CoffeeTracker.Infrastructure.AI;
 using MediatR;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.Extensions.Options;
+using System.Net.Http.Headers;
 
 namespace CoffeeTracker.Api.Endpoints;
 
@@ -171,7 +172,9 @@ public static class BrewLogEndpoints
                 statusCode: StatusCodes.Status400BadRequest);
         }
 
-        if (!SupportedAudioMimeTypes.Contains(audioFile.ContentType))
+        if (!MediaTypeHeaderValue.TryParse(audioFile.ContentType, out var parsedContentType) ||
+            string.IsNullOrWhiteSpace(parsedContentType.MediaType) ||
+            !SupportedAudioMimeTypes.Contains(parsedContentType.MediaType))
         {
             return TypedResults.Problem(
                 title: "Unsupported audio MIME type",
@@ -192,7 +195,7 @@ public static class BrewLogEndpoints
 
         await using var audioStream = audioFile.OpenReadStream();
         var result = await sender.Send(
-            new ParseVoiceBrewLogCommand(audioStream, audioFile.ContentType),
+            new ParseVoiceBrewLogCommand(audioStream),
             cancellationToken);
 
         return TypedResults.Ok(ParseVoiceBrewLogResponse.FromResult(result));
