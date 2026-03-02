@@ -1,5 +1,5 @@
 using CoffeeTracker.Infrastructure.AI;
-using CoffeeTracker.Infrastructure.AI.WhisperCpp;
+using CoffeeTracker.Infrastructure.AI.Transcription.Providers.WhisperCpp;
 using FluentAssertions;
 using Microsoft.Extensions.Options;
 

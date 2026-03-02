@@ -1,4 +1,4 @@
-using CoffeeTracker.Infrastructure.AI.WhisperCpp;
+using CoffeeTracker.Infrastructure.AI.Transcription.Providers.WhisperCpp;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using NSubstitute;

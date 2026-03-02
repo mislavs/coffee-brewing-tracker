@@ -2,7 +2,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using Microsoft.Extensions.Options;
 
-namespace CoffeeTracker.Infrastructure.AI.WhisperCpp;
+namespace CoffeeTracker.Infrastructure.AI.Transcription.Providers.WhisperCpp;
 
 public sealed class FfmpegAudioTranscodingService(
     IOptions<AiSettings> aiSettings,

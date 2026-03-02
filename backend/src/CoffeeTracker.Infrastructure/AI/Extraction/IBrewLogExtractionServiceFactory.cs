@@ -1,4 +1,4 @@
-namespace CoffeeTracker.Infrastructure.AI;
+namespace CoffeeTracker.Infrastructure.AI.Extraction;
 
 public interface IBrewLogExtractionServiceFactory
 {

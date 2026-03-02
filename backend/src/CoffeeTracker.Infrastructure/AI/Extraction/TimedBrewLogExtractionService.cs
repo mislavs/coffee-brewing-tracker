@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using Microsoft.Extensions.Logging;
 
-namespace CoffeeTracker.Infrastructure.AI;
+namespace CoffeeTracker.Infrastructure.AI.Extraction;
 
 public sealed class TimedBrewLogExtractionService(
     IBrewLogExtractionService _inner,

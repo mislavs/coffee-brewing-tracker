@@ -4,7 +4,7 @@ using Microsoft.Extensions.Options;
 using OpenAI;
 using System.ClientModel;
 
-namespace CoffeeTracker.Infrastructure.AI;
+namespace CoffeeTracker.Infrastructure.AI.Extraction;
 
 public sealed class BrewLogExtractionServiceFactory(
     IOptions<AiSettings> _aiSettings,

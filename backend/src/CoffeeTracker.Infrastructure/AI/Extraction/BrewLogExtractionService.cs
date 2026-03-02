@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 using System.Text;
 using System.Text.Json;
 
-namespace CoffeeTracker.Infrastructure.AI;
+namespace CoffeeTracker.Infrastructure.AI.Extraction;
 
 public sealed class BrewLogExtractionService(
     IChatClient chatClient,

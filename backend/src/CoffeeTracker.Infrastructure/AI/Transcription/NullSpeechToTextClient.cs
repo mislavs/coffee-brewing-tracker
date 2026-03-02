@@ -1,7 +1,7 @@
 using Microsoft.Extensions.AI;
 using System.Runtime.CompilerServices;
 
-namespace CoffeeTracker.Infrastructure.AI;
+namespace CoffeeTracker.Infrastructure.AI.Transcription;
 
 public sealed class NullSpeechToTextClient : ISpeechToTextClient
 {

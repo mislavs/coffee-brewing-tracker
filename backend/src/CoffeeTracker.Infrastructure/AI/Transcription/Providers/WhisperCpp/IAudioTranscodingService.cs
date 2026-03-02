@@ -1,4 +1,4 @@
-namespace CoffeeTracker.Infrastructure.AI.WhisperCpp;
+namespace CoffeeTracker.Infrastructure.AI.Transcription.Providers.WhisperCpp;
 
 public interface IAudioTranscodingService
 {

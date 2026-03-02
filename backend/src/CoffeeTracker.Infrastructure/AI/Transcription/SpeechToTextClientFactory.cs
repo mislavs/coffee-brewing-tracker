@@ -1,10 +1,10 @@
-using CoffeeTracker.Infrastructure.AI.WhisperCpp;
+using CoffeeTracker.Infrastructure.AI.Transcription.Providers.WhisperCpp;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace CoffeeTracker.Infrastructure.AI;
+namespace CoffeeTracker.Infrastructure.AI.Transcription;
 
 public sealed class SpeechToTextClientFactory(
     IOptions<AiSettings> _aiSettings,

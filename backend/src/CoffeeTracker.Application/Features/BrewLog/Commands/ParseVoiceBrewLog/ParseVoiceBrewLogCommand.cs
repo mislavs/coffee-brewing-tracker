@@ -1,5 +1,5 @@
 using CoffeeTracker.Application.Features.BrewLog.Dtos;
-using CoffeeTracker.Infrastructure.AI;
+using CoffeeTracker.Infrastructure.AI.Extraction;
 using CoffeeTracker.Infrastructure.Persistence;
 using MediatR;
 using Microsoft.EntityFrameworkCore;

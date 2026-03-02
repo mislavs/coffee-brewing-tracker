@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 using System.Text;
 using Whisper.net;
 
-namespace CoffeeTracker.Infrastructure.AI.WhisperCpp;
+namespace CoffeeTracker.Infrastructure.AI.Transcription.Providers.WhisperCpp;
 
 public sealed class WhisperCppSpeechToTextClient : ISpeechToTextClient
 {

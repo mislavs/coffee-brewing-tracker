@@ -1,4 +1,4 @@
-using CoffeeTracker.Infrastructure.AI;
+using CoffeeTracker.Infrastructure.AI.Extraction;
 using FluentAssertions;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Logging;
