@@ -1,7 +1,6 @@
 using CoffeeTracker.Domain.Exceptions;
 using FluentAssertions;
 using NetArchTest.Rules;
-using Xunit;
 
 namespace CoffeeTracker.Architecture.Tests;
 
