@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace CoffeeTracker.Infrastructure;
 
@@ -35,7 +36,18 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<ISpeechToTextClient>(serviceProvider =>
         {
             var inner = serviceProvider.GetRequiredService<ISpeechToTextClientFactory>().Create();
-            return ActivatorUtilities.CreateInstance<TimedSpeechToTextClient>(serviceProvider, inner);
+            if (inner is NullSpeechToTextClient)
+            {
+                return inner;
+            }
+
+            var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
+
+            return inner
+                .AsBuilder()
+                .UseOpenTelemetry(loggerFactory)
+                .UseLogging(loggerFactory)
+                .Build(serviceProvider);
         });
             
         services.AddSingleton<IBrewLogExtractionServiceFactory, BrewLogExtractionServiceFactory>();
