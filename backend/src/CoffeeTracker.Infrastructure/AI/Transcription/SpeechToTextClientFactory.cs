@@ -11,7 +11,7 @@ public sealed class SpeechToTextClientFactory(
     ILogger<SpeechToTextClientFactory> _logger,
     ILogger<WhisperCppSpeechToTextClient> _whisperLogger,
     IAudioTranscodingService _audioTranscodingService,
-    IHostEnvironment _hostEnvironment) : ISpeechToTextClientFactory
+    IHostEnvironment _hostEnvironment)
 {
     public ISpeechToTextClient Create()
     {

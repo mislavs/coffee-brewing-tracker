@@ -6,19 +6,18 @@ using System.ClientModel;
 
 namespace CoffeeTracker.Infrastructure.AI.Extraction;
 
-public sealed class BrewLogExtractionServiceFactory(
-    IOptions<AiSettings> _aiSettings,
-    ILogger<BrewLogExtractionServiceFactory> _logger,
-    ILogger<BrewLogExtractionService> _extractionLogger) : IBrewLogExtractionServiceFactory
+public sealed class ChatClientFactory(
+    IOptions<AiSettings> aiSettings,
+    ILogger<ChatClientFactory> logger)
 {
-    public IBrewLogExtractionService Create()
+    public IChatClient? Create()
     {
-        var settings = _aiSettings.Value;
+        var settings = aiSettings.Value;
         var provider = settings.Extraction.Provider;
 
         if (string.IsNullOrWhiteSpace(provider))
         {
-            return new NullBrewLogExtractionService();
+            return null;
         }
 
         if (provider.Equals(AiProviders.Extraction.OpenRouter, StringComparison.OrdinalIgnoreCase))
@@ -26,12 +25,19 @@ public sealed class BrewLogExtractionServiceFactory(
             if (string.IsNullOrWhiteSpace(settings.Extraction.ApiKey) ||
                 string.IsNullOrWhiteSpace(settings.Extraction.Model))
             {
-                _logger.LogWarning(
+                logger.LogWarning(
                     "OpenRouter extraction provider requires AI:Extraction:ApiKey and AI:Extraction:Model. Falling back to NullBrewLogExtractionService.");
-                return new NullBrewLogExtractionService();
+                return null;
             }
 
-            var endpoint = GetOpenRouterEndpoint(settings.Extraction.Endpoint);
+            if (!TryGetOpenRouterEndpoint(settings.Extraction.Endpoint, out var endpoint))
+            {
+                logger.LogWarning(
+                    "AI:Extraction:Endpoint '{Endpoint}' is not a valid absolute URI. Falling back to NullBrewLogExtractionService.",
+                    settings.Extraction.Endpoint ?? AiProviderDefaults.OpenRouterEndpoint);
+                return null;
+            }
+
             var openAiClient = new OpenAIClient(
                 new ApiKeyCredential(settings.Extraction.ApiKey),
                 new OpenAIClientOptions
@@ -39,47 +45,45 @@ public sealed class BrewLogExtractionServiceFactory(
                     Endpoint = endpoint
                 });
 
-            var chatClient = openAiClient
+            return openAiClient
                 .GetChatClient(settings.Extraction.Model)
-                .AsIChatClient()
-                .AsBuilder()
-                .UseOpenTelemetry()
-                .Build();
-            return new BrewLogExtractionService(chatClient, _extractionLogger);
+                .AsIChatClient();
         }
 
         if (IsKnownExtractionProvider(provider))
         {
-            _logger.LogWarning(
+            logger.LogWarning(
                 "AI extraction provider '{Provider}' is known but not implemented yet. Falling back to NullBrewLogExtractionService.",
                 provider);
         }
         else
         {
-            _logger.LogWarning(
+            logger.LogWarning(
                 "Unsupported AI extraction provider '{Provider}'. Falling back to NullBrewLogExtractionService.",
                 provider);
         }
 
-        return new NullBrewLogExtractionService();
+        return null;
     }
 
     private static bool IsKnownExtractionProvider(string provider) =>
         provider.Equals(AiProviders.Extraction.OpenRouter, StringComparison.OrdinalIgnoreCase) ||
         provider.Equals(AiProviders.Extraction.OpenAi, StringComparison.OrdinalIgnoreCase);
 
-    private static Uri GetOpenRouterEndpoint(string? configuredEndpoint)
+    private static bool TryGetOpenRouterEndpoint(string? configuredEndpoint, out Uri endpoint)
     {
-        var endpoint = string.IsNullOrWhiteSpace(configuredEndpoint)
+        var endpointText = string.IsNullOrWhiteSpace(configuredEndpoint)
             ? AiProviderDefaults.OpenRouterEndpoint
             : configuredEndpoint;
 
-        if (!Uri.TryCreate(endpoint, UriKind.Absolute, out var uri))
+        if (Uri.TryCreate(endpointText, UriKind.Absolute, out var parsedEndpoint) &&
+            parsedEndpoint is not null)
         {
-            throw new InvalidOperationException(
-                $"AI:Extraction:Endpoint '{endpoint}' is not a valid absolute URI.");
+            endpoint = parsedEndpoint;
+            return true;
         }
 
-        return uri;
+        endpoint = null!;
+        return false;
     }
 }

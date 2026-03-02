@@ -33,35 +33,45 @@ public static class ServiceCollectionExtensions
             .Bind(configuration.GetSection(AiSettings.SectionName));
 
         services.AddSingleton<IAudioTranscodingService, FfmpegAudioTranscodingService>();
+        services.AddSingleton<SpeechToTextClientFactory>();
+        services.AddSingleton<ChatClientFactory>();
 
-        services.AddSingleton<ISpeechToTextClientFactory, SpeechToTextClientFactory>();
         services.AddSingleton<ISpeechToTextClient>(serviceProvider =>
         {
-            var inner = serviceProvider.GetRequiredService<ISpeechToTextClientFactory>().Create();
+            var inner = serviceProvider.GetRequiredService<SpeechToTextClientFactory>().Create();
             if (inner is NullSpeechToTextClient)
             {
                 return inner;
             }
 
-            var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
-
             return inner
                 .AsBuilder()
-                .UseOpenTelemetry(loggerFactory)
-                .UseLogging(loggerFactory)
+                .UseOpenTelemetry()
+                .UseLogging()
                 .Build(serviceProvider);
         });
-            
-        services.AddSingleton<IBrewLogExtractionServiceFactory, BrewLogExtractionServiceFactory>();
+
         services.AddSingleton<IBrewLogExtractionService>(serviceProvider =>
         {
-            var inner = serviceProvider.GetRequiredService<IBrewLogExtractionServiceFactory>().Create();
-            return ActivatorUtilities.CreateInstance<TimedBrewLogExtractionService>(serviceProvider, inner);
+            var chatClient = serviceProvider.GetRequiredService<ChatClientFactory>().Create();
+            if (chatClient is null)
+            {
+                return new NullBrewLogExtractionService();
+            }
+
+            var wrapped = chatClient
+                .AsBuilder()
+                .UseOpenTelemetry()
+                .UseLogging()
+                .Build(serviceProvider);
+
+            return ActivatorUtilities.CreateInstance<BrewLogExtractionService>(
+                serviceProvider,
+                wrapped);
         });
 
         services.AddSingleton<IAiFeatureAvailability, AiFeatureAvailability>();
 
         return services;
     }
-
 }
