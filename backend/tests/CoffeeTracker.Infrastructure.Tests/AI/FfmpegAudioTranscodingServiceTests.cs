@@ -23,7 +23,7 @@ public class FfmpegAudioTranscodingServiceTests
             ffmpegExecutablePath: "ffmpeg-does-not-exist-12345");
 
         // Act
-        Func<Task> action = async () => _ = await service.ConvertToWaveAsync(new MemoryStream([1, 2, 3]), CancellationToken.None);
+        Func<Task> action = async () => _ = await service.ConvertToWaveAsync(new MemoryStream([1, 2, 3]), TestContext.Current.CancellationToken);
 
         // Assert
         await action.Should().ThrowAsync<InvalidOperationException>()

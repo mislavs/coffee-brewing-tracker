@@ -36,7 +36,7 @@ public class BrewLogExtractionServiceTests
             [new EntityRef(Guid.NewGuid(), "Paper Filter")]);
 
         // Act
-        _ = await sut.ExtractAsync("I brewed a nice V60 cup", catalog, CancellationToken.None);
+        _ = await sut.ExtractAsync("I brewed a nice V60 cup", catalog, TestContext.Current.CancellationToken);
 
         // Assert
         capturedMessages.Should().NotBeNull();
@@ -85,7 +85,7 @@ public class BrewLogExtractionServiceTests
         var catalog = new EntityCatalog([], [], [], [], []);
 
         // Act
-        var result = await sut.ExtractAsync("transcript", catalog, CancellationToken.None);
+        var result = await sut.ExtractAsync("transcript", catalog, TestContext.Current.CancellationToken);
 
         // Assert
         result.BeanId.Should().Be(beanId);
@@ -110,7 +110,7 @@ public class BrewLogExtractionServiceTests
         var catalog = new EntityCatalog([], [], [], [], []);
 
         // Act
-        var result = await sut.ExtractAsync("transcript", catalog, CancellationToken.None);
+        var result = await sut.ExtractAsync("transcript", catalog, TestContext.Current.CancellationToken);
 
         // Assert
         result.BeanId.Should().BeNull();

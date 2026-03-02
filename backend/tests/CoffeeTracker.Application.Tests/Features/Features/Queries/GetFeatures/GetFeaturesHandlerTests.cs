@@ -13,7 +13,7 @@ public class GetFeaturesHandlerTests
         var handler = new GetFeaturesHandler(new StubAiFeatureAvailability(false));
 
         // Act
-        var result = await handler.Handle(new GetFeaturesQuery(), CancellationToken.None);
+        var result = await handler.Handle(new GetFeaturesQuery(), TestContext.Current.CancellationToken);
 
         // Assert
         result.VoiceBrewLogParsing.Should().BeFalse();
@@ -26,7 +26,7 @@ public class GetFeaturesHandlerTests
         var handler = new GetFeaturesHandler(new StubAiFeatureAvailability(true));
 
         // Act
-        var result = await handler.Handle(new GetFeaturesQuery(), CancellationToken.None);
+        var result = await handler.Handle(new GetFeaturesQuery(), TestContext.Current.CancellationToken);
 
         // Assert
         result.VoiceBrewLogParsing.Should().BeTrue();
