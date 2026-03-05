@@ -1,6 +1,5 @@
 using CoffeeTracker.Infrastructure.AI.Extraction;
 using FluentAssertions;
-using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 
@@ -8,26 +7,34 @@ namespace CoffeeTracker.Infrastructure.Tests.AI;
 
 public class BrewLogExtractionServiceTests
 {
-    private readonly IChatClient _chatClient = Substitute.For<IChatClient>();
+    private readonly IDataExtractor _dataExtractor = Substitute.For<IDataExtractor>();
     private readonly ILogger<BrewLogExtractionService> _logger = Substitute.For<ILogger<BrewLogExtractionService>>();
 
     [Fact]
-    public async Task ExtractAsync_ShouldIncludeEntityCatalogInPrompt()
+    public async Task ExtractAsync_ShouldIncludeEntityCatalogInInstructions()
     {
         // Arrange
-        IEnumerable<ChatMessage>? capturedMessages = null;
+        string? capturedInstructions = null;
+        string? capturedTranscript = null;
 
-        _chatClient.GetResponseAsync(
-                Arg.Any<IEnumerable<ChatMessage>>(),
-                Arg.Any<ChatOptions>(),
+        _dataExtractor.ExtractFromTextAsync<BrewLogExtractionResult>(
+                Arg.Any<string>(),
+                Arg.Any<string>(),
                 Arg.Any<CancellationToken>())
             .Returns(callInfo =>
             {
-                capturedMessages = callInfo.ArgAt<IEnumerable<ChatMessage>>(0);
-                return new ChatResponse(new ChatMessage(ChatRole.Assistant, "{}"));
+                capturedInstructions = callInfo.ArgAt<string>(0);
+                capturedTranscript = callInfo.ArgAt<string>(1);
+                return Task.FromResult<BrewLogExtractionResult?>(
+                    BrewLogExtractionResult.Empty with
+                    {
+                        AccessoryIds = [],
+                        AccessoryNames = [],
+                        UnmatchedReferences = []
+                    });
             });
 
-        var sut = new BrewLogExtractionService(_chatClient, _logger);
+        var sut = new BrewLogExtractionService(_dataExtractor, _logger);
         var catalog = new EntityCatalog(
             [new EntityRef(Guid.NewGuid(), "Bean Alpha")],
             [new EntityRef(Guid.NewGuid(), "V60")],
@@ -39,89 +46,77 @@ public class BrewLogExtractionServiceTests
         _ = await sut.ExtractAsync("I brewed a nice V60 cup", catalog, TestContext.Current.CancellationToken);
 
         // Assert
-        capturedMessages.Should().NotBeNull();
-        var promptText = string.Join(Environment.NewLine, capturedMessages!.Select(GetMessageText));
-        promptText.Should().Contain("Bean Alpha");
-        promptText.Should().Contain("V60");
-        promptText.Should().Contain("K-Ultra");
-        promptText.Should().Contain("Morning Recipe");
-        promptText.Should().Contain("Paper Filter");
+        capturedInstructions.Should().NotBeNullOrWhiteSpace();
+        capturedInstructions.Should().Contain("Bean Alpha");
+        capturedInstructions.Should().Contain("V60");
+        capturedInstructions.Should().Contain("K-Ultra");
+        capturedInstructions.Should().Contain("Morning Recipe");
+        capturedInstructions.Should().Contain("Paper Filter");
+        capturedTranscript.Should().Be("I brewed a nice V60 cup");
     }
 
     [Fact]
-    public async Task ExtractAsync_WhenJsonIsValid_ShouldParseResult()
+    public async Task ExtractAsync_WhenExtractorReturnsNull_ShouldReturnEmpty()
     {
         // Arrange
-        var beanId = Guid.NewGuid();
-        var brewerId = Guid.NewGuid();
-        var json = $$"""
-                     {
-                       "beanId": "{{beanId}}",
-                       "beanName": "Kenya AA",
-                       "brewerId": "{{brewerId}}",
-                       "brewerName": "V60",
-                       "accessoryIds": [],
-                       "accessoryNames": [],
-                       "dose": 18.5,
-                       "waterAmount": 300,
-                       "waterTemperature": 93,
-                       "grindSize": "medium-fine",
-                       "brewTimeSeconds": 165,
-                       "rating": 9,
-                       "notes": "bright acidity",
-                       "adjustmentIdeas": "grind slightly finer",
-                       "brewedAt": null,
-                       "unmatchedReferences": ["hand grinder"]
-                     }
-                     """;
-
-        _chatClient.GetResponseAsync(
-                Arg.Any<IEnumerable<ChatMessage>>(),
-                Arg.Any<ChatOptions>(),
+        _dataExtractor.ExtractFromTextAsync<BrewLogExtractionResult>(
+                Arg.Any<string>(),
+                Arg.Any<string>(),
                 Arg.Any<CancellationToken>())
-            .Returns(new ChatResponse(new ChatMessage(ChatRole.Assistant, json)));
+            .Returns(Task.FromResult<BrewLogExtractionResult?>(null));
 
-        var sut = new BrewLogExtractionService(_chatClient, _logger);
+        var sut = new BrewLogExtractionService(_dataExtractor, _logger);
         var catalog = new EntityCatalog([], [], [], [], []);
 
         // Act
         var result = await sut.ExtractAsync("transcript", catalog, TestContext.Current.CancellationToken);
 
         // Assert
-        result.BeanId.Should().Be(beanId);
+        result.Should().BeEquivalentTo(BrewLogExtractionResult.Empty);
+    }
+
+    [Fact]
+    public async Task ExtractAsync_WhenExtractorReturnsResult_ShouldNormalizeCollections()
+    {
+        // Arrange
+        _dataExtractor.ExtractFromTextAsync<BrewLogExtractionResult>(
+                Arg.Any<string>(),
+                Arg.Any<string>(),
+                Arg.Any<CancellationToken>())
+            .Returns(
+                Task.FromResult<BrewLogExtractionResult?>(
+                    new BrewLogExtractionResult(
+                        Guid.NewGuid(),
+                        "Kenya AA",
+                        Guid.NewGuid(),
+                        "V60",
+                        null,
+                        "K-Ultra",
+                        null,
+                        null,
+                        null!,
+                        null!,
+                        18.5m,
+                        300m,
+                        93m,
+                        "medium-fine",
+                        165,
+                        9,
+                        "bright acidity",
+                        "grind slightly finer",
+                        null,
+                        null!)));
+
+        var sut = new BrewLogExtractionService(_dataExtractor, _logger);
+        var catalog = new EntityCatalog([], [], [], [], []);
+
+        // Act
+        var result = await sut.ExtractAsync("transcript", catalog, TestContext.Current.CancellationToken);
+
+        // Assert
         result.BeanName.Should().Be("Kenya AA");
-        result.BrewerId.Should().Be(brewerId);
-        result.Dose.Should().Be(18.5m);
-        result.BrewTimeSeconds.Should().Be(165);
-        result.UnmatchedReferences.Should().ContainSingle().Which.Should().Be("hand grinder");
-    }
-
-    [Fact]
-    public async Task ExtractAsync_WhenJsonIsInvalid_ShouldReturnEmptyWithError()
-    {
-        // Arrange
-        _chatClient.GetResponseAsync(
-                Arg.Any<IEnumerable<ChatMessage>>(),
-                Arg.Any<ChatOptions>(),
-                Arg.Any<CancellationToken>())
-            .Returns(new ChatResponse(new ChatMessage(ChatRole.Assistant, "{invalid-json")));
-
-        var sut = new BrewLogExtractionService(_chatClient, _logger);
-        var catalog = new EntityCatalog([], [], [], [], []);
-
-        // Act
-        var result = await sut.ExtractAsync("transcript", catalog, TestContext.Current.CancellationToken);
-
-        // Assert
-        result.BeanId.Should().BeNull();
-        result.BrewerId.Should().BeNull();
-        result.UnmatchedReferences.Should().NotBeEmpty();
-    }
-
-    private static string GetMessageText(ChatMessage message)
-    {
-        var textProperty = message.GetType().GetProperty("Text");
-        var text = textProperty?.GetValue(message) as string;
-        return string.IsNullOrWhiteSpace(text) ? message.ToString() : text;
+        result.AccessoryIds.Should().NotBeNull().And.BeEmpty();
+        result.AccessoryNames.Should().NotBeNull().And.BeEmpty();
+        result.UnmatchedReferences.Should().NotBeNull().And.BeEmpty();
     }
 }

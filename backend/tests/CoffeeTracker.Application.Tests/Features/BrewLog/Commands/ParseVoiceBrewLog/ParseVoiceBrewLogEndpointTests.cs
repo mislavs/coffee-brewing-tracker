@@ -100,6 +100,8 @@ public class ParseVoiceBrewLogEndpointTests(IntegrationTestFactory factory)
     private sealed class StubAiFeatureAvailability(bool isVoiceBrewLogParsingAvailable) : IAiFeatureAvailability
     {
         public bool IsVoiceBrewLogParsingAvailable { get; } = isVoiceBrewLogParsingAvailable;
+
+        public bool IsImageBeanParsingAvailable { get; } = false;
     }
 
     private sealed class StubParseVoiceBrewLogHandler

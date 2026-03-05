@@ -10,14 +10,41 @@ public sealed class ChatClientFactory(
     IOptions<AiSettings> aiSettings,
     ILogger<ChatClientFactory> logger)
 {
+    public readonly record struct ExtractionAvailability(bool IsAvailable);
+
+    public ExtractionAvailability GetAvailability() =>
+        new(TryResolveOpenRouterConfiguration(logFailures: false, out _));
+
     public IChatClient? Create()
+    {
+        if (!TryResolveOpenRouterConfiguration(logFailures: true, out var configuration))
+        {
+            return null;
+        }
+
+        var openAiClient = new OpenAIClient(
+            new ApiKeyCredential(configuration.ApiKey),
+            new OpenAIClientOptions
+            {
+                Endpoint = configuration.Endpoint
+            });
+
+        return openAiClient
+            .GetChatClient(configuration.Model)
+            .AsIChatClient();
+    }
+
+    private bool TryResolveOpenRouterConfiguration(
+        bool logFailures,
+        out OpenRouterConfiguration configuration)
     {
         var settings = aiSettings.Value;
         var provider = settings.Extraction.Provider;
 
         if (string.IsNullOrWhiteSpace(provider))
         {
-            return null;
+            configuration = default;
+            return false;
         }
 
         if (provider.Equals(AiProviders.Extraction.OpenRouter, StringComparison.OrdinalIgnoreCase))
@@ -25,45 +52,58 @@ public sealed class ChatClientFactory(
             if (string.IsNullOrWhiteSpace(settings.Extraction.ApiKey) ||
                 string.IsNullOrWhiteSpace(settings.Extraction.Model))
             {
-                logger.LogWarning(
-                    "OpenRouter extraction provider requires AI:Extraction:ApiKey and AI:Extraction:Model. Falling back to NullBrewLogExtractionService.");
-                return null;
+                if (logFailures)
+                {
+                    logger.LogWarning(
+                        "OpenRouter extraction provider requires AI:Extraction:ApiKey and AI:Extraction:Model. Falling back to null extraction features.");
+                }
+
+                configuration = default;
+                return false;
             }
 
             if (!TryGetOpenRouterEndpoint(settings.Extraction.Endpoint, out var endpoint))
             {
-                logger.LogWarning(
-                    "AI:Extraction:Endpoint '{Endpoint}' is not a valid absolute URI. Falling back to NullBrewLogExtractionService.",
-                    settings.Extraction.Endpoint ?? AiProviderDefaults.OpenRouterEndpoint);
-                return null;
+                if (logFailures)
+                {
+                    logger.LogWarning(
+                        "AI:Extraction:Endpoint '{Endpoint}' is not a valid absolute URI. Falling back to null extraction features.",
+                        settings.Extraction.Endpoint ?? AiProviderDefaults.OpenRouterEndpoint);
+                }
+
+                configuration = default;
+                return false;
             }
 
-            var openAiClient = new OpenAIClient(
-                new ApiKeyCredential(settings.Extraction.ApiKey),
-                new OpenAIClientOptions
-                {
-                    Endpoint = endpoint
-                });
+            configuration = new OpenRouterConfiguration(
+                settings.Extraction.ApiKey,
+                settings.Extraction.Model,
+                endpoint);
 
-            return openAiClient
-                .GetChatClient(settings.Extraction.Model)
-                .AsIChatClient();
+            return true;
         }
 
         if (IsKnownExtractionProvider(provider))
         {
-            logger.LogWarning(
-                "AI extraction provider '{Provider}' is known but not implemented yet. Falling back to NullBrewLogExtractionService.",
-                provider);
+            if (logFailures)
+            {
+                logger.LogWarning(
+                    "AI extraction provider '{Provider}' is known but not implemented yet. Falling back to null extraction features.",
+                    provider);
+            }
         }
         else
         {
-            logger.LogWarning(
-                "Unsupported AI extraction provider '{Provider}'. Falling back to NullBrewLogExtractionService.",
-                provider);
+            if (logFailures)
+            {
+                logger.LogWarning(
+                    "Unsupported AI extraction provider '{Provider}'. Falling back to null extraction features.",
+                    provider);
+            }
         }
 
-        return null;
+        configuration = default;
+        return false;
     }
 
     private static bool IsKnownExtractionProvider(string provider) =>
@@ -86,4 +126,9 @@ public sealed class ChatClientFactory(
         endpoint = null!;
         return false;
     }
+
+    private readonly record struct OpenRouterConfiguration(
+        string ApiKey,
+        string Model,
+        Uri Endpoint);
 }

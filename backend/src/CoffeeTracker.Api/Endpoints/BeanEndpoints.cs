@@ -1,14 +1,26 @@
 using CoffeeTracker.Api.Contracts;
 using CoffeeTracker.Application.Features.Beans.Commands;
+using CoffeeTracker.Application.Features.Beans.Commands.ParseBeanImage;
 using CoffeeTracker.Application.Features.Beans.Dtos;
 using CoffeeTracker.Application.Features.Beans.Queries;
+using CoffeeTracker.Infrastructure.AI;
 using MediatR;
 using Microsoft.AspNetCore.Http.HttpResults;
+using System.Net.Http.Headers;
 
 namespace CoffeeTracker.Api.Endpoints;
 
 public static class BeanEndpoints
 {
+    private const int MaxImageUploadBytes = 10 * 1024 * 1024;
+
+    private static readonly HashSet<string> SupportedImageMimeTypes = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "image/png",
+        "image/jpeg",
+        "image/webp"
+    };
+
     public static IEndpointRouteBuilder MapBeanEndpoints(this IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/beans")
@@ -28,6 +40,14 @@ public static class BeanEndpoints
 
         group.MapPatch("/{id:guid}/availability", SetBeanAvailability)
             .WithName("SetBeanAvailability");
+
+        group.MapPost("/parse-image", ParseBeanImage)
+            .WithName("ParseBeanImage")
+            .DisableAntiforgery()
+            .Accepts<IFormFile>("multipart/form-data")
+            .Produces<ParseBeanImageResponse>(StatusCodes.Status200OK)
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status501NotImplemented);
 
         return app;
     }
@@ -124,5 +144,53 @@ public static class BeanEndpoints
             cancellationToken);
 
         return TypedResults.Ok();
+    }
+
+    private static async Task<Results<Ok<ParseBeanImageResponse>, ProblemHttpResult>> ParseBeanImage(
+        IFormFile? imageFile,
+        IAiFeatureAvailability aiFeatureAvailability,
+        ISender sender,
+        CancellationToken cancellationToken)
+    {
+        if (!aiFeatureAvailability.IsImageBeanParsingAvailable)
+        {
+            return TypedResults.Problem(
+                title: "Image bean parsing is unavailable",
+                detail: "Configure extraction AI provider settings to enable this endpoint.",
+                statusCode: StatusCodes.Status501NotImplemented);
+        }
+
+        if (imageFile is null || imageFile.Length == 0)
+        {
+            return TypedResults.Problem(
+                title: "Image file is required",
+                detail: "Provide a non-empty image file in the 'imageFile' form field.",
+                statusCode: StatusCodes.Status400BadRequest);
+        }
+
+        if (!MediaTypeHeaderValue.TryParse(imageFile.ContentType, out var parsedContentType) ||
+            string.IsNullOrWhiteSpace(parsedContentType.MediaType) ||
+            !SupportedImageMimeTypes.Contains(parsedContentType.MediaType))
+        {
+            return TypedResults.Problem(
+                title: "Unsupported image MIME type",
+                detail: $"Supported MIME types: {string.Join(", ", SupportedImageMimeTypes)}.",
+                statusCode: StatusCodes.Status400BadRequest);
+        }
+
+        if (imageFile.Length > MaxImageUploadBytes)
+        {
+            return TypedResults.Problem(
+                title: "Image file is too large",
+                detail: $"Maximum upload size is {MaxImageUploadBytes} bytes.",
+                statusCode: StatusCodes.Status400BadRequest);
+        }
+
+        await using var imageStream = imageFile.OpenReadStream();
+        var result = await sender.Send(
+            new ParseBeanImageCommand(imageStream, parsedContentType.MediaType),
+            cancellationToken);
+
+        return TypedResults.Ok(ParseBeanImageResponse.FromResult(result));
     }
 }

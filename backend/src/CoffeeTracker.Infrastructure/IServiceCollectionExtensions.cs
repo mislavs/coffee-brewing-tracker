@@ -35,6 +35,9 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IAudioTranscodingService, FfmpegAudioTranscodingService>();
         services.AddSingleton<SpeechToTextClientFactory>();
         services.AddSingleton<ChatClientFactory>();
+        services.AddSingleton<DataExtractorFactory>();
+        services.AddSingleton<IDataExtractor>(serviceProvider =>
+            serviceProvider.GetRequiredService<DataExtractorFactory>().Create());
 
         services.AddSingleton<ISpeechToTextClient>(serviceProvider =>
         {
@@ -53,21 +56,25 @@ public static class ServiceCollectionExtensions
 
         services.AddSingleton<IBrewLogExtractionService>(serviceProvider =>
         {
-            var chatClient = serviceProvider.GetRequiredService<ChatClientFactory>().Create();
-            if (chatClient is null)
+            var dataExtractor = serviceProvider.GetRequiredService<IDataExtractor>();
+            if (dataExtractor is NullDataExtractor)
             {
                 return new NullBrewLogExtractionService();
             }
 
-            var wrapped = chatClient
-                .AsBuilder()
-                .UseOpenTelemetry()
-                .UseLogging()
-                .Build(serviceProvider);
-
             return ActivatorUtilities.CreateInstance<BrewLogExtractionService>(
-                serviceProvider,
-                wrapped);
+                serviceProvider);
+        });
+
+        services.AddSingleton<IBeanImageExtractionService>(serviceProvider =>
+        {
+            var dataExtractor = serviceProvider.GetRequiredService<IDataExtractor>();
+            if (dataExtractor is NullDataExtractor)
+            {
+                return new NullBeanImageExtractionService();
+            }
+
+            return ActivatorUtilities.CreateInstance<BeanImageExtractionService>(serviceProvider);
         });
 
         services.AddSingleton<IAiFeatureAvailability, AiFeatureAvailability>();

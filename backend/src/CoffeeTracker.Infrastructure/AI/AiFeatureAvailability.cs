@@ -1,37 +1,47 @@
 using System.ComponentModel;
 using System.Diagnostics;
+using CoffeeTracker.Infrastructure.AI.Extraction;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace CoffeeTracker.Infrastructure.AI;
 
-public sealed class AiFeatureAvailability(
-    IOptions<AiSettings> aiSettings,
-    ILogger<AiFeatureAvailability> logger,
-    string ffmpegExecutablePath = "ffmpeg") : IAiFeatureAvailability
+public sealed class AiFeatureAvailability : IAiFeatureAvailability
 {
-    public bool IsVoiceBrewLogParsingAvailable { get; } = ResolveAvailability(aiSettings, logger, ffmpegExecutablePath);
+    public AiFeatureAvailability(
+        IOptions<AiSettings> aiSettings,
+        ChatClientFactory chatClientFactory,
+        ILogger<AiFeatureAvailability> logger,
+        string ffmpegExecutablePath = "ffmpeg")
+    {
+        ArgumentNullException.ThrowIfNull(aiSettings);
+        ArgumentNullException.ThrowIfNull(chatClientFactory);
+        ArgumentNullException.ThrowIfNull(logger);
+        ArgumentException.ThrowIfNullOrWhiteSpace(ffmpegExecutablePath);
+
+        IsImageBeanParsingAvailable = chatClientFactory.GetAvailability().IsAvailable;
+        IsVoiceBrewLogParsingAvailable = ResolveVoiceBrewLogParsingAvailability(
+            aiSettings.Value.Transcription.Provider,
+            IsImageBeanParsingAvailable,
+            logger,
+            ffmpegExecutablePath);
+    }
+
+    public bool IsImageBeanParsingAvailable { get; }
+
+    public bool IsVoiceBrewLogParsingAvailable { get; }
 
     private static bool IsImplementedTranscriptionProvider(string? provider) =>
         !string.IsNullOrWhiteSpace(provider) &&
         provider.Equals(AiProviders.Transcription.WhisperCpp, StringComparison.OrdinalIgnoreCase);
 
-    private static bool IsImplementedExtractionProvider(string? provider) =>
-        !string.IsNullOrWhiteSpace(provider) &&
-        provider.Equals(AiProviders.Extraction.OpenRouter, StringComparison.OrdinalIgnoreCase);
-
-    private static bool ResolveAvailability(
-        IOptions<AiSettings> settings,
+    private static bool ResolveVoiceBrewLogParsingAvailability(
+        string? transcriptionProvider,
+        bool isImageBeanParsingAvailable,
         ILogger<AiFeatureAvailability> logger,
         string ffmpegExecutablePath)
     {
-        ArgumentNullException.ThrowIfNull(settings);
-        ArgumentNullException.ThrowIfNull(logger);
-        ArgumentException.ThrowIfNullOrWhiteSpace(ffmpegExecutablePath);
-
-        var isTranscriptionProviderAvailable = IsImplementedTranscriptionProvider(settings.Value.Transcription.Provider);
-        var isExtractionProviderAvailable = IsImplementedExtractionProvider(settings.Value.Extraction.Provider);
-        if (!isTranscriptionProviderAvailable || !isExtractionProviderAvailable)
+        if (!isImageBeanParsingAvailable || !IsImplementedTranscriptionProvider(transcriptionProvider))
         {
             return false;
         }

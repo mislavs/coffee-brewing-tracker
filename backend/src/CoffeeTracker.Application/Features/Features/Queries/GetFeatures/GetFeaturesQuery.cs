@@ -10,6 +10,9 @@ public sealed class GetFeaturesHandler(IAiFeatureAvailability aiFeatureAvailabil
 {
     public Task<FeaturesDto> Handle(GetFeaturesQuery request, CancellationToken cancellationToken)
     {
-        return Task.FromResult(new FeaturesDto(aiFeatureAvailability.IsVoiceBrewLogParsingAvailable));
+        return Task.FromResult(
+            new FeaturesDto(
+                aiFeatureAvailability.IsVoiceBrewLogParsingAvailable,
+                aiFeatureAvailability.IsImageBeanParsingAvailable));
     }
 }
