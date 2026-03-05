@@ -161,6 +161,53 @@ public class AiFeatureAvailabilityTests
         sut.IsVoiceBrewLogParsingAvailable.Should().BeFalse();
     }
 
+    [Fact]
+    public void IsVoiceBrewLogParsingAvailable_WhenTranscriptionProviderMissing_ShouldBeFalse()
+    {
+        // Arrange
+        var aiSettings = CreateSettings(
+            extractionProvider: AiProviders.Extraction.OpenRouter,
+            extractionApiKey: "test-key",
+            extractionModel: "test-model",
+            extractionEndpoint: "https://openrouter.ai/api/v1",
+            transcriptionProvider: null);
+        var chatClientFactory = new ChatClientFactory(aiSettings, NullLogger<ChatClientFactory>.Instance);
+
+        // Act
+        var sut = new AiFeatureAvailability(
+            aiSettings,
+            chatClientFactory,
+            NullLogger<AiFeatureAvailability>.Instance);
+
+        // Assert
+        sut.IsImageBeanParsingAvailable.Should().BeTrue();
+        sut.IsVoiceBrewLogParsingAvailable.Should().BeFalse();
+    }
+
+    [Fact]
+    public void IsVoiceBrewLogParsingAvailable_WhenFfmpegExecutableIsMissing_ShouldBeFalse()
+    {
+        // Arrange
+        var aiSettings = CreateSettings(
+            extractionProvider: AiProviders.Extraction.OpenRouter,
+            extractionApiKey: "test-key",
+            extractionModel: "test-model",
+            extractionEndpoint: "https://openrouter.ai/api/v1",
+            transcriptionProvider: AiProviders.Transcription.WhisperCpp);
+        var chatClientFactory = new ChatClientFactory(aiSettings, NullLogger<ChatClientFactory>.Instance);
+
+        // Act
+        var sut = new AiFeatureAvailability(
+            aiSettings,
+            chatClientFactory,
+            NullLogger<AiFeatureAvailability>.Instance,
+            ffmpegExecutablePath: $"definitely-missing-ffmpeg-{Guid.NewGuid():N}");
+
+        // Assert
+        sut.IsImageBeanParsingAvailable.Should().BeTrue();
+        sut.IsVoiceBrewLogParsingAvailable.Should().BeFalse();
+    }
+
     private static IOptions<AiSettings> CreateSettings(
         string? extractionProvider = AiProviders.Extraction.OpenRouter,
         string? extractionApiKey = "test-key",

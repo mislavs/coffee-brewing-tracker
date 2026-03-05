@@ -40,4 +40,51 @@ public class CountryTests
         // Assert
         country.Name.Should().Be("Colombia");
     }
+
+    [Fact]
+    public void Create_WhenIsoAlpha2IsWhitespace_StoresEmptyIsoAlpha2()
+    {
+        // Act
+        var country = Country.Create("Kenya", "   ", "404");
+
+        // Assert
+        country.IsoAlpha2.Should().BeEmpty();
+    }
+
+    [Theory]
+    [InlineData("E")]
+    [InlineData("ETH")]
+    public void Create_WhenIsoAlpha2LengthIsInvalid_ThrowsArgumentException(string isoAlpha2)
+    {
+        // Act
+        Action act = () => Country.Create("Ethiopia", isoAlpha2, "231");
+
+        // Assert
+        act.Should().Throw<ArgumentException>()
+            .WithParameterName("value");
+    }
+
+    [Fact]
+    public void Create_WhenIsoNumericCodeIsWhitespace_StoresEmptyIsoNumericCode()
+    {
+        // Act
+        var country = Country.Create("Kenya", "KE", "   ");
+
+        // Assert
+        country.IsoNumericCode.Should().BeEmpty();
+    }
+
+    [Theory]
+    [InlineData("12")]
+    [InlineData("1234")]
+    [InlineData("12A")]
+    public void Create_WhenIsoNumericCodeIsInvalid_ThrowsArgumentException(string isoNumericCode)
+    {
+        // Act
+        Action act = () => Country.Create("Ethiopia", "ET", isoNumericCode);
+
+        // Assert
+        act.Should().Throw<ArgumentException>()
+            .WithParameterName("value");
+    }
 }

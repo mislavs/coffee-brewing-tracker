@@ -112,6 +112,21 @@ public class RoasterTests
     }
 
     [Fact]
+    public void SetLogo_WhenFileNameExceedsMaxLength_ThrowsArgumentException()
+    {
+        // Arrange
+        var roaster = Roaster.Create("Kawa", "Warsaw", null);
+        var fileName = $"{new string('a', 252)}.png";
+
+        // Act
+        Action act = () => roaster.SetLogo(fileName, [1, 2, 3]);
+
+        // Assert
+        act.Should().Throw<ArgumentException>()
+            .WithParameterName("fileName");
+    }
+
+    [Fact]
     public void RemoveLogo_WhenLogoExists_ClearsLogoProperties()
     {
         // Arrange

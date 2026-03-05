@@ -179,5 +179,27 @@ public class LlmDataExtractorTests
         imageContent.Data.ToArray().Should().Equal(imageBytes);
     }
 
+    [Fact]
+    public async Task ExtractFromTextAsync_WhenResponseStartsWithCodeFenceWithoutNewline_ShouldReturnNull()
+    {
+        // Arrange
+        _chatClient.GetResponseAsync(
+                Arg.Any<IEnumerable<ChatMessage>>(),
+                Arg.Any<ChatOptions>(),
+                Arg.Any<CancellationToken>())
+            .Returns(new ChatResponse(new ChatMessage(ChatRole.Assistant, "```json")));
+
+        var sut = new LlmDataExtractor(_chatClient, _logger);
+
+        // Act
+        var result = await sut.ExtractFromTextAsync<SampleExtractionResult>(
+            "Extract fields",
+            "text",
+            TestContext.Current.CancellationToken);
+
+        // Assert
+        result.Should().BeNull();
+    }
+
     private sealed record SampleExtractionResult(string? Value);
 }
