@@ -25,7 +25,9 @@ public class DeleteRecipeHandlerTests(IntegrationTestFactory factory) : Integrat
         // Assert
         var deletedRecipe = await DbContext.Recipes
             .AsNoTracking()
-            .FirstOrDefaultAsync(entity => entity.Id == recipe.Id);
+            .FirstOrDefaultAsync(
+                entity => entity.Id == recipe.Id,
+                TestContext.Current.CancellationToken);
 
         deletedRecipe.Should().BeNull();
     }

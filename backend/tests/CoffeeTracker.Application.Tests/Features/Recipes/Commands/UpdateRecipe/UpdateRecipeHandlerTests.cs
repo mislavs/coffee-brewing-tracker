@@ -32,7 +32,9 @@ public class UpdateRecipeHandlerTests(IntegrationTestFactory factory) : Integrat
         // Assert
         var updatedRecipe = await DbContext.Recipes
             .AsNoTracking()
-            .FirstOrDefaultAsync(entity => entity.Id == recipe.Id);
+            .FirstOrDefaultAsync(
+                entity => entity.Id == recipe.Id,
+                TestContext.Current.CancellationToken);
 
         updatedRecipe.Should().NotBeNull();
         updatedRecipe!.Name.Should().Be("Updated Recipe");

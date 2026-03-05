@@ -20,7 +20,9 @@ public class CreateAccessoryHandlerTests(IntegrationTestFactory factory) : Integ
         // Assert
         var accessory = await DbContext.Accessories
             .AsNoTracking()
-            .FirstOrDefaultAsync(entity => entity.Id == accessoryId);
+            .FirstOrDefaultAsync(
+                entity => entity.Id == accessoryId,
+                TestContext.Current.CancellationToken);
 
         accessory.Should().NotBeNull();
         accessory!.Name.Should().Be("Paper Filters");
@@ -41,7 +43,9 @@ public class CreateAccessoryHandlerTests(IntegrationTestFactory factory) : Integ
         var accessory = await DbContext.Accessories
             .AsNoTracking()
             .Include(entity => entity.CompatibleBrewers)
-            .FirstOrDefaultAsync(entity => entity.Id == accessoryId);
+            .FirstOrDefaultAsync(
+                entity => entity.Id == accessoryId,
+                TestContext.Current.CancellationToken);
 
         accessory.Should().NotBeNull();
         accessory!.CompatibleBrewers.Select(entity => entity.Name)

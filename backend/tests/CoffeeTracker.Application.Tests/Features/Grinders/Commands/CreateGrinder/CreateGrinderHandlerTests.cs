@@ -17,7 +17,9 @@ public class CreateGrinderHandlerTests(IntegrationTestFactory factory) : Integra
         var grinderId = await Send(command);
 
         // Assert
-        var grinder = await DbContext.Grinders.FirstOrDefaultAsync(entity => entity.Id == grinderId);
+        var grinder = await DbContext.Grinders.FirstOrDefaultAsync(
+            entity => entity.Id == grinderId,
+            TestContext.Current.CancellationToken);
         grinder.Should().NotBeNull();
         grinder!.Name.Should().Be("Kawa Grinders");
     }

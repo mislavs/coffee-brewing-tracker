@@ -60,7 +60,9 @@ public class UpdateBrewLogHandlerTests(IntegrationTestFactory factory) : Integra
         var updatedBrewLogEntry = await DbContext.BrewLogEntries
             .AsNoTracking()
             .Include(entity => entity.Accessories)
-            .FirstOrDefaultAsync(entity => entity.Id == brewLogEntry.Id);
+            .FirstOrDefaultAsync(
+                entity => entity.Id == brewLogEntry.Id,
+                TestContext.Current.CancellationToken);
 
         updatedBrewLogEntry.Should().NotBeNull();
         updatedBrewLogEntry!.Dose.Should().Be(20m);

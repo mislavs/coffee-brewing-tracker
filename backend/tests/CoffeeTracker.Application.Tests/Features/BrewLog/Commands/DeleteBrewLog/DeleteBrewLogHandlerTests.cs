@@ -58,7 +58,9 @@ public class DeleteBrewLogHandlerTests(IntegrationTestFactory factory) : Integra
         // Assert
         var deletedBrewLogEntry = await DbContext.BrewLogEntries
             .AsNoTracking()
-            .FirstOrDefaultAsync(entity => entity.Id == brewLogEntry.Id);
+            .FirstOrDefaultAsync(
+                entity => entity.Id == brewLogEntry.Id,
+                TestContext.Current.CancellationToken);
 
         deletedBrewLogEntry.Should().BeNull();
     }

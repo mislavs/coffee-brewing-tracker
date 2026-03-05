@@ -22,7 +22,9 @@ public class UpdateBrewerHandlerTests(IntegrationTestFactory factory) : Integrat
 
         // Assert
         var updated = await DbContext.Brewers.AsNoTracking()
-            .FirstOrDefaultAsync(entity => entity.Id == brewer.Id);
+            .FirstOrDefaultAsync(
+                entity => entity.Id == brewer.Id,
+                TestContext.Current.CancellationToken);
         updated.Should().NotBeNull();
         updated!.Name.Should().Be("Kawa Brewers");
     }

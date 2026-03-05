@@ -65,7 +65,9 @@ public class UpdateBeanHandlerTests(IntegrationTestFactory factory) : Integratio
             .AsNoTracking()
             .Include(entity => entity.OriginCountries)
             .Include(entity => entity.FlavorNotes)
-            .FirstOrDefaultAsync(entity => entity.Id == bean.Id);
+            .FirstOrDefaultAsync(
+                entity => entity.Id == bean.Id,
+                TestContext.Current.CancellationToken);
 
         updatedBean.Should().NotBeNull();
         updatedBean!.Name.Should().Be("Updated Bean");

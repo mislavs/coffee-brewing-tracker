@@ -17,7 +17,9 @@ public class CreateBrewerHandlerTests(IntegrationTestFactory factory) : Integrat
         var brewerId = await Send(command);
 
         // Assert
-        var brewer = await DbContext.Brewers.FirstOrDefaultAsync(entity => entity.Id == brewerId);
+        var brewer = await DbContext.Brewers.FirstOrDefaultAsync(
+            entity => entity.Id == brewerId,
+            TestContext.Current.CancellationToken);
         brewer.Should().NotBeNull();
         brewer!.Name.Should().Be("Kawa Brewers");
     }

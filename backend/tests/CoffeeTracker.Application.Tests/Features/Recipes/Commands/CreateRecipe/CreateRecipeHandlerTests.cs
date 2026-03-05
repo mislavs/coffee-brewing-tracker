@@ -22,7 +22,9 @@ public class CreateRecipeHandlerTests(IntegrationTestFactory factory) : Integrat
         // Assert
         var recipe = await DbContext.Recipes
             .AsNoTracking()
-            .FirstOrDefaultAsync(entity => entity.Id == recipeId);
+            .FirstOrDefaultAsync(
+                entity => entity.Id == recipeId,
+                TestContext.Current.CancellationToken);
 
         recipe.Should().NotBeNull();
         recipe!.Name.Should().Be("Daily V60");

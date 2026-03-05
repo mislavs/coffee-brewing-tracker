@@ -23,7 +23,9 @@ public class UpdateAccessoryHandlerTests(IntegrationTestFactory factory) : Integ
         // Assert
         var updatedAccessory = await DbContext.Accessories
             .AsNoTracking()
-            .FirstOrDefaultAsync(entity => entity.Id == accessory.Id);
+            .FirstOrDefaultAsync(
+                entity => entity.Id == accessory.Id,
+                TestContext.Current.CancellationToken);
 
         updatedAccessory.Should().NotBeNull();
         updatedAccessory!.Name.Should().Be("Paper Filters");
@@ -51,7 +53,9 @@ public class UpdateAccessoryHandlerTests(IntegrationTestFactory factory) : Integ
         var updatedAccessory = await DbContext.Accessories
             .AsNoTracking()
             .Include(entity => entity.CompatibleBrewers)
-            .FirstOrDefaultAsync(entity => entity.Id == accessory.Id);
+            .FirstOrDefaultAsync(
+                entity => entity.Id == accessory.Id,
+                TestContext.Current.CancellationToken);
 
         updatedAccessory.Should().NotBeNull();
         updatedAccessory!.CompatibleBrewers.Should().ContainSingle();

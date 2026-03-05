@@ -22,7 +22,9 @@ public class UpdateGrinderHandlerTests(IntegrationTestFactory factory) : Integra
 
         // Assert
         var updated = await DbContext.Grinders.AsNoTracking()
-            .FirstOrDefaultAsync(entity => entity.Id == grinder.Id);
+            .FirstOrDefaultAsync(
+                entity => entity.Id == grinder.Id,
+                TestContext.Current.CancellationToken);
         updated.Should().NotBeNull();
         updated!.Name.Should().Be("Kawa Grinders");
     }

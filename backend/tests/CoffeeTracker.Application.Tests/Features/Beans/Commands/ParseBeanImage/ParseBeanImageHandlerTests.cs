@@ -51,8 +51,8 @@ public class ParseBeanImageHandlerTests(IntegrationTestFactory factory) : Integr
         result.RoastDate.Should().Be(new DateOnly(2026, 3, 1));
         result.OriginType.Should().Be(OriginType.SingleOrigin);
         result.OriginCountries.Should().Equal(["Kenya"]);
-        result.FlavorNotes.Should().Equal(["Chocolate"]);
-        result.UnmatchedReferences.Should().Equal(["RawRef", "UnknownLand", "Floral"]);
+        result.FlavorNotes.Should().Equal(["Chocolate", "Floral"]);
+        result.UnmatchedReferences.Should().Equal(["RawRef", "UnknownLand"]);
     }
 
     [Fact]

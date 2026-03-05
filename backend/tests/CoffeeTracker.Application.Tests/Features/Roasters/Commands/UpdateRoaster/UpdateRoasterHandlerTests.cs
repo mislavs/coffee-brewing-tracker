@@ -22,7 +22,9 @@ public class UpdateRoasterHandlerTests(IntegrationTestFactory factory) : Integra
 
         // Assert
         var updated = await DbContext.Roasters.AsNoTracking()
-            .FirstOrDefaultAsync(entity => entity.Id == roaster.Id);
+            .FirstOrDefaultAsync(
+                entity => entity.Id == roaster.Id,
+                TestContext.Current.CancellationToken);
         updated.Should().NotBeNull();
         updated!.Name.Should().Be("Kawa Roasters");
         updated.City.Should().Be("Krakow");

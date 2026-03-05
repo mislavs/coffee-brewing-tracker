@@ -48,16 +48,11 @@ public sealed class ParseBeanImageHandler(
             unmatchedReferences,
             unmatchedSet);
 
-        var knownFlavorNoteNames = await dbContext.FlavorNotes
-            .AsNoTracking()
-            .Select(entity => entity.Name)
-            .ToListAsync(cancellationToken);
-        
-        var flavorNotes = ResolveKnownNames(
-            extractionResult.FlavorNotes,
-            knownFlavorNoteNames,
-            unmatchedReferences,
-            unmatchedSet);
+        var flavorNotes = (extractionResult.FlavorNotes ?? [])
+            .Where(name => !string.IsNullOrWhiteSpace(name))
+            .Select(name => name.Trim())
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
 
         var originType = originCountries.Count switch
         {

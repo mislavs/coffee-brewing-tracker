@@ -25,7 +25,9 @@ public class CreateBeanHandlerTests(IntegrationTestFactory factory) : Integratio
             .Include(entity => entity.Roaster)
             .Include(entity => entity.OriginCountries)
             .Include(entity => entity.FlavorNotes)
-            .FirstOrDefaultAsync(entity => entity.Id == beanId);
+            .FirstOrDefaultAsync(
+                entity => entity.Id == beanId,
+                TestContext.Current.CancellationToken);
 
         bean.Should().NotBeNull();
         bean!.Name.Should().Be("Kenya AB");
@@ -54,7 +56,7 @@ public class CreateBeanHandlerTests(IntegrationTestFactory factory) : Integratio
             .AsNoTracking()
             .OrderBy(entity => entity.Name)
             .Select(entity => entity.Name)
-            .ToListAsync();
+            .ToListAsync(TestContext.Current.CancellationToken);
 
         flavorNoteNames.Should().ContainInOrder("Caramel", "Strawberry");
     }
@@ -75,7 +77,9 @@ public class CreateBeanHandlerTests(IntegrationTestFactory factory) : Integratio
         // Assert
         var bean = await DbContext.Beans
             .Include(entity => entity.FlavorNotes)
-            .FirstOrDefaultAsync(entity => entity.Id == beanId);
+            .FirstOrDefaultAsync(
+                entity => entity.Id == beanId,
+                TestContext.Current.CancellationToken);
 
         bean.Should().NotBeNull();
         bean!.FlavorNotes.Should().ContainSingle(entity => entity.Name == "Berry");

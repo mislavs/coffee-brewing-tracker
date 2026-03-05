@@ -17,7 +17,9 @@ public class CreateRoasterHandlerTests(IntegrationTestFactory factory) : Integra
         var roasterId = await Send(command);
 
         // Assert
-        var roaster = await DbContext.Roasters.FirstOrDefaultAsync(entity => entity.Id == roasterId);
+        var roaster = await DbContext.Roasters.FirstOrDefaultAsync(
+            entity => entity.Id == roasterId,
+            TestContext.Current.CancellationToken);
         roaster.Should().NotBeNull();
         roaster!.Name.Should().Be("Kawa");
         roaster.City.Should().Be("Warsaw");
