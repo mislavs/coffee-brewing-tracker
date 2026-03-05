@@ -1,6 +1,13 @@
 import { useMemo, useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Controller, useForm, useWatch } from 'react-hook-form'
+import {
+  Controller,
+  type Path,
+  type PathValue,
+  useForm,
+  useWatch,
+} from 'react-hook-form'
+import { ImagePlus } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import {
@@ -36,7 +43,11 @@ import {
 import {
   originTypeLabels,
   roastProfileLabels,
+  toDateInputValue,
+  toOriginTypeValue,
+  toRoastProfileValue,
 } from '@/features/beans/beanShared'
+import { ImageExtractionDialog } from '@/features/beans/components/ImageExtractionDialog'
 import { useCountries } from '@/features/beans/hooks/useCountries'
 import { useFlavorNotes } from '@/features/beans/hooks/useFlavorNotes'
 import { applyBeanFormServerErrors } from '@/features/beans/mapApiValidationErrors'
@@ -44,11 +55,13 @@ import { TagCombobox } from '@/features/beans/components/TagCombobox'
 import { useRoasters } from '@/features/roasters/hooks/useRoasters'
 import { useCreateRoaster } from '@/features/roasters/hooks/useCreateRoaster'
 import { RoasterFormCard } from '@/features/roasters/components/RoasterFormCard'
+import { useFeatures } from '@/hooks/useFeatures'
 import {
   getFieldErrorMessage,
   normalizeOptional,
 } from '@/lib/formUtils'
 import { FieldErrorText } from '@/components/FieldErrorText'
+import type { ParseBeanImageResponse } from '@/lib/api/schemas'
 import {
   type RoasterFormValues,
 } from '@/features/roasters/roasterFormSchema'
@@ -102,6 +115,7 @@ export function BeanFormCard({
     resolver: zodResolver(beanFormSchema),
     defaultValues: initialValues,
   })
+  const { data: features } = useFeatures()
   const { data: roasters = [] } = useRoasters()
   const { data: countries = [] } = useCountries()
   const { data: flavorNotes = [] } = useFlavorNotes()
@@ -109,6 +123,7 @@ export function BeanFormCard({
     useCreateRoaster()
 
   const [isCreateRoasterOpen, setIsCreateRoasterOpen] = useState(false)
+  const [isImageExtractionOpen, setIsImageExtractionOpen] = useState(false)
   const watchedRoastDate = useWatch({ control: form.control, name: 'roastDate' })
 
   const roasterOptions = useMemo(
@@ -170,12 +185,62 @@ export function BeanFormCard({
     setIsCreateRoasterOpen(false)
   }
 
+  const handleFillFromImage = (result: ParseBeanImageResponse) => {
+    const setValueOptions = { shouldDirty: true, shouldValidate: true } as const
+    const setIfPresent = <K extends keyof BeanFormValues>(
+      field: K,
+      value: PathValue<BeanFormValues, Path<BeanFormValues>> | null | undefined,
+    ) => {
+      if (value != null) {
+        form.setValue(
+          field as Path<BeanFormValues>,
+          value as PathValue<BeanFormValues, Path<BeanFormValues>>,
+          setValueOptions,
+        )
+      }
+    }
+
+    setIfPresent('name', result.beanName)
+    setIfPresent('roasterId', result.roasterId)
+
+    const originType = toOriginTypeValue(result.originType)
+    setIfPresent('originType', originType)
+    setIfPresent('originCountries', result.originCountries)
+    setIfPresent('variety', result.variety)
+    setIfPresent('processingMethod', result.processingMethod)
+
+    const roastProfile = toRoastProfileValue(result.roastProfile)
+    setIfPresent('roastProfile', roastProfile)
+
+    if (result.roastDate != null) {
+      const roastDate = toDateInputValue(result.roastDate)
+      setIfPresent('roastDate', roastDate)
+    }
+
+    setIfPresent('flavorNoteNames', result.flavorNotes)
+    setIfPresent('altitude', result.altitude)
+    setIfPresent('bagWeight', result.bagWeight)
+    setIfPresent('price', result.price)
+  }
+
   return (
     <>
       <Card>
-        <CardHeader>
-          <CardTitle>{title}</CardTitle>
-          <CardDescription>{description}</CardDescription>
+        <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <CardTitle>{title}</CardTitle>
+            <CardDescription>{description}</CardDescription>
+          </div>
+          {features?.imageBeanParsing ? (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setIsImageExtractionOpen(true)}
+            >
+              <ImagePlus className="size-4" />
+              Extract from image
+            </Button>
+          ) : null}
         </CardHeader>
         <CardContent>
           <form className="space-y-4" onSubmit={submitForm}>
@@ -477,6 +542,14 @@ export function BeanFormCard({
           />
         </DialogContent>
       </Dialog>
+
+      {isImageExtractionOpen ? (
+        <ImageExtractionDialog
+          open={isImageExtractionOpen}
+          onOpenChange={setIsImageExtractionOpen}
+          onFillForm={handleFillFromImage}
+        />
+      ) : null}
     </>
   )
 }

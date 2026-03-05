@@ -14,7 +14,7 @@ import { Input } from '@/components/ui/input'
 import { Switch } from '@/components/ui/switch'
 import { BrewLogCard } from '@/features/brew-log/components/BrewLogCard'
 import { useBrewLogs } from '@/features/brew-log/hooks/useBrewLogs'
-import { useFeatures } from '@/features/brew-log/hooks/useFeatures'
+import { useFeatures } from '@/hooks/useFeatures'
 import { useDebouncedSearchParam } from '@/hooks/useDebouncedSearchParam'
 
 export function BrewLogListPage() {

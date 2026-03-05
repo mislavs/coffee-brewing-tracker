@@ -9,7 +9,3 @@ export const brewLogQueryKeys = {
     ['brew-logs', params] as const,
   detail: (id: string) => ['brew-logs', id] as const,
 }
-
-export const featuresQueryKeys = {
-  all: ['features'] as const,
-}

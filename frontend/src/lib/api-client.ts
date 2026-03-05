@@ -9,6 +9,7 @@ import {
   getCreateBeanUrl,
   getGetBeanByIdUrl,
   getGetBeansUrl,
+  getParseBeanImageUrl,
   getSetBeanAvailabilityUrl,
   getUpdateBeanUrl,
 } from '@/lib/api/generated/beans/beans'
@@ -87,6 +88,7 @@ import type {
   GetRecipesParams,
   GrinderDto,
   GrinderSummaryDto,
+  ParseBeanImageResponse,
   ParseVoiceBrewLogResponse,
   RecipeDto,
   RecipeSummaryDto,
@@ -172,6 +174,15 @@ export const apiClient = {
           headers: jsonRequestHeaders,
           body: serializeJsonBody(request),
         }),
+      parseImage: async (imageFile: File) => {
+        const formData = new FormData()
+        formData.append('imageFile', imageFile)
+
+        return requestJson<ParseBeanImageResponse>(getParseBeanImageUrl(), {
+          method: 'POST',
+          body: formData,
+        })
+      },
       byId: (id: Guid) => ({
         get: () =>
           requestJson<BeanDto>(getGetBeanByIdUrl(id), {

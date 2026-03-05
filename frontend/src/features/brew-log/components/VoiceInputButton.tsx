@@ -1,6 +1,6 @@
 import { Mic } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { useFeatures } from '@/features/brew-log/hooks/useFeatures'
+import { useFeatures } from '@/hooks/useFeatures'
 
 type VoiceInputButtonProps = {
   onClick: () => void

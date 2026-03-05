@@ -291,6 +291,66 @@
         }
       }
     },
+    "/api/beans/parse-image": {
+      "post": {
+        "tags": [
+          "Beans"
+        ],
+        "operationId": "ParseBeanImage",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "imageFile": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              },
+              "encoding": {
+                "imageFile": {
+                  "style": "form"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ParseBeanImageResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "501": {
+            "description": "Not Implemented",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/brewers": {
       "get": {
         "tags": [
@@ -1961,6 +2021,9 @@
         "properties": {
           "voiceBrewLogParsing": {
             "type": "boolean"
+          },
+          "imageBeanParsing": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -2038,6 +2101,80 @@
         ],
         "type": "integer",
         "format": "int32"
+      },
+      "ParseBeanImageResponse": {
+        "type": "object",
+        "properties": {
+          "beanName": {
+            "type": "string",
+            "nullable": true
+          },
+          "roasterId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "roasterName": {
+            "type": "string",
+            "nullable": true
+          },
+          "originType": {
+            "$ref": "#/components/schemas/OriginType"
+          },
+          "originCountries": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "variety": {
+            "type": "string",
+            "nullable": true
+          },
+          "processingMethod": {
+            "type": "string",
+            "nullable": true
+          },
+          "roastProfile": {
+            "$ref": "#/components/schemas/RoastProfile"
+          },
+          "roastDate": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "altitude": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "bagWeight": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "price": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "flavorNotes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "unmatchedReferences": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
       },
       "ParseVoiceBrewLogResponse": {
         "type": "object",
