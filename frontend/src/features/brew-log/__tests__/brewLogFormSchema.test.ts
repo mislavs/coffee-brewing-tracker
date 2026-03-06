@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest'
-import type { BrewLogFormValues } from '@/features/brew-log/brewLogFormSchema'
-import { normalizeBrewLogFormValues } from '@/features/brew-log/brewLogFormSchema'
+import type {
+  BrewLogFormInput,
+  BrewLogFormValues,
+} from '@/features/brew-log/brewLogFormSchema'
+import {
+  brewLogFormSchema,
+  normalizeBrewLogFormValues,
+} from '@/features/brew-log/brewLogFormSchema'
 
 const beanId = '11111111-1111-1111-1111-111111111111'
 const brewerId = '22222222-2222-2222-2222-222222222222'
@@ -30,6 +36,137 @@ function buildValues(
     ...overrides,
   }
 }
+
+function buildInput(
+  overrides: Partial<BrewLogFormInput> = {},
+): BrewLogFormInput {
+  return {
+    beanId,
+    brewerId,
+    grinderId,
+    recipeId,
+    accessoryIds: [],
+    dose: '18' as never,
+    waterAmount: '300' as never,
+    waterTemperature: '94' as never,
+    grindSize: 'medium',
+    brewTimeMinutes: '3' as never,
+    brewTimeSeconds: '30' as never,
+    rating: '4' as never,
+    tastingNotes: 'balanced',
+    adjustmentIdeas: 'slightly finer',
+    brewedAt: '2025-03-05T14:30:00.000Z',
+    ...overrides,
+  }
+}
+
+function issuesFor(result: ReturnType<typeof brewLogFormSchema.safeParse>) {
+  return result.success ? [] : result.error.issues
+}
+
+describe('brewLogFormSchema', () => {
+  it('coerces required positive numbers from strings', () => {
+    const result = brewLogFormSchema.safeParse(buildInput())
+
+    expect(result.success).toBe(true)
+    if (result.success) {
+      expect(result.data.dose).toBe(18)
+      expect(result.data.waterAmount).toBe(300)
+    }
+  })
+
+  it('fails required positive numbers when empty, nullish, or zero', () => {
+    for (const value of ['', null, undefined]) {
+      const result = brewLogFormSchema.safeParse(buildInput({ dose: value as never }))
+      expect(result.success).toBe(false)
+      expect(issuesFor(result).some((issue) => issue.path[0] === 'dose')).toBe(true)
+    }
+
+    const zeroResult = brewLogFormSchema.safeParse(buildInput({ dose: 0 as never }))
+    expect(zeroResult.success).toBe(false)
+    expect(
+      issuesFor(zeroResult).some(
+        (issue) =>
+          issue.path[0] === 'dose' &&
+          issue.message === 'Dose must be greater than 0.',
+      ),
+    ).toBe(true)
+  })
+
+  it('coerces optional numbers and normalizes empty or invalid values to undefined', () => {
+    const stringResult = brewLogFormSchema.safeParse(
+      buildInput({ waterTemperature: '94' as never }),
+    )
+
+    expect(stringResult.success).toBe(true)
+    if (stringResult.success) {
+      expect(stringResult.data.waterTemperature).toBe(94)
+    }
+
+    for (const value of ['', null, 'abc']) {
+      const result = brewLogFormSchema.safeParse(
+        buildInput({ waterTemperature: value as never }),
+      )
+      expect(result.success).toBe(true)
+      if (result.success) {
+        expect(result.data.waterTemperature).toBeUndefined()
+      }
+    }
+  })
+
+  it('enforces numeric refinement boundaries', () => {
+    expect(
+      brewLogFormSchema.safeParse(buildInput({ waterTemperature: '0' as never })).success,
+    ).toBe(true)
+    expect(
+      brewLogFormSchema.safeParse(buildInput({ waterTemperature: '100' as never })).success,
+    ).toBe(true)
+    expect(
+      brewLogFormSchema.safeParse(buildInput({ waterTemperature: '101' as never }))
+        .success,
+    ).toBe(false)
+
+    expect(
+      brewLogFormSchema.safeParse(buildInput({ brewTimeSeconds: '59' as never })).success,
+    ).toBe(true)
+    expect(
+      brewLogFormSchema.safeParse(buildInput({ brewTimeSeconds: '60' as never })).success,
+    ).toBe(false)
+
+    expect(brewLogFormSchema.safeParse(buildInput({ rating: '1' as never })).success).toBe(
+      true,
+    )
+    expect(brewLogFormSchema.safeParse(buildInput({ rating: '5' as never })).success).toBe(
+      true,
+    )
+    expect(brewLogFormSchema.safeParse(buildInput({ rating: '0' as never })).success).toBe(
+      false,
+    )
+    expect(brewLogFormSchema.safeParse(buildInput({ rating: '6' as never })).success).toBe(
+      false,
+    )
+  })
+
+  it('enforces grind size length limits', () => {
+    expect(
+      brewLogFormSchema.safeParse(buildInput({ grindSize: '1234567890' })).success,
+    ).toBe(true)
+    expect(
+      brewLogFormSchema.safeParse(buildInput({ grindSize: '12345678901' })).success,
+    ).toBe(false)
+  })
+
+  it('validates brewedAt values', () => {
+    expect(brewLogFormSchema.safeParse(buildInput({ brewedAt: '' })).success).toBe(false)
+    expect(
+      brewLogFormSchema.safeParse(buildInput({ brewedAt: 'not-a-date' })).success,
+    ).toBe(false)
+    expect(
+      brewLogFormSchema.safeParse(buildInput({ brewedAt: '2025-03-05T14:30:00.000Z' }))
+        .success,
+    ).toBe(true)
+  })
+})
 
 describe('normalizeBrewLogFormValues', () => {
   it('maps form values and aggregates brew time', () => {
