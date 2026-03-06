@@ -94,4 +94,110 @@ public class WhisperCppSpeechToTextClientTests
         // Assert
         await action.Should().ThrowAsync<OperationCanceledException>();
     }
+
+    [Fact]
+    public async Task GetTextAsync_WhenTranscriptionSucceeds_ShouldReturnTranscript()
+    {
+        // Arrange
+        using var sut = new WhisperCppSpeechToTextClient(
+            processingTimeoutSeconds: 30,
+            logger: _logger,
+            audioTranscodingService: _audioTranscodingService,
+            transcriber: (_, _) => Task.FromResult("hello world"));
+        _audioTranscodingService
+            .ConvertToWaveAsync(Arg.Any<Stream>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(new MemoryStream()));
+
+        // Act
+        var response = await sut.GetTextAsync(
+            new MemoryStream([1, 2, 3]),
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        // Assert
+        response.Text.Should().Be("hello world");
+    }
+
+    [Fact]
+    public async Task GetTextAsync_WhenTimeoutIsZero_ShouldDefaultToThirtySeconds()
+    {
+        // Arrange
+        CancellationToken capturedToken = default;
+        using var sut = new WhisperCppSpeechToTextClient(
+            processingTimeoutSeconds: 0,
+            logger: _logger,
+            audioTranscodingService: _audioTranscodingService,
+            transcriber: async (_, cancellationToken) =>
+            {
+                capturedToken = cancellationToken;
+                await Task.Delay(TimeSpan.FromMilliseconds(50), cancellationToken);
+                return "transcript";
+            });
+        _audioTranscodingService
+            .ConvertToWaveAsync(Arg.Any<Stream>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(new MemoryStream()));
+
+        // Act
+        var response = await sut.GetTextAsync(
+            new MemoryStream([1, 2, 3]),
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        // Assert
+        response.Text.Should().Be("transcript");
+        capturedToken.IsCancellationRequested.Should().BeFalse();
+    }
+
+    [Fact]
+    public void GetService_WhenServiceTypeMatches_ShouldReturnSelf()
+    {
+        // Arrange
+        using var sut = new WhisperCppSpeechToTextClient(
+            processingTimeoutSeconds: 30,
+            logger: _logger,
+            audioTranscodingService: _audioTranscodingService,
+            transcriber: (_, _) => Task.FromResult("transcript"));
+
+        // Act
+        var service = sut.GetService(typeof(WhisperCppSpeechToTextClient));
+
+        // Assert
+        service.Should().BeSameAs(sut);
+    }
+
+    [Theory]
+    [InlineData(typeof(string), null)]
+    [InlineData(typeof(WhisperCppSpeechToTextClient), "some-key")]
+    public void GetService_WhenTypeDoesNotMatchOrKeyIsNotNull_ShouldReturnNull(
+        Type serviceType,
+        object? serviceKey)
+    {
+        // Arrange
+        using var sut = new WhisperCppSpeechToTextClient(
+            processingTimeoutSeconds: 30,
+            logger: _logger,
+            audioTranscodingService: _audioTranscodingService,
+            transcriber: (_, _) => Task.FromResult("transcript"));
+
+        // Act
+        var service = sut.GetService(serviceType, serviceKey);
+
+        // Assert
+        service.Should().BeNull();
+    }
+
+    [Fact]
+    public void GetService_WhenServiceTypeIsNull_ShouldThrowArgumentNullException()
+    {
+        // Arrange
+        using var sut = new WhisperCppSpeechToTextClient(
+            processingTimeoutSeconds: 30,
+            logger: _logger,
+            audioTranscodingService: _audioTranscodingService,
+            transcriber: (_, _) => Task.FromResult("transcript"));
+
+        // Act
+        Action action = () => sut.GetService(null!);
+
+        // Assert
+        action.Should().Throw<ArgumentNullException>();
+    }
 }
