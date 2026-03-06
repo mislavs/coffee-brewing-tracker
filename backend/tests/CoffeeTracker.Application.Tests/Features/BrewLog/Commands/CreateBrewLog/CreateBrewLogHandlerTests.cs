@@ -130,6 +130,34 @@ public class CreateBrewLogHandlerTests(IntegrationTestFactory factory) : Integra
             .Contain(["Scale", "Thermometer"]);
     }
 
+    [Fact]
+    public async Task Handle_WhenDoseExceedsBagWeight_ReturnsZeroRemainingBeanQuantity()
+    {
+        // Arrange
+        var (bean, brewer, grinder) = await SeedRequiredEntities("over-brew");
+        var command = new CreateBrewLogCommand(
+            bean.Id,
+            brewer.Id,
+            grinder.Id,
+            null,
+            null,
+            300m,
+            300m,
+            93m,
+            "10clicks",
+            180,
+            4,
+            "Over brewed",
+            null,
+            DateTime.UtcNow);
+
+        // Act
+        var brewLogResult = await Send(command);
+
+        // Assert
+        brewLogResult.RemainingBeanQuantity.Should().Be(0m);
+    }
+
     private async Task<(Bean Bean, Brewer Brewer, Grinder Grinder)> SeedRequiredEntities(string suffix)
     {
         var roaster = Roaster.Create($"Roaster {suffix}", null, null);

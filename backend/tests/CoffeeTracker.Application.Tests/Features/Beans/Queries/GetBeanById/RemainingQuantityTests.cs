@@ -113,6 +113,24 @@ public class RemainingQuantityTests(IntegrationTestFactory factory) : Integratio
         listedBean.RemainingQuantity.Should().Be(482m);
     }
 
+    [Fact]
+    public async Task Handle_WhenTotalDoseExceedsBagWeight_ReturnsZeroRemainingQuantity()
+    {
+        // Arrange
+        var (bean, brewer, grinder) = await SeedRequiredEntities("remaining-over-brew", 250m);
+        await Send(CreateBrewCommand(bean.Id, brewer.Id, grinder.Id, 300m));
+
+        // Act
+        var beanResult = await Send(new GetBeanByIdQuery(bean.Id));
+        var listResult = await Send(new GetBeansListQuery(null));
+
+        // Assert
+        beanResult.RemainingQuantity.Should().Be(0m);
+
+        var listedBean = listResult.Single(entity => entity.Id == bean.Id);
+        listedBean.RemainingQuantity.Should().Be(0m);
+    }
+
     private async Task<(Bean Bean, Brewer Brewer, Grinder Grinder)> SeedRequiredEntities(
         string suffix,
         decimal bagWeight)

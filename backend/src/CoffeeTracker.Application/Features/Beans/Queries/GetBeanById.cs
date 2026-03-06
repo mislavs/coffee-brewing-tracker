@@ -51,6 +51,6 @@ public sealed class GetBeanByIdHandler(ApplicationDbContext dbContext)
                 .Select(entity => new FlavorNoteDto(entity.Id, entity.Name))
                 .ToList(),
             bean.IsAvailable,
-            bean.BagWeight - totalDose);
+            Math.Max(0m, bean.BagWeight - totalDose));
     }
 }

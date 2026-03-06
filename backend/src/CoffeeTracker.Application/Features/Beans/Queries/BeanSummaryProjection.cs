@@ -18,7 +18,7 @@ public static class BeanSummaryProjection
                 ? entity.Price.Value / (entity.BagWeight / 1000m)
                 : null,
             entity.IsAvailable,
-            entity.BagWeight - (dbContext.BrewLogEntries
+            Math.Max(0m, entity.BagWeight - (dbContext.BrewLogEntries
                 .Where(entry => entry.BeanId == entity.Id)
-                .Sum(entry => (decimal?)entry.Dose) ?? 0m));
+                .Sum(entry => (decimal?)entry.Dose) ?? 0m)));
 }
