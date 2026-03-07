@@ -24,11 +24,6 @@ public class Country : IHasName
 
     public string IsoNumericCode { get; private set; } = string.Empty;
 
-    public static Country Create(string name)
-    {
-        return new Country(Guid.NewGuid(), name, string.Empty, string.Empty);
-    }
-
     public static Country Create(string name, string isoAlpha2, string isoNumericCode)
     {
         return new Country(Guid.NewGuid(), name, isoAlpha2, isoNumericCode);

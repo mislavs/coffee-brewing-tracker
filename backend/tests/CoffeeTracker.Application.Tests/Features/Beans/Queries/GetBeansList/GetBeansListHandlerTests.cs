@@ -14,8 +14,8 @@ public class GetBeansListHandlerTests(IntegrationTestFactory factory) : Integrat
         // Arrange
         var roaster = Roaster.Create("Kawa", "Warsaw", null);
         await Insert(roaster);
-        var brazil = Country.Create("Brazil");
-        var kenya = Country.Create("Kenya");
+        var brazil = Country.Create("Brazil", string.Empty, string.Empty);
+        var kenya = Country.Create("Kenya", string.Empty, string.Empty);
         await InsertMany([brazil, kenya]);
 
         var beans = new[]
@@ -43,8 +43,8 @@ public class GetBeansListHandlerTests(IntegrationTestFactory factory) : Integrat
         // Arrange
         var roaster = Roaster.Create("Kawa", "Warsaw", null);
         await Insert(roaster);
-        var kenya = Country.Create("Kenya");
-        var ethiopia = Country.Create("Ethiopia");
+        var kenya = Country.Create("Kenya", string.Empty, string.Empty);
+        var ethiopia = Country.Create("Ethiopia", string.Empty, string.Empty);
         await InsertMany([kenya, ethiopia]);
 
         var beans = new[]
@@ -70,8 +70,8 @@ public class GetBeansListHandlerTests(IntegrationTestFactory factory) : Integrat
         // Arrange
         var roaster = Roaster.Create("Kawa", "Warsaw", null);
         await Insert(roaster);
-        var kenya = Country.Create("Kenya");
-        var brazil = Country.Create("Brazil");
+        var kenya = Country.Create("Kenya", string.Empty, string.Empty);
+        var brazil = Country.Create("Brazil", string.Empty, string.Empty);
         await InsertMany([kenya, brazil]);
 
         var beans = new[]
@@ -100,8 +100,8 @@ public class GetBeansListHandlerTests(IntegrationTestFactory factory) : Integrat
         // Arrange
         var roaster = Roaster.Create("Kawa", "Warsaw", null);
         await Insert(roaster);
-        var kenya = Country.Create("Kenya");
-        var brazil = Country.Create("Brazil");
+        var kenya = Country.Create("Kenya", string.Empty, string.Empty);
+        var brazil = Country.Create("Brazil", string.Empty, string.Empty);
         await InsertMany([kenya, brazil]);
 
         var kenyaAvailable = Bean.Create(

@@ -13,9 +13,9 @@ public class GetCountriesListHandlerTests(IntegrationTestFactory factory) : Inte
         // Arrange
         var countries = new[]
         {
-            Country.Create("Kenya"),
-            Country.Create("Brazil"),
-            Country.Create("Ethiopia")
+            Country.Create("Kenya", string.Empty, string.Empty),
+            Country.Create("Brazil", string.Empty, string.Empty),
+            Country.Create("Ethiopia", string.Empty, string.Empty)
         };
         await InsertMany(countries);
         var query = new GetCountriesListQuery();

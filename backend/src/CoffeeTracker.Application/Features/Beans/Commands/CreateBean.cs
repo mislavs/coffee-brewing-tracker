@@ -1,5 +1,4 @@
 using CoffeeTracker.Application.Features.FlavorNotes;
-using CoffeeTracker.Application.Features.Countries;
 using CoffeeTracker.Domain.Entities;
 using CoffeeTracker.Domain.Enums;
 using CoffeeTracker.Domain.Exceptions;
@@ -14,7 +13,7 @@ public sealed record CreateBeanCommand(
     string Name,
     Guid RoasterId,
     OriginType OriginType,
-    IReadOnlyList<string>? OriginCountries,
+    IReadOnlyList<Guid>? OriginCountryIds,
     string? Variety,
     string? ProcessingMethod,
     RoastProfile RoastProfile,
@@ -43,7 +42,19 @@ public sealed class CreateBeanHandler(ApplicationDbContext dbContext)
         }
 
         var flavorNotes = await dbContext.ResolveFlavorNotesAsync(request.FlavorNoteNames, cancellationToken);
-        var originCountries = await dbContext.ResolveCountriesAsync(request.OriginCountries, cancellationToken);
+        var requestedOriginCountryIds = request.OriginCountryIds?
+            .Distinct()
+            .ToList() ?? [];
+        var originCountries = requestedOriginCountryIds.Count > 0
+            ? await dbContext.Countries
+                .Where(entity => requestedOriginCountryIds.Contains(entity.Id))
+                .ToListAsync(cancellationToken)
+            : [];
+
+        if (originCountries.Count != requestedOriginCountryIds.Count)
+        {
+            throw new NotFoundException("One or more origin countries were not found.");
+        }
 
         var bean = Bean.Create(
             request.Name,

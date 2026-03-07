@@ -14,8 +14,10 @@ public class CreateBeanHandlerTests(IntegrationTestFactory factory) : Integratio
     {
         // Arrange
         var roaster = Roaster.Create("Kawa", "Warsaw", null);
+        var kenya = Country.Create("Kenya", string.Empty, string.Empty);
         await Insert(roaster);
-        var command = CreateCommand(roaster.Id, ["Citrus", "Chocolate"]);
+        await Insert(kenya);
+        var command = CreateCommand(roaster.Id, kenya.Id, ["Citrus", "Chocolate"]);
 
         // Act
         var beanId = await Send(command);
@@ -45,8 +47,10 @@ public class CreateBeanHandlerTests(IntegrationTestFactory factory) : Integratio
     {
         // Arrange
         var roaster = Roaster.Create("Kawa", "Warsaw", null);
+        var kenya = Country.Create("Kenya", string.Empty, string.Empty);
         await Insert(roaster);
-        var command = CreateCommand(roaster.Id, ["Strawberry", "Caramel"]);
+        await Insert(kenya);
+        var command = CreateCommand(roaster.Id, kenya.Id, ["Strawberry", "Caramel"]);
 
         // Act
         _ = await Send(command);
@@ -66,10 +70,12 @@ public class CreateBeanHandlerTests(IntegrationTestFactory factory) : Integratio
     {
         // Arrange
         var roaster = Roaster.Create("Kawa", "Warsaw", null);
+        var kenya = Country.Create("Kenya", string.Empty, string.Empty);
         var existingFlavorNote = FlavorNote.Create("Berry");
         await Insert(roaster);
+        await Insert(kenya);
         await Insert(existingFlavorNote);
-        var command = CreateCommand(roaster.Id, ["Berry"]);
+        var command = CreateCommand(roaster.Id, kenya.Id, ["Berry"]);
 
         // Act
         var beanId = await Send(command);
@@ -86,13 +92,16 @@ public class CreateBeanHandlerTests(IntegrationTestFactory factory) : Integratio
         DbContext.FlavorNotes.Count(entity => entity.Name == "Berry").Should().Be(1);
     }
 
-    private static CreateBeanCommand CreateCommand(Guid roasterId, IReadOnlyList<string> flavorNotes)
+    private static CreateBeanCommand CreateCommand(
+        Guid roasterId,
+        Guid originCountryId,
+        IReadOnlyList<string> flavorNotes)
     {
         return new CreateBeanCommand(
             "Kenya AB",
             roasterId,
             OriginType.SingleOrigin,
-            ["Kenya"],
+            [originCountryId],
             "SL28",
             "Washed",
             RoastProfile.Filter,

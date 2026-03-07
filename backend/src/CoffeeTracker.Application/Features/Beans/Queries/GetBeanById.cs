@@ -37,7 +37,10 @@ public sealed class GetBeanByIdHandler(ApplicationDbContext dbContext)
             bean.RoasterId,
             bean.Roaster.Name,
             bean.OriginType,
-            bean.OriginCountries.Select(country => country.Name).ToList(),
+            bean.OriginCountries
+                .OrderBy(country => country.Name)
+                .Select(country => new BeanOriginCountryDto(country.Id, country.Name))
+                .ToList(),
             bean.Variety,
             bean.ProcessingMethod,
             bean.RoastProfile,

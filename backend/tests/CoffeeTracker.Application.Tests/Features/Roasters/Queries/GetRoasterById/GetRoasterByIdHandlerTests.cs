@@ -13,7 +13,7 @@ public class GetRoasterByIdHandlerTests(IntegrationTestFactory factory) : Integr
     public async Task Handle_WhenRoasterExists_ReturnsRoasterDetails()
     {
         // Arrange
-        var country = Country.Create("Poland");
+        var country = Country.Create("Poland", string.Empty, string.Empty);
         await Insert(country);
         var roaster = Roaster.Create("Kawa", "Warsaw", country.Id);
         await Insert(roaster);
@@ -43,12 +43,12 @@ public class GetRoasterByIdHandlerTests(IntegrationTestFactory factory) : Integr
     public async Task Handle_WhenRoasterHasBeans_ReturnsBeanSummariesAndStats()
     {
         // Arrange
-        var country = Country.Create("Poland");
+        var country = Country.Create("Poland", string.Empty, string.Empty);
         await Insert(country);
         var roaster = Roaster.Create("Kawa", "Warsaw", country.Id);
         await Insert(roaster);
-        var kenya = Country.Create("Kenya");
-        var ethiopia = Country.Create("Ethiopia");
+        var kenya = Country.Create("Kenya", string.Empty, string.Empty);
+        var ethiopia = Country.Create("Ethiopia", string.Empty, string.Empty);
         await InsertMany([kenya, ethiopia]);
 
         var beanA = Bean.Create(

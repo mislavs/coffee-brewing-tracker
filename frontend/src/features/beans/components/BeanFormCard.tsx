@@ -67,6 +67,7 @@ import {
 } from '@/features/roasters/roasterFormSchema'
 
 const createRoasterValue = '__create_roaster__'
+const noRoasterValue = '__no_roaster__'
 
 function toDistinctOptions(values: (string | null | undefined)[]) {
   const distinct: string[] = []
@@ -142,19 +143,48 @@ export function BeanFormCard({
   )
 
   const countryOptions = useMemo(
-    () => toDistinctOptions(countries.map((country) => country.name)),
+    () =>
+      countries
+        .map((country) => {
+          const id = country.id?.trim()
+          const name = country.name?.trim()
+
+          return id && name ? { id, name } : null
+        })
+        .filter((country): country is { id: string; name: string } => Boolean(country)),
     [countries],
+  )
+  const countryIdToName = useMemo(
+    () => new Map(countryOptions.map((country) => [country.id, country.name])),
+    [countryOptions],
+  )
+  const countryNameToId = useMemo(
+    () =>
+      new Map(countryOptions.map((country) => [country.name.toLowerCase(), country.id])),
+    [countryOptions],
   )
   const flavorNoteOptions = useMemo(
     () => toDistinctOptions(flavorNotes.map((note) => note.name)),
     [flavorNotes],
   )
-  const originCountriesError = getFieldErrorMessage(
-    form.formState.errors.originCountries,
+  const originCountryIdsError = getFieldErrorMessage(
+    form.formState.errors.originCountryIds,
   )
   const flavorNotesError = getFieldErrorMessage(
     form.formState.errors.flavorNoteNames,
   )
+
+  const toCountryNames = (countryIds: string[]) =>
+    countryIds.flatMap((countryId) => {
+      const name = countryIdToName.get(countryId)
+      return name ? [name] : []
+    })
+
+  const toCountryIds = (countryNames: string[]) =>
+    countryNames.flatMap((countryName) => {
+      const countryId = countryNameToId.get(countryName.trim().toLowerCase())
+      return countryId ? [countryId] : []
+    })
 
   const submitForm = form.handleSubmit(async (values) => {
     form.clearErrors('root.serverError')
@@ -205,7 +235,9 @@ export function BeanFormCard({
 
     const originType = toOriginTypeValue(result.originType)
     setIfPresent('originType', originType)
-    setIfPresent('originCountries', result.originCountries)
+    if (result.originCountries != null) {
+      setIfPresent('originCountryIds', toCountryIds(result.originCountries))
+    }
     setIfPresent('variety', result.variety)
     setIfPresent('processingMethod', result.processingMethod)
 
@@ -261,8 +293,13 @@ export function BeanFormCard({
                 name="roasterId"
                 render={({ field }) => (
                   <Select
-                    value={field.value || undefined}
+                    value={field.value || noRoasterValue}
                     onValueChange={(nextValue) => {
+                      if (nextValue === noRoasterValue) {
+                        field.onChange('')
+                        return
+                      }
+
                       if (nextValue === createRoasterValue) {
                         setIsCreateRoasterOpen(true)
                         return
@@ -275,6 +312,9 @@ export function BeanFormCard({
                       <SelectValue placeholder="Select a roaster" />
                     </SelectTrigger>
                     <SelectContent>
+                      <SelectItem value={noRoasterValue}>
+                        Select a roaster
+                      </SelectItem>
                       <SelectItem value={createRoasterValue}>
                         + Create roaster
                       </SelectItem>
@@ -354,20 +394,21 @@ export function BeanFormCard({
               <label className="text-sm font-medium">Origin Countries</label>
               <Controller
                 control={form.control}
-                name="originCountries"
+                name="originCountryIds"
                 render={({ field }) => (
                   <TagCombobox
-                    placeholder="Select or create countries"
+                    placeholder="Select countries"
                     searchPlaceholder="Search countries..."
                     emptyMessage="No countries found."
                     createLabel={(value) => `Create "${value}"`}
-                    values={field.value ?? []}
-                    options={countryOptions}
-                    onChange={field.onChange}
+                    allowCreate={false}
+                    values={toCountryNames(field.value ?? [])}
+                    options={countryOptions.map((country) => country.name)}
+                    onChange={(values) => field.onChange(toCountryIds(values))}
                   />
                 )}
               />
-              <FieldErrorText message={originCountriesError} />
+              <FieldErrorText message={originCountryIdsError} />
             </div>
 
             <div className="space-y-2">

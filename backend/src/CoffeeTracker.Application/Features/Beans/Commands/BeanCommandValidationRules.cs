@@ -11,7 +11,7 @@ public interface IBeanCommand
     string Name { get; }
     Guid RoasterId { get; }
     OriginType OriginType { get; }
-    IReadOnlyList<string>? OriginCountries { get; }
+    IReadOnlyList<Guid>? OriginCountryIds { get; }
     string? Variety { get; }
     string? ProcessingMethod { get; }
     RoastProfile RoastProfile { get; }
@@ -57,10 +57,9 @@ public sealed class BeanCommandValidationRules<T> : AbstractValidator<T>
             .GreaterThan(0)
             .When(c => c.Altitude.HasValue);
 
-        RuleForEach(c => c.OriginCountries!)
+        RuleForEach(c => c.OriginCountryIds!)
             .NotEmpty()
-            .MaximumLength(100)
-            .When(c => c.OriginCountries is not null);
+            .When(c => c.OriginCountryIds is not null);
 
         RuleForEach(c => c.FlavorNoteNames!)
             .NotEmpty()

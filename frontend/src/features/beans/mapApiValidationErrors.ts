@@ -6,7 +6,7 @@ const beanFieldNames: Record<string, keyof BeanFormValues> = {
   name: 'name',
   roasterId: 'roasterId',
   originType: 'originType',
-  originCountries: 'originCountries',
+  originCountryIds: 'originCountryIds',
   variety: 'variety',
   processingMethod: 'processingMethod',
   roastProfile: 'roastProfile',

@@ -9,7 +9,7 @@ public sealed record BeanDto(
     Guid RoasterId,
     string RoasterName,
     OriginType OriginType,
-    IReadOnlyList<string> OriginCountries,
+    IReadOnlyList<BeanOriginCountryDto> OriginCountries,
     string? Variety,
     string? ProcessingMethod,
     RoastProfile RoastProfile,

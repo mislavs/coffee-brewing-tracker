@@ -21,6 +21,7 @@ type TagComboboxProps = {
   searchPlaceholder: string
   emptyMessage: string
   createLabel: (value: string) => string
+  allowCreate?: boolean
   values: string[]
   options: string[]
   onChange: (values: string[]) => void
@@ -61,6 +62,7 @@ export function TagCombobox({
   searchPlaceholder,
   emptyMessage,
   createLabel,
+  allowCreate = true,
   values,
   options,
   onChange,
@@ -77,18 +79,21 @@ export function TagCombobox({
     [normalizedValues],
   )
 
+  const normalizedOptions = useMemo(() => normalizeDistinct(options), [options])
+
   const filteredOptions = useMemo(() => {
     const normalizedQuery = normalize(query)
 
-    return normalizeDistinct(options)
+    return normalizedOptions
       .filter((option) => !normalizedValueSet.has(option.toLowerCase()))
       .filter((option) =>
         normalizedQuery ? includesIgnoreCase(option, normalizedQuery) : true,
       )
-  }, [normalizedValueSet, options, query])
+  }, [normalizedOptions, normalizedValueSet, query])
 
   const normalizedQuery = normalize(query)
   const canCreate =
+    allowCreate &&
     normalizedQuery.length > 0 &&
     !normalizedValueSet.has(normalizedQuery.toLowerCase()) &&
     !filteredOptions.some(
@@ -142,7 +147,18 @@ export function TagCombobox({
               onKeyDown={(event) => {
                 if (event.key === 'Enter' && normalizedQuery) {
                   event.preventDefault()
-                  addValue(normalizedQuery)
+                  const matchingOption = normalizedOptions.find(
+                    (option) => option.toLowerCase() === normalizedQuery.toLowerCase(),
+                  )
+
+                  if (matchingOption) {
+                    addValue(matchingOption)
+                    return
+                  }
+
+                  if (allowCreate) {
+                    addValue(normalizedQuery)
+                  }
                 }
               }}
               placeholder={searchPlaceholder}

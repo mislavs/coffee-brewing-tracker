@@ -1,18 +1,20 @@
 import { describe, expect, it } from 'vitest'
 import {
   beanFormSchema,
+  normalizeDistinctIdList,
   normalizeDistinctNameList,
   toOptionalDateOnly,
 } from '@/features/beans/beanFormSchema'
 
 const roasterId = '11111111-1111-1111-1111-111111111111'
+const countryId = '22222222-2222-2222-2222-222222222222'
 
 function buildInput(overrides: Record<string, unknown> = {}) {
   return {
     name: 'Test bean',
     roasterId,
     originType: '0',
-    originCountries: ['Brazil'],
+    originCountryIds: [countryId],
     variety: 'Bourbon',
     processingMethod: 'Washed',
     roastProfile: '2',
@@ -105,7 +107,7 @@ describe('beanFormSchema', () => {
   it('applies defaults for omitted array and boolean fields', () => {
     const result = beanFormSchema.safeParse(
       buildInput({
-        originCountries: undefined,
+        originCountryIds: undefined,
         flavorNoteNames: undefined,
         isAvailable: undefined,
       }),
@@ -113,7 +115,7 @@ describe('beanFormSchema', () => {
 
     expect(result.success).toBe(true)
     if (result.success) {
-      expect(result.data.originCountries).toEqual([])
+      expect(result.data.originCountryIds).toEqual([])
       expect(result.data.flavorNoteNames).toEqual([])
       expect(result.data.isAvailable).toBe(true)
     }
@@ -133,6 +135,19 @@ describe('beanFormSchema helpers', () => {
           ' Citrus',
         ]),
       ).toEqual(['Chocolate', 'Berry', 'Citrus'])
+    })
+  })
+
+  describe('normalizeDistinctIdList', () => {
+    it('trims values, removes blanks and deduplicates case-insensitively', () => {
+      expect(
+        normalizeDistinctIdList([
+          ` ${countryId} `,
+          countryId.toUpperCase(),
+          '   ',
+          '33333333-3333-3333-3333-333333333333',
+        ]),
+      ).toEqual([countryId, '33333333-3333-3333-3333-333333333333'])
     })
   })
 

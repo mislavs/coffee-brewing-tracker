@@ -14,8 +14,8 @@ public class GetCountryBeansListHandlerTests(IntegrationTestFactory factory) : I
     {
         // Arrange
         var roaster = Roaster.Create("Kawa", "Warsaw", null);
-        var kenya = Country.Create("Kenya");
-        var ethiopia = Country.Create("Ethiopia");
+        var kenya = Country.Create("Kenya", string.Empty, string.Empty);
+        var ethiopia = Country.Create("Ethiopia", string.Empty, string.Empty);
         await Insert(roaster);
         await InsertMany([kenya, ethiopia]);
 

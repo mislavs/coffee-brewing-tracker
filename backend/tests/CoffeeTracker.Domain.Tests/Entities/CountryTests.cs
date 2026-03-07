@@ -6,19 +6,6 @@ namespace CoffeeTracker.Domain.Tests.Entities;
 public class CountryTests
 {
     [Fact]
-    public void Create_WhenCalledWithNameOnly_SetsDefaultIsoCodes()
-    {
-        // Act
-        var country = Country.Create("Kenya");
-
-        // Assert
-        country.Id.Should().NotBe(Guid.Empty);
-        country.Name.Should().Be("Kenya");
-        country.IsoAlpha2.Should().BeEmpty();
-        country.IsoNumericCode.Should().BeEmpty();
-    }
-
-    [Fact]
     public void Create_WhenCalledWithIsoCodes_SetsNormalizedValues()
     {
         // Act
@@ -35,7 +22,7 @@ public class CountryTests
     public void Create_WhenNameContainsWhitespace_StoresTrimmedName()
     {
         // Act
-        var country = Country.Create("  Colombia  ");
+        var country = Country.Create("  Colombia  ", string.Empty, string.Empty);
 
         // Assert
         country.Name.Should().Be("Colombia");

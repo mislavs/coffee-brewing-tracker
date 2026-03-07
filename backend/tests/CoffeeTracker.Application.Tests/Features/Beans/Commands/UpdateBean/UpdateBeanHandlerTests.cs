@@ -19,9 +19,9 @@ public class UpdateBeanHandlerTests(IntegrationTestFactory factory) : Integratio
         var citrus = FlavorNote.Create("Citrus");
         var chocolate = FlavorNote.Create("Chocolate");
         var floral = FlavorNote.Create("Floral");
-        var kenya = Country.Create("Kenya");
-        var brazil = Country.Create("Brazil");
-        var ethiopia = Country.Create("Ethiopia");
+        var kenya = Country.Create("Kenya", string.Empty, string.Empty);
+        var brazil = Country.Create("Brazil", string.Empty, string.Empty);
+        var ethiopia = Country.Create("Ethiopia", string.Empty, string.Empty);
         await InsertMany([roasterA, roasterB]);
         await InsertMany([citrus, chocolate, floral]);
         await InsertMany([kenya, brazil, ethiopia]);
@@ -46,7 +46,7 @@ public class UpdateBeanHandlerTests(IntegrationTestFactory factory) : Integratio
             "Updated Bean",
             roasterB.Id,
             OriginType.Blend,
-            ["Brazil", "Ethiopia"],
+            [brazil.Id, ethiopia.Id],
             "Bourbon",
             "Natural",
             RoastProfile.Espresso,
@@ -89,7 +89,7 @@ public class UpdateBeanHandlerTests(IntegrationTestFactory factory) : Integratio
             "Updated Bean",
             Guid.NewGuid(),
             OriginType.SingleOrigin,
-            ["Kenya"],
+            [Guid.NewGuid()],
             "Bourbon",
             "Natural",
             RoastProfile.Filter,

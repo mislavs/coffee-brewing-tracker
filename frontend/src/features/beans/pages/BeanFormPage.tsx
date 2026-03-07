@@ -3,6 +3,7 @@ import { Navigate, useNavigate } from 'react-router-dom'
 import type { CreateBeanRequest, UpdateBeanRequest } from '@/lib/api/schemas'
 import { BeanFormCard } from '@/features/beans/components/BeanFormCard'
 import {
+  normalizeDistinctIdList,
   normalizeDistinctNameList,
   toOptionalDateOnly,
   type BeanFormValues,
@@ -14,15 +15,15 @@ import { useUpdateBean } from '@/features/beans/hooks/useUpdateBean'
 import { useEntityFormId } from '@/lib/useEntityFormId'
 
 function toBeanRequestBase(values: BeanFormValues): CreateBeanRequest {
-  const normalizedOriginCountries = normalizeDistinctNameList(values.originCountries)
+  const normalizedOriginCountryIds = normalizeDistinctIdList(values.originCountryIds)
   const normalizedFlavorNotes = normalizeDistinctNameList(values.flavorNoteNames)
 
   return {
     name: values.name.trim(),
     roasterId: values.roasterId as Guid,
     originType: values.originType as CreateBeanRequest['originType'],
-    originCountries:
-      normalizedOriginCountries.length > 0 ? normalizedOriginCountries : undefined,
+    originCountryIds:
+      normalizedOriginCountryIds.length > 0 ? normalizedOriginCountryIds : undefined,
     variety: values.variety,
     processingMethod: values.processingMethod,
     roastProfile: values.roastProfile as CreateBeanRequest['roastProfile'],
@@ -61,7 +62,7 @@ function CreateBeanForm() {
         name: '',
         roasterId: '',
         originType: 0,
-        originCountries: [],
+        originCountryIds: [],
         variety: '',
         processingMethod: '',
         roastProfile: 0,
@@ -96,7 +97,10 @@ function EditBeanForm({ beanId }: { beanId: Guid }) {
         name: bean.name ?? '',
         roasterId: bean.roasterId ?? '',
         originType: bean.originType === 1 ? 1 : 0,
-        originCountries: bean.originCountries ?? [],
+        originCountryIds:
+          bean.originCountries
+            ?.map((country) => country.id?.trim() ?? '')
+            .filter((countryId) => countryId.length > 0) ?? [],
         variety: bean.variety ?? '',
         processingMethod: bean.processingMethod ?? '',
         roastProfile: bean.roastProfile ?? 0,

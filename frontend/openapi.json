@@ -1361,7 +1361,7 @@
           "originCountries": {
             "type": "array",
             "items": {
-              "type": "string"
+              "$ref": "#/components/schemas/BeanOriginCountryDto"
             },
             "nullable": true
           },
@@ -1413,6 +1413,20 @@
           "remainingQuantity": {
             "type": "number",
             "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "BeanOriginCountryDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -1756,10 +1770,11 @@
           "originType": {
             "$ref": "#/components/schemas/OriginType"
           },
-          "originCountries": {
+          "originCountryIds": {
             "type": "array",
             "items": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             },
             "nullable": true
           },
@@ -2572,10 +2587,11 @@
           "originType": {
             "$ref": "#/components/schemas/OriginType"
           },
-          "originCountries": {
+          "originCountryIds": {
             "type": "array",
             "items": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             },
             "nullable": true
           },

@@ -16,7 +16,7 @@ public class ParseBeanImageHandlerTests(IntegrationTestFactory factory) : Integr
         // Arrange
         var roaster = Roaster.Create("Known Roaster", "Warsaw", null);
         await Insert(roaster);
-        await Insert(Country.Create("Kenya"));
+        await Insert(Country.Create("Kenya", string.Empty, string.Empty));
         await Insert(FlavorNote.Create("Chocolate"));
 
         var extractionService = Substitute.For<IBeanImageExtractionService>();

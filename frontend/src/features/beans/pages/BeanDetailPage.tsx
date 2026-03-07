@@ -68,11 +68,23 @@ function BeanDetailContent({ beanId }: { beanId: Guid }) {
                 <DetailField label="Origin Countries" stacked>
                   {bean.originCountries && bean.originCountries.length > 0 ? (
                     <div className="flex flex-wrap gap-2">
-                      {bean.originCountries.map((country) => (
-                        <Badge key={country} variant="secondary">
-                          {country}
-                        </Badge>
-                      ))}
+                      {bean.originCountries
+                        .map((country) => {
+                          const countryName = country.name?.trim()
+                          if (!countryName) {
+                            return null
+                          }
+
+                          return (
+                            <Badge
+                              key={country.id ?? countryName}
+                              variant="secondary"
+                            >
+                              {countryName}
+                            </Badge>
+                          )
+                        })
+                        .filter(Boolean)}
                     </div>
                   ) : (
                     <p className="text-muted-foreground">No origin countries set.</p>

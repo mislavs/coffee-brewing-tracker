@@ -6,7 +6,7 @@ public sealed record CreateBeanRequest(
     string Name,
     Guid RoasterId,
     OriginType OriginType,
-    IReadOnlyList<string>? OriginCountries,
+    IReadOnlyList<Guid>? OriginCountryIds,
     string? Variety,
     string? ProcessingMethod,
     RoastProfile RoastProfile,

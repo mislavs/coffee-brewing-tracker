@@ -92,7 +92,7 @@ public class CreateBeanValidatorTests
             "Kenya AB",
             Guid.NewGuid(),
             OriginType.SingleOrigin,
-            ["Kenya"],
+            [Guid.NewGuid()],
             "SL28",
             "Washed",
             RoastProfile.Filter,

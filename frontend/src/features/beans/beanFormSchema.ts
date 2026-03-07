@@ -44,7 +44,7 @@ export const beanFormSchema = z.object({
     .number()
     .int()
     .refine((value) => value === 0 || value === 1, 'Choose a valid origin type.'),
-  originCountries: z.array(z.string().trim().min(1)).default([]),
+  originCountryIds: z.array(z.string().trim().min(1)).default([]),
   variety: optionalTrimmedStringSchema,
   processingMethod: optionalTrimmedStringSchema,
   roastProfile: z.coerce
@@ -72,6 +72,28 @@ export type BeanFormInput = z.input<typeof beanFormSchema>
 export type BeanFormValues = z.output<typeof beanFormSchema>
 
 export function normalizeDistinctNameList(values: string[]) {
+  const seen = new Set<string>()
+  const normalized: string[] = []
+
+  for (const value of values) {
+    const trimmed = value.trim()
+    if (!trimmed) {
+      continue
+    }
+
+    const key = trimmed.toLowerCase()
+    if (seen.has(key)) {
+      continue
+    }
+
+    seen.add(key)
+    normalized.push(trimmed)
+  }
+
+  return normalized
+}
+
+export function normalizeDistinctIdList(values: string[]) {
   const seen = new Set<string>()
   const normalized: string[] = []
 

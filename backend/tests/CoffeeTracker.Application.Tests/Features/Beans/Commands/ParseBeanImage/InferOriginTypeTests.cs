@@ -38,7 +38,7 @@ public class InferOriginTypeTests(IntegrationTestFactory factory) : IntegrationT
     public async Task Handle_WhenSingleOriginCountryResolved_ShouldReturnSingleOrigin()
     {
         // Arrange
-        await Insert(Country.Create("Kenya"));
+        await Insert(Country.Create("Kenya", string.Empty, string.Empty));
 
         var extractionService = Substitute.For<IBeanImageExtractionService>();
         extractionService.ExtractAsync(
@@ -64,7 +64,10 @@ public class InferOriginTypeTests(IntegrationTestFactory factory) : IntegrationT
     public async Task Handle_WhenMultipleOriginCountriesResolved_ShouldReturnBlend()
     {
         // Arrange
-        await InsertMany([Country.Create("Kenya"), Country.Create("Ethiopia")]);
+        await InsertMany([
+            Country.Create("Kenya", string.Empty, string.Empty),
+            Country.Create("Ethiopia", string.Empty, string.Empty)
+        ]);
 
         var extractionService = Substitute.For<IBeanImageExtractionService>();
         extractionService.ExtractAsync(

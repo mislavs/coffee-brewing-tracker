@@ -14,7 +14,7 @@ public class GetBeanByIdHandlerTests(IntegrationTestFactory factory) : Integrati
     {
         // Arrange
         var roaster = Roaster.Create("Kawa", "Warsaw", null);
-        var kenya = Country.Create("Kenya");
+        var kenya = Country.Create("Kenya", string.Empty, string.Empty);
         var citrus = FlavorNote.Create("Citrus");
         var chocolate = FlavorNote.Create("Chocolate");
         await Insert(roaster);
@@ -46,7 +46,9 @@ public class GetBeanByIdHandlerTests(IntegrationTestFactory factory) : Integrati
         result.Name.Should().Be("Kenya AB");
         result.RoasterId.Should().Be(roaster.Id);
         result.RoasterName.Should().Be("Kawa");
-        result.OriginCountries.Should().ContainSingle("Kenya");
+        result.OriginCountries.Should().ContainSingle();
+        result.OriginCountries.Single().Id.Should().Be(kenya.Id);
+        result.OriginCountries.Single().Name.Should().Be("Kenya");
         result.PricePerKg.Should().Be(160m);
         result.RemainingQuantity.Should().Be(250m);
         result.FlavorNotes.Select(entity => entity.Name)
