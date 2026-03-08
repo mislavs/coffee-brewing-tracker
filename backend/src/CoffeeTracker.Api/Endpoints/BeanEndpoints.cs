@@ -1,4 +1,4 @@
-using CoffeeTracker.Api.Contracts;
+using CoffeeTracker.Api.Contracts.Beans;
 using CoffeeTracker.Application.Features.Beans.Commands;
 using CoffeeTracker.Application.Features.Beans.Commands.ParseBeanImage;
 using CoffeeTracker.Application.Features.Beans.Dtos;

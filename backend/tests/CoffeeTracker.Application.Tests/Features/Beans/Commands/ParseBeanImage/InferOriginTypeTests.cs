@@ -1,7 +1,7 @@
 using CoffeeTracker.Application.Features.Beans.Commands.ParseBeanImage;
 using CoffeeTracker.Domain.Entities;
 using CoffeeTracker.Domain.Enums;
-using CoffeeTracker.Infrastructure.AI.Extraction;
+using CoffeeTracker.Infrastructure.AI.Extraction.BeanImage;
 using FluentAssertions;
 using NSubstitute;
 

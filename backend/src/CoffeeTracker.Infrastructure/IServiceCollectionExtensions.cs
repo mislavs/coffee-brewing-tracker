@@ -1,6 +1,8 @@
 using CoffeeTracker.Infrastructure.Persistence;
 using CoffeeTracker.Infrastructure.AI;
-using CoffeeTracker.Infrastructure.AI.Extraction;
+using CoffeeTracker.Infrastructure.AI.Extraction.BeanImage;
+using CoffeeTracker.Infrastructure.AI.Extraction.BrewLog;
+using CoffeeTracker.Infrastructure.AI.Extraction.Shared;
 using CoffeeTracker.Infrastructure.AI.Transcription;
 using CoffeeTracker.Infrastructure.AI.Transcription.Providers.WhisperCpp;
 using Microsoft.EntityFrameworkCore;

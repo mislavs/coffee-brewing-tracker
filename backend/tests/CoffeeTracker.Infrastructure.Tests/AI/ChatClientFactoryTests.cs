@@ -1,5 +1,5 @@
 using CoffeeTracker.Infrastructure.AI;
-using CoffeeTracker.Infrastructure.AI.Extraction;
+using CoffeeTracker.Infrastructure.AI.Extraction.Shared;
 using FluentAssertions;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;

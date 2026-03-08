@@ -1,4 +1,4 @@
-using CoffeeTracker.Api.Contracts;
+using CoffeeTracker.Api.Contracts.Brewers;
 using CoffeeTracker.Application.Features.Brewers.Commands;
 using CoffeeTracker.Application.Features.Brewers.Dtos;
 using CoffeeTracker.Application.Features.Brewers.Queries;

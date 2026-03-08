@@ -1,6 +1,6 @@
 using System.ComponentModel;
 using System.Diagnostics;
-using CoffeeTracker.Infrastructure.AI.Extraction;
+using CoffeeTracker.Infrastructure.AI.Extraction.Shared;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 

@@ -1,4 +1,5 @@
-using CoffeeTracker.Infrastructure.AI.Extraction;
+using CoffeeTracker.Infrastructure.AI.Extraction.BrewLog;
+using CoffeeTracker.Infrastructure.AI.Extraction.Shared;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using NSubstitute;

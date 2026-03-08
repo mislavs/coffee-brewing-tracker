@@ -1,4 +1,4 @@
-using CoffeeTracker.Api.Contracts;
+using CoffeeTracker.Api.Contracts.Grinders;
 using CoffeeTracker.Application.Features.Grinders.Commands;
 using CoffeeTracker.Application.Features.Grinders.Dtos;
 using CoffeeTracker.Application.Features.Grinders.Queries;

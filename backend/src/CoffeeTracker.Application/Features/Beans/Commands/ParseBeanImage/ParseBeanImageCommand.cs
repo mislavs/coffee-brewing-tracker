@@ -1,7 +1,7 @@
 using System.Globalization;
 using CoffeeTracker.Application.Features.Beans.Dtos;
 using CoffeeTracker.Domain.Enums;
-using CoffeeTracker.Infrastructure.AI.Extraction;
+using CoffeeTracker.Infrastructure.AI.Extraction.BeanImage;
 using CoffeeTracker.Infrastructure.Persistence;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
