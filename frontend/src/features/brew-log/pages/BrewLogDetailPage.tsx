@@ -50,6 +50,9 @@ function BrewLogDetailContent({ brewLogId }: { brewLogId: Guid }) {
             <Button asChild>
               <Link to={`/brew-log/${brewLogId}/edit`}>Edit</Link>
             </Button>
+            <Button variant="outline" asChild>
+              <Link to={`/brew-log/new?repeatFrom=${brewLogId}`}>Repeat</Link>
+            </Button>
             <Button
               type="button"
               variant="destructive"

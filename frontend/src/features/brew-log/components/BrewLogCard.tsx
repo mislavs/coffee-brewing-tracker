@@ -1,4 +1,6 @@
+import { Repeat } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { Button } from '@/components/ui/button'
 import type { BrewLogSummaryDto } from '@/lib/api/schemas'
 import { formatDateTime } from '@/lib/date'
 import { Badge } from '@/components/ui/badge'
@@ -8,6 +10,12 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
 import { formatBrewTime, getRatingDisplay } from '@/features/brew-log/formatters'
 
 type BrewLogCardProps = {
@@ -42,9 +50,28 @@ export function BrewLogCard({ brewLog }: BrewLogCardProps) {
   return (
     <Card className="h-full py-4">
       <CardHeader className="space-y-1 px-3 pt-2.5 pb-0.5">
-        <Badge variant="secondary" className="w-fit">
-          {formatDateTime(brewLog.brewedAt)}
-        </Badge>
+        <div className="flex items-start justify-between gap-2">
+          <Badge variant="secondary" className="w-fit">
+            {formatDateTime(brewLog.brewedAt)}
+          </Badge>
+          {brewLog.id ? (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="ghost" size="icon-sm" asChild>
+                    <Link
+                      to={`/brew-log/new?repeatFrom=${brewLog.id}`}
+                      aria-label={`Repeat brew for ${beanDisplayName}`}
+                    >
+                      <Repeat className="size-4" />
+                    </Link>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Repeat brew</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          ) : null}
+        </div>
         <CardTitle className="text-base leading-none">
           {brewLog.id ? (
             <Link to={`/brew-log/${brewLog.id}`} className="hover:underline">

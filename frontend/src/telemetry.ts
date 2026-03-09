@@ -50,7 +50,9 @@ export function initializeTelemetry(
   const attributes = parseDelimitedValues(resourceAttributes)
   attributes[ATTR_SERVICE_NAME] = serviceName.trim() || 'frontend'
   const spanProcessors = [new SimpleSpanProcessor(exporter)]
-  if (import.meta.env.DEV) {
+  // Keep OTLP export enabled, but only mirror spans to the browser console
+  // when explicitly requested during local debugging.
+  if (import.meta.env.DEV && import.meta.env.VITE_OTEL_CONSOLE_EXPORT === 'true') {
     spanProcessors.unshift(new SimpleSpanProcessor(new ConsoleSpanExporter()))
   }
 

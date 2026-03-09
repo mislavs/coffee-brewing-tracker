@@ -20,6 +20,8 @@ import { BrewLogFormCard } from '@/features/brew-log/components/BrewLogFormCardC
 import { useBrewLog } from '@/features/brew-log/hooks/useBrewLog'
 import { useCreateBrewLog } from '@/features/brew-log/hooks/useCreateBrewLog'
 import { useUpdateBrewLog } from '@/features/brew-log/hooks/useUpdateBrewLog'
+import type { BrewLogDto } from '@/lib/api/schemas'
+import { tryParseGuid } from '@/lib/guid'
 import { useEntityFormId } from '@/lib/useEntityFormId'
 
 function toDateTimeLocalValue(value: Date | string | null | undefined) {
@@ -66,8 +68,51 @@ function createInitialValues(): BrewLogFormValues {
   }
 }
 
-function CreateBrewLogForm() {
-  const [searchParams] = useSearchParams()
+function createInitialValuesFromBrewLog(
+  brewLog: BrewLogDto,
+  options?: {
+    clearResults?: boolean
+    brewedAt?: Date | string | null | undefined
+  },
+): BrewLogFormValues {
+  const clearResults = options?.clearResults ?? false
+
+  return {
+    ...toBrewTimeParts(clearResults ? undefined : brewLog.brewTimeSeconds),
+    beanId: brewLog.beanId ?? '',
+    brewerId: brewLog.brewerId ?? '',
+    grinderId: brewLog.grinderId ?? '',
+    recipeId: brewLog.recipeId ?? '',
+    dose: brewLog.dose ?? 0,
+    waterAmount: brewLog.waterAmount ?? 0,
+    waterTemperature: brewLog.waterTemperature ?? undefined,
+    grindSize: brewLog.grindSize ?? undefined,
+    rating: clearResults ? undefined : (brewLog.rating ?? undefined),
+    tastingNotes: clearResults ? undefined : (brewLog.notes ?? undefined),
+    adjustmentIdeas: clearResults ? undefined : (brewLog.adjustmentIdeas ?? undefined),
+    accessoryIds:
+      brewLog.accessories
+        ?.map((accessory) => accessory.id ?? '')
+        .filter((id) => id.length > 0) ?? [],
+    brewedAt: toDateTimeLocalValue(options?.brewedAt ?? brewLog.brewedAt),
+  }
+}
+
+type CreateLikeBrewLogFormProps = {
+  title: string
+  description: string
+  initialValues: BrewLogFormValues
+  showVoiceInput?: boolean
+  initialVoiceDialogOpen?: boolean
+}
+
+function CreateLikeBrewLogForm({
+  title,
+  description,
+  initialValues,
+  showVoiceInput = false,
+  initialVoiceDialogOpen = false,
+}: CreateLikeBrewLogFormProps) {
   const navigate = useNavigate()
   const { mutateAsync, isPending } = useCreateBrewLog()
   const { mutateAsync: setBeanAvailability, isPending: isSettingAvailability } =
@@ -76,8 +121,6 @@ function CreateBrewLogForm() {
     beanId: Guid
     remainingQuantity: number
   } | null>(null)
-  const shouldOpenVoiceInput = searchParams.get('dictate') === 'true'
-
   const closeLowStockPrompt = () => {
     setLowStockPrompt(null)
     navigate('/brew-log')
@@ -86,14 +129,14 @@ function CreateBrewLogForm() {
   return (
     <>
       <BrewLogFormCard
-        title="Log Brew"
-        description="Record a new brew entry."
+        title={title}
+        description={description}
         submitLabel="Create"
         cancelHref="/brew-log"
-        showVoiceInput={shouldOpenVoiceInput}
-        initialVoiceDialogOpen={shouldOpenVoiceInput}
+        showVoiceInput={showVoiceInput}
+        initialVoiceDialogOpen={initialVoiceDialogOpen}
         isSubmitting={isPending}
-        initialValues={createInitialValues()}
+        initialValues={initialValues}
         onSubmit={async (values) => {
           const request = normalizeBrewLogFormValues(values)
           const response = await mutateAsync(request)
@@ -162,6 +205,36 @@ function CreateBrewLogForm() {
   )
 }
 
+function CreateBrewLogForm() {
+  const [searchParams] = useSearchParams()
+  const shouldOpenVoiceInput = searchParams.get('dictate') === 'true'
+
+  return (
+    <CreateLikeBrewLogForm
+      title="Log Brew"
+      description="Record a new brew entry."
+      initialValues={createInitialValues()}
+      showVoiceInput={shouldOpenVoiceInput}
+      initialVoiceDialogOpen={shouldOpenVoiceInput}
+    />
+  )
+}
+
+function RepeatBrewLogForm({ sourceBrewLogId }: { sourceBrewLogId: Guid }) {
+  const { data: brewLog } = useBrewLog(sourceBrewLogId)
+
+  return (
+    <CreateLikeBrewLogForm
+      title="Log Brew (Repeat)"
+      description="Start a new brew using a previous brew as a template."
+      initialValues={createInitialValuesFromBrewLog(brewLog, {
+        clearResults: true,
+        brewedAt: new Date(),
+      })}
+    />
+  )
+}
+
 function EditBrewLogForm({ brewLogId }: { brewLogId: Guid }) {
   const navigate = useNavigate()
   const { data: brewLog } = useBrewLog(brewLogId)
@@ -175,25 +248,7 @@ function EditBrewLogForm({ brewLogId }: { brewLogId: Guid }) {
       cancelHref={`/brew-log/${brewLogId}`}
       showVoiceInput
       isSubmitting={isPending}
-      initialValues={{
-        ...toBrewTimeParts(brewLog.brewTimeSeconds),
-        beanId: brewLog.beanId ?? '',
-        brewerId: brewLog.brewerId ?? '',
-        grinderId: brewLog.grinderId ?? '',
-        recipeId: brewLog.recipeId ?? '',
-        dose: brewLog.dose ?? 0,
-        waterAmount: brewLog.waterAmount ?? 0,
-        waterTemperature: brewLog.waterTemperature ?? undefined,
-        grindSize: brewLog.grindSize ?? undefined,
-        rating: brewLog.rating ?? undefined,
-        tastingNotes: brewLog.notes ?? undefined,
-        adjustmentIdeas: brewLog.adjustmentIdeas ?? undefined,
-        accessoryIds:
-          brewLog.accessories
-            ?.map((accessory) => accessory.id ?? '')
-            .filter((id) => id.length > 0) ?? [],
-        brewedAt: toDateTimeLocalValue(brewLog.brewedAt),
-      }}
+      initialValues={createInitialValuesFromBrewLog(brewLog)}
       onSubmit={async (values) => {
         await mutateAsync({
           id: brewLogId,
@@ -208,10 +263,17 @@ function EditBrewLogForm({ brewLogId }: { brewLogId: Guid }) {
 
 export function BrewLogFormPage() {
   const formId = useEntityFormId()
+  const [searchParams] = useSearchParams()
+  const repeatFrom = tryParseGuid(searchParams.get('repeatFrom') ?? undefined)
+
   if (formId.mode === 'invalid') {
     return <Navigate to="/brew-log" replace />
   }
   if (formId.mode === 'create') {
+    if (repeatFrom) {
+      return <RepeatBrewLogForm sourceBrewLogId={repeatFrom} />
+    }
+
     return <CreateBrewLogForm />
   }
 
