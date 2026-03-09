@@ -66,7 +66,9 @@ function RecipeDetailContent({ recipeId }: { recipeId: Guid }) {
                   <StatCard
                     key={stat.grinderId ?? `${stat.grinderName ?? 'grind-stat'}-${index}`}
                     label={stat.grinderName ?? 'Unknown grinder'}
-                    value={`${stat.mostCommonGrindSize ?? '—'} (${formatBrewCount(stat.usageCount ?? 0)})`}
+                    value={`${
+                      stat.mostCommonGrindSize ?? '—'
+                    } (${formatBrewCount(stat.usageCount ?? 0)})`}
                   />
                 ))}
               </div>

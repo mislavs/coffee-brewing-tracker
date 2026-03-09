@@ -35,9 +35,9 @@ public class GetGrinderByIdHandlerTests(IntegrationTestFactory factory) : Integr
 
         await InsertMany(
         [
-            BrewLogEntry.Create(bean.Id, brewer.Id, grinder.Id, null, 18m, 300m, null, "10", null, BrewRating.Good, null, null, DateTime.UtcNow.AddDays(-3)),
-            BrewLogEntry.Create(bean.Id, brewer.Id, grinder.Id, null, 20m, 320m, null, "10", null, BrewRating.Excellent, null, null, DateTime.UtcNow.AddDays(-2)),
-            BrewLogEntry.Create(bean.Id, brewer.Id, grinder.Id, null, 19m, 300m, null, "8", null, BrewRating.Average, null, null, DateTime.UtcNow.AddDays(-1))
+            BrewLogEntry.Create(bean.Id, brewer.Id, grinder.Id, null, 18m, 300m, null, 10m, null, BrewRating.Good, null, null, DateTime.UtcNow.AddDays(-3)),
+            BrewLogEntry.Create(bean.Id, brewer.Id, grinder.Id, null, 20m, 320m, null, 10m, null, BrewRating.Excellent, null, null, DateTime.UtcNow.AddDays(-2)),
+            BrewLogEntry.Create(bean.Id, brewer.Id, grinder.Id, null, 19m, 300m, null, 8m, null, BrewRating.Average, null, null, DateTime.UtcNow.AddDays(-1))
         ]);
 
         var query = new GetGrinderByIdQuery(grinder.Id);
@@ -50,10 +50,10 @@ public class GetGrinderByIdHandlerTests(IntegrationTestFactory factory) : Integr
         result.Name.Should().Be("Kawa Grinders");
         result.TotalBrews.Should().Be(3);
         result.TotalCoffeeGround.Should().Be(57m);
-        result.MostCommonGrindSetting.Should().Be("10");
-        result.GrindSettingMin.Should().Be("8");
-        result.GrindSettingMax.Should().Be("10");
-        result.BestRatedGrindSetting.Should().Be("10");
+        result.MostCommonGrindSetting.Should().Be(10m);
+        result.GrindSettingMin.Should().Be(8m);
+        result.GrindSettingMax.Should().Be(10m);
+        result.BestRatedGrindSetting.Should().Be(10m);
     }
 
     [Fact]

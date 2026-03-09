@@ -97,8 +97,8 @@ public class GetRoasterByIdHandlerTests(IntegrationTestFactory factory) : Integr
 
         await InsertMany(
         [
-            BrewLogEntry.Create(beanA.Id, brewer.Id, grinder.Id, null, 18m, 300m, null, "10", null, BrewRating.Good, null, null, DateTime.UtcNow.AddDays(-2)),
-            BrewLogEntry.Create(beanB.Id, brewer.Id, grinder.Id, null, 19m, 320m, null, "11", null, BrewRating.Excellent, null, null, DateTime.UtcNow.AddDays(-1))
+            BrewLogEntry.Create(beanA.Id, brewer.Id, grinder.Id, null, 18m, 300m, null, 10m, null, BrewRating.Good, null, null, DateTime.UtcNow.AddDays(-2)),
+            BrewLogEntry.Create(beanB.Id, brewer.Id, grinder.Id, null, 19m, 320m, null, 11m, null, BrewRating.Excellent, null, null, DateTime.UtcNow.AddDays(-1))
         ]);
 
         var query = new GetRoasterByIdQuery(roaster.Id);

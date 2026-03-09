@@ -150,8 +150,9 @@ export function VoiceInputDialog({
         value: `${result.waterTemperature} C`,
       })
     }
-    if (result.grindSize)
-      fields.push({ label: 'Grind size', value: result.grindSize })
+    if (result.grindSize != null) {
+      fields.push({ label: 'Grind size', value: `${result.grindSize}` })
+    }
     if (result.brewTimeSeconds != null) {
       const minutes = Math.floor(result.brewTimeSeconds / 60)
       const seconds = result.brewTimeSeconds % 60

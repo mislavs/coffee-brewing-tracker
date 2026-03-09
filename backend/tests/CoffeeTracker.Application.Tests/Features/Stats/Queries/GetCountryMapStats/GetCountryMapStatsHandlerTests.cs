@@ -63,10 +63,10 @@ public class GetCountryMapStatsHandlerTests(IntegrationTestFactory factory) : In
 
         await InsertMany(
         [
-            BrewLogEntry.Create(kenyaBeanA.Id, brewer.Id, grinder.Id, null, 18m, 300m, null, "10", null, BrewRating.Good, null, null, DateTime.UtcNow.AddDays(-3)),
-            BrewLogEntry.Create(kenyaBeanA.Id, brewer.Id, grinder.Id, null, 18m, 300m, null, "11", null, BrewRating.Excellent, null, null, DateTime.UtcNow.AddDays(-2)),
-            BrewLogEntry.Create(kenyaBeanB.Id, brewer.Id, grinder.Id, null, 19m, 320m, null, "12", null, null, null, null, DateTime.UtcNow.AddDays(-1)),
-            BrewLogEntry.Create(ethiopiaBean.Id, brewer.Id, grinder.Id, null, 17m, 280m, null, "9", null, BrewRating.Average, null, null, DateTime.UtcNow)
+            BrewLogEntry.Create(kenyaBeanA.Id, brewer.Id, grinder.Id, null, 18m, 300m, null, 10m, null, BrewRating.Good, null, null, DateTime.UtcNow.AddDays(-3)),
+            BrewLogEntry.Create(kenyaBeanA.Id, brewer.Id, grinder.Id, null, 18m, 300m, null, 11m, null, BrewRating.Excellent, null, null, DateTime.UtcNow.AddDays(-2)),
+            BrewLogEntry.Create(kenyaBeanB.Id, brewer.Id, grinder.Id, null, 19m, 320m, null, 12m, null, null, null, null, DateTime.UtcNow.AddDays(-1)),
+            BrewLogEntry.Create(ethiopiaBean.Id, brewer.Id, grinder.Id, null, 17m, 280m, null, 9m, null, BrewRating.Average, null, null, DateTime.UtcNow)
         ]);
 
         var query = new GetCountryMapStatsQuery();
@@ -160,8 +160,8 @@ public class GetCountryMapStatsHandlerTests(IntegrationTestFactory factory) : In
 
         await InsertMany(
         [
-            BrewLogEntry.Create(bean.Id, brewer.Id, grinder.Id, null, 18m, 300m, null, "15", null, null, null, null, DateTime.UtcNow.AddDays(-1)),
-            BrewLogEntry.Create(bean.Id, brewer.Id, grinder.Id, null, 19m, 310m, null, "16", null, null, null, null, DateTime.UtcNow)
+            BrewLogEntry.Create(bean.Id, brewer.Id, grinder.Id, null, 18m, 300m, null, 15m, null, null, null, null, DateTime.UtcNow.AddDays(-1)),
+            BrewLogEntry.Create(bean.Id, brewer.Id, grinder.Id, null, 19m, 310m, null, 16m, null, null, null, null, DateTime.UtcNow)
         ]);
 
         var query = new GetCountryMapStatsQuery();

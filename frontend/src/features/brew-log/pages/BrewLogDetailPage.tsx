@@ -162,7 +162,9 @@ function BrewLogDetailContent({ brewLogId }: { brewLogId: Guid }) {
                       : '—'}
                   </DetailField>
                   <DetailField label="Grind size" stacked>
-                    {brewLog.grindSize || '—'}
+                    {brewLog.grindSize !== null && brewLog.grindSize !== undefined
+                      ? brewLog.grindSize
+                      : '—'}
                   </DetailField>
                   <DetailField label="Brew time" stacked>
                     {formatBrewTime(brewLog.brewTimeSeconds)}

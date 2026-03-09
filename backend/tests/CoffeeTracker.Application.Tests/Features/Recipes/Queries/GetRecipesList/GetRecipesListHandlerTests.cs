@@ -117,14 +117,14 @@ public class GetRecipesListHandlerTests(IntegrationTestFactory factory) : Integr
 
         await InsertMany<BrewLogEntry>(
         [
-            BrewLogEntry.Create(bean.Id, brewer.Id, comandante.Id, dailyRecipe.Id, 18m, 300m, null, "20", null, null, null, null, DateTime.UtcNow.AddDays(-8)),
-            BrewLogEntry.Create(bean.Id, brewer.Id, comandante.Id, dailyRecipe.Id, 18m, 300m, null, "20", null, null, null, null, DateTime.UtcNow.AddDays(-7)),
-            BrewLogEntry.Create(bean.Id, brewer.Id, comandante.Id, dailyRecipe.Id, 18m, 300m, null, "21", null, null, null, null, DateTime.UtcNow.AddDays(-6)),
-            BrewLogEntry.Create(bean.Id, brewer.Id, kultra.Id, dailyRecipe.Id, 18m, 300m, null, "8.5", null, null, null, null, DateTime.UtcNow.AddDays(-5)),
-            BrewLogEntry.Create(bean.Id, brewer.Id, kultra.Id, dailyRecipe.Id, 18m, 300m, null, "8.5", null, null, null, null, DateTime.UtcNow.AddDays(-4)),
-            BrewLogEntry.Create(bean.Id, brewer.Id, kultra.Id, dailyRecipe.Id, 18m, 300m, null, "8.0", null, null, null, null, DateTime.UtcNow.AddDays(-3)),
-            BrewLogEntry.Create(bean.Id, brewer.Id, comandante.Id, weekendRecipe.Id, 18m, 300m, null, "16", null, null, null, null, DateTime.UtcNow.AddDays(-2)),
-            BrewLogEntry.Create(bean.Id, brewer.Id, comandante.Id, weekendRecipe.Id, 18m, 300m, null, "16", null, null, null, null, DateTime.UtcNow.AddDays(-1)),
+            BrewLogEntry.Create(bean.Id, brewer.Id, comandante.Id, dailyRecipe.Id, 18m, 300m, null, 20m, null, null, null, null, DateTime.UtcNow.AddDays(-8)),
+            BrewLogEntry.Create(bean.Id, brewer.Id, comandante.Id, dailyRecipe.Id, 18m, 300m, null, 20m, null, null, null, null, DateTime.UtcNow.AddDays(-7)),
+            BrewLogEntry.Create(bean.Id, brewer.Id, comandante.Id, dailyRecipe.Id, 18m, 300m, null, 21m, null, null, null, null, DateTime.UtcNow.AddDays(-6)),
+            BrewLogEntry.Create(bean.Id, brewer.Id, kultra.Id, dailyRecipe.Id, 18m, 300m, null, 8.5m, null, null, null, null, DateTime.UtcNow.AddDays(-5)),
+            BrewLogEntry.Create(bean.Id, brewer.Id, kultra.Id, dailyRecipe.Id, 18m, 300m, null, 8.5m, null, null, null, null, DateTime.UtcNow.AddDays(-4)),
+            BrewLogEntry.Create(bean.Id, brewer.Id, kultra.Id, dailyRecipe.Id, 18m, 300m, null, 8.0m, null, null, null, null, DateTime.UtcNow.AddDays(-3)),
+            BrewLogEntry.Create(bean.Id, brewer.Id, comandante.Id, weekendRecipe.Id, 18m, 300m, null, 16m, null, null, null, null, DateTime.UtcNow.AddDays(-2)),
+            BrewLogEntry.Create(bean.Id, brewer.Id, comandante.Id, weekendRecipe.Id, 18m, 300m, null, 16m, null, null, null, null, DateTime.UtcNow.AddDays(-1)),
             BrewLogEntry.Create(bean.Id, brewer.Id, comandante.Id, weekendRecipe.Id, 18m, 300m, null, null, null, null, null, null, DateTime.UtcNow)
         ]);
 
@@ -138,19 +138,19 @@ public class GetRecipesListHandlerTests(IntegrationTestFactory factory) : Integr
         dailyResult.GrindStats.Should().HaveCount(2);
         var dailyComandante = dailyResult.GrindStats.Single(stat => stat.GrinderId == comandante.Id);
         dailyComandante.GrinderName.Should().Be("Comandante");
-        dailyComandante.MostCommonGrindSize.Should().Be("20");
+        dailyComandante.MostCommonGrindSize.Should().Be(20m);
         dailyComandante.UsageCount.Should().Be(2);
 
         var dailyKultra = dailyResult.GrindStats.Single(stat => stat.GrinderId == kultra.Id);
         dailyKultra.GrinderName.Should().Be("K-Ultra");
-        dailyKultra.MostCommonGrindSize.Should().Be("8.5");
+        dailyKultra.MostCommonGrindSize.Should().Be(8.5m);
         dailyKultra.UsageCount.Should().Be(2);
 
         var weekendResult = result.Single(entity => entity.Id == weekendRecipe.Id);
         weekendResult.GrindStats.Should().HaveCount(1);
         var weekendComandante = weekendResult.GrindStats.Single();
         weekendComandante.GrinderId.Should().Be(comandante.Id);
-        weekendComandante.MostCommonGrindSize.Should().Be("16");
+        weekendComandante.MostCommonGrindSize.Should().Be(16m);
         weekendComandante.UsageCount.Should().Be(2);
     }
 }

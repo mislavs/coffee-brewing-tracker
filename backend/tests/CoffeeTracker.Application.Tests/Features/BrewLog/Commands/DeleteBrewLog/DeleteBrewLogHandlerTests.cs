@@ -42,7 +42,7 @@ public class DeleteBrewLogHandlerTests(IntegrationTestFactory factory) : Integra
             18m,
             300m,
             null,
-            "10clicks",
+            10m,
             null,
             BrewRating.Good,
             "Notes",

@@ -15,7 +15,7 @@ public sealed record ParseVoiceBrewLogResult(
     decimal? Dose,
     decimal? WaterAmount,
     decimal? WaterTemperature,
-    string? GrindSize,
+    decimal? GrindSize,
     int? BrewTimeSeconds,
     int? Rating,
     string? Notes,

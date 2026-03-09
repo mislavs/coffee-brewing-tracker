@@ -65,13 +65,13 @@ public class GetRecipeByIdHandlerTests(IntegrationTestFactory factory) : Integra
 
         await InsertMany(
         [
-            BrewLogEntry.Create(bean.Id, brewer.Id, comandante.Id, recipe.Id, 18m, 300m, null, "20", null, null, null, null, DateTime.UtcNow.AddDays(-6)),
-            BrewLogEntry.Create(bean.Id, brewer.Id, comandante.Id, recipe.Id, 18m, 300m, null, "20", null, null, null, null, DateTime.UtcNow.AddDays(-5)),
-            BrewLogEntry.Create(bean.Id, brewer.Id, comandante.Id, recipe.Id, 18m, 300m, null, "21", null, null, null, null, DateTime.UtcNow.AddDays(-4)),
-            BrewLogEntry.Create(bean.Id, brewer.Id, kultra.Id, recipe.Id, 18m, 300m, null, "8.0", null, null, null, null, DateTime.UtcNow.AddDays(-3)),
-            BrewLogEntry.Create(bean.Id, brewer.Id, kultra.Id, recipe.Id, 18m, 300m, null, "8.0", null, null, null, null, DateTime.UtcNow.AddDays(-2)),
-            BrewLogEntry.Create(bean.Id, brewer.Id, kultra.Id, recipe.Id, 18m, 300m, null, "8.5", null, null, null, null, DateTime.UtcNow.AddDays(-1)),
-            BrewLogEntry.Create(bean.Id, brewer.Id, comandante.Id, ignoredRecipe.Id, 18m, 300m, null, "14", null, null, null, null, DateTime.UtcNow)
+            BrewLogEntry.Create(bean.Id, brewer.Id, comandante.Id, recipe.Id, 18m, 300m, null, 20m, null, null, null, null, DateTime.UtcNow.AddDays(-6)),
+            BrewLogEntry.Create(bean.Id, brewer.Id, comandante.Id, recipe.Id, 18m, 300m, null, 20m, null, null, null, null, DateTime.UtcNow.AddDays(-5)),
+            BrewLogEntry.Create(bean.Id, brewer.Id, comandante.Id, recipe.Id, 18m, 300m, null, 21m, null, null, null, null, DateTime.UtcNow.AddDays(-4)),
+            BrewLogEntry.Create(bean.Id, brewer.Id, kultra.Id, recipe.Id, 18m, 300m, null, 8.0m, null, null, null, null, DateTime.UtcNow.AddDays(-3)),
+            BrewLogEntry.Create(bean.Id, brewer.Id, kultra.Id, recipe.Id, 18m, 300m, null, 8.0m, null, null, null, null, DateTime.UtcNow.AddDays(-2)),
+            BrewLogEntry.Create(bean.Id, brewer.Id, kultra.Id, recipe.Id, 18m, 300m, null, 8.5m, null, null, null, null, DateTime.UtcNow.AddDays(-1)),
+            BrewLogEntry.Create(bean.Id, brewer.Id, comandante.Id, ignoredRecipe.Id, 18m, 300m, null, 14m, null, null, null, null, DateTime.UtcNow)
         ]);
 
         var query = new GetRecipeByIdQuery(recipe.Id);
@@ -84,12 +84,12 @@ public class GetRecipeByIdHandlerTests(IntegrationTestFactory factory) : Integra
 
         var comandanteStats = result.GrindStats.Single(entry => entry.GrinderId == comandante.Id);
         comandanteStats.GrinderName.Should().Be("Comandante");
-        comandanteStats.MostCommonGrindSize.Should().Be("20");
+        comandanteStats.MostCommonGrindSize.Should().Be(20m);
         comandanteStats.UsageCount.Should().Be(2);
 
         var kultraStats = result.GrindStats.Single(entry => entry.GrinderId == kultra.Id);
         kultraStats.GrinderName.Should().Be("K-Ultra");
-        kultraStats.MostCommonGrindSize.Should().Be("8.0");
+        kultraStats.MostCommonGrindSize.Should().Be(8.0m);
         kultraStats.UsageCount.Should().Be(2);
     }
 

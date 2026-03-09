@@ -39,7 +39,7 @@ public sealed class GetRecipeByIdHandler(ApplicationDbContext dbContext)
             {
                 entry.GrinderId,
                 GrinderName = entry.Grinder.Name,
-                GrindSize = entry.GrindSize!
+                GrindSize = entry.GrindSize!.Value
             })
             .ToListAsync(cancellationToken);
 

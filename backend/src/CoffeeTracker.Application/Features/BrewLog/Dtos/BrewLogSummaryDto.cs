@@ -10,6 +10,6 @@ public sealed record BrewLogSummaryDto(
     decimal Dose,
     decimal WaterAmount,
     string GrinderName,
-    string? GrindSize,
+    decimal? GrindSize,
     int? BrewTimeSeconds,
     int? Rating);

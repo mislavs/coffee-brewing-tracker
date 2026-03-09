@@ -55,7 +55,7 @@ public class GetDashboardStatsHandlerTests(IntegrationTestFactory factory) : Int
                 300m,
                 300m,
                 null,
-                "10",
+                10m,
                 null,
                 BrewRating.Good,
                 null,

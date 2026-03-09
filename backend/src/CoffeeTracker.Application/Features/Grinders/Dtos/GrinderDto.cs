@@ -5,7 +5,7 @@ public sealed record GrinderDto(
     string Name,
     int TotalBrews,
     decimal TotalCoffeeGround,
-    string? MostCommonGrindSetting,
-    string? GrindSettingMin,
-    string? GrindSettingMax,
-    string? BestRatedGrindSetting);
+    decimal? MostCommonGrindSetting,
+    decimal? GrindSettingMin,
+    decimal? GrindSettingMax,
+    decimal? BestRatedGrindSetting);

@@ -26,7 +26,7 @@ function buildValues(
     dose: 18,
     waterAmount: 300,
     waterTemperature: 94,
-    grindSize: 'medium',
+    grindSize: 12.5,
     brewTimeMinutes: 3,
     brewTimeSeconds: 30,
     rating: 4,
@@ -49,7 +49,7 @@ function buildInput(
     dose: '18' as never,
     waterAmount: '300' as never,
     waterTemperature: '94' as never,
-    grindSize: 'medium',
+    grindSize: '12.5' as never,
     brewTimeMinutes: '3' as never,
     brewTimeSeconds: '30' as never,
     rating: '4' as never,
@@ -147,12 +147,15 @@ describe('brewLogFormSchema', () => {
     )
   })
 
-  it('enforces grind size length limits', () => {
+  it('validates grind size as a non-negative number', () => {
     expect(
-      brewLogFormSchema.safeParse(buildInput({ grindSize: '1234567890' })).success,
+      brewLogFormSchema.safeParse(buildInput({ grindSize: '0' as never })).success,
     ).toBe(true)
     expect(
-      brewLogFormSchema.safeParse(buildInput({ grindSize: '12345678901' })).success,
+      brewLogFormSchema.safeParse(buildInput({ grindSize: '12.5' as never })).success,
+    ).toBe(true)
+    expect(
+      brewLogFormSchema.safeParse(buildInput({ grindSize: '-0.1' as never })).success,
     ).toBe(false)
   })
 
@@ -195,7 +198,7 @@ describe('normalizeBrewLogFormValues', () => {
     const result = normalizeBrewLogFormValues(
       buildValues({
         accessoryIds: [],
-        grindSize: '   ',
+        grindSize: undefined,
         tastingNotes: '   ',
         adjustmentIdeas: '   ',
       }),

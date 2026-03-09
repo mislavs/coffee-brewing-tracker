@@ -35,7 +35,7 @@ export function BrewLogCard({ brewLog }: BrewLogCardProps) {
   const recipeName = brewLog.recipeName?.trim() || '—'
   const doseAndWater = `${formatWeight(brewLog.dose)} / ${formatWeight(brewLog.waterAmount)}`
   const grinderAndSetting =
-    brewLog.grindSize && brewLog.grindSize.trim().length > 0
+    brewLog.grindSize != null
       ? `${brewLog.grinderName ?? '—'} (${brewLog.grindSize})`
       : (brewLog.grinderName ?? '—')
 

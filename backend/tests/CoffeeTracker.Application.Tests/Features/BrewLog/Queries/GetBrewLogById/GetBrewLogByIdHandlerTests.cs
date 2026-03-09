@@ -46,7 +46,7 @@ public class GetBrewLogByIdHandlerTests(IntegrationTestFactory factory) : Integr
             18m,
             300m,
             93m,
-            "10clicks",
+            10m,
             180,
             BrewRating.Excellent,
             "Clear cup",

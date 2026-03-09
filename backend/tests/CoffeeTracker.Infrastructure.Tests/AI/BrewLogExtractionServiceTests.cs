@@ -100,7 +100,7 @@ public class BrewLogExtractionServiceTests
                         18.5m,
                         300m,
                         93m,
-                        "medium-fine",
+                        8.5m,
                         165,
                         9,
                         "bright acidity",

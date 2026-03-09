@@ -22,7 +22,7 @@ public class BrewLogEntryConfiguration : IEntityTypeConfiguration<BrewLogEntry>
             .HasPrecision(5, 1);
 
         builder.Property(entity => entity.GrindSize)
-            .HasMaxLength(10);
+            .HasPrecision(8, 2);
 
         builder.Property(entity => entity.Notes)
             .HasMaxLength(2000);

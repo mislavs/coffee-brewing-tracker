@@ -20,7 +20,7 @@ public class BrewLogEntry
         decimal dose,
         decimal waterAmount,
         decimal? waterTemperature,
-        string? grindSize,
+        decimal? grindSize,
         int? brewTimeSeconds,
         BrewRating? rating,
         string? notes,
@@ -35,7 +35,7 @@ public class BrewLogEntry
         Dose = dose;
         WaterAmount = waterAmount;
         WaterTemperature = waterTemperature;
-        GrindSize = EntityNormalization.NormalizeOptional(grindSize);
+        GrindSize = grindSize;
         BrewTimeSeconds = brewTimeSeconds;
         Rating = rating;
         Notes = EntityNormalization.NormalizeOptional(notes);
@@ -59,7 +59,7 @@ public class BrewLogEntry
 
     public decimal? WaterTemperature { get; private set; }
 
-    public string? GrindSize { get; private set; }
+    public decimal? GrindSize { get; private set; }
 
     public int? BrewTimeSeconds { get; private set; }
 
@@ -93,7 +93,7 @@ public class BrewLogEntry
         decimal dose,
         decimal waterAmount,
         decimal? waterTemperature,
-        string? grindSize,
+        decimal? grindSize,
         int? brewTimeSeconds,
         BrewRating? rating,
         string? notes,
@@ -125,7 +125,7 @@ public class BrewLogEntry
         decimal dose,
         decimal waterAmount,
         decimal? waterTemperature,
-        string? grindSize,
+        decimal? grindSize,
         int? brewTimeSeconds,
         BrewRating? rating,
         string? notes,
@@ -139,7 +139,7 @@ public class BrewLogEntry
         Dose = dose;
         WaterAmount = waterAmount;
         WaterTemperature = waterTemperature;
-        GrindSize = EntityNormalization.NormalizeOptional(grindSize);
+        GrindSize = grindSize;
         BrewTimeSeconds = brewTimeSeconds;
         Rating = rating;
         Notes = EntityNormalization.NormalizeOptional(notes);

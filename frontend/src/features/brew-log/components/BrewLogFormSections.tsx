@@ -247,7 +247,7 @@ export function BrewParametersSection({ form }: FormSectionProps) {
           <label htmlFor="grindSize" className="text-sm font-medium">
             Grind size
           </label>
-          <Input id="grindSize" {...form.register('grindSize')} />
+          <Input id="grindSize" type="number" step="0.1" {...form.register('grindSize')} />
           <FieldErrorText message={form.formState.errors.grindSize?.message} />
         </div>
       </div>

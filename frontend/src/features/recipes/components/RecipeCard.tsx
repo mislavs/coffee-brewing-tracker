@@ -34,8 +34,7 @@ export function RecipeCard({ recipe }: RecipeCardProps) {
   const name = recipe.name ?? 'Unnamed recipe'
   const brewerName = recipe.brewerName || '—'
   const grindStats = (recipe.grindStats ?? []).filter(
-    (stat) =>
-      Boolean(stat.grinderName?.trim()) && Boolean(stat.mostCommonGrindSize?.trim()),
+    (stat) => Boolean(stat.grinderName?.trim()) && stat.mostCommonGrindSize != null,
   )
 
   return (

@@ -18,7 +18,7 @@ public sealed record UpdateBrewLogCommand(
     decimal Dose,
     decimal WaterAmount,
     decimal? WaterTemperature,
-    string? GrindSize,
+    decimal? GrindSize,
     int? BrewTimeSeconds,
     int? Rating,
     string? Notes,
@@ -52,7 +52,8 @@ public sealed class UpdateBrewLogValidator : AbstractValidator<UpdateBrewLogComm
             .When(command => command.WaterTemperature.HasValue);
 
         RuleFor(command => command.GrindSize)
-            .MaximumLength(10);
+            .GreaterThanOrEqualTo(0m)
+            .When(command => command.GrindSize.HasValue);
 
         RuleFor(command => command.BrewTimeSeconds)
             .GreaterThanOrEqualTo(0)

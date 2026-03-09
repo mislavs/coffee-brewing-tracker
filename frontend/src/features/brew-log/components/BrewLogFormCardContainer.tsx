@@ -122,7 +122,7 @@ export function BrewLogFormCard({
     if (result.waterTemperature != null) {
       setValidatedValue('waterTemperature', result.waterTemperature)
     }
-    if (result.grindSize) setValidatedValue('grindSize', result.grindSize)
+    if (result.grindSize != null) setValidatedValue('grindSize', result.grindSize)
     if (result.brewTimeSeconds != null) {
       setValidatedValue('brewTimeMinutes', Math.floor(result.brewTimeSeconds / 60))
       setValidatedValue('brewTimeSeconds', result.brewTimeSeconds % 60)

@@ -1543,7 +1543,8 @@
             "nullable": true
           },
           "grindSize": {
-            "type": "string",
+            "type": "number",
+            "format": "double",
             "nullable": true
           },
           "brewTimeSeconds": {
@@ -1616,7 +1617,8 @@
             "nullable": true
           },
           "grindSize": {
-            "type": "string",
+            "type": "number",
+            "format": "double",
             "nullable": true
           },
           "brewTimeSeconds": {
@@ -1870,7 +1872,8 @@
             "nullable": true
           },
           "grindSize": {
-            "type": "string",
+            "type": "number",
+            "format": "double",
             "nullable": true
           },
           "brewTimeSeconds": {
@@ -2077,19 +2080,23 @@
             "format": "double"
           },
           "mostCommonGrindSetting": {
-            "type": "string",
+            "type": "number",
+            "format": "double",
             "nullable": true
           },
           "grindSettingMin": {
-            "type": "string",
+            "type": "number",
+            "format": "double",
             "nullable": true
           },
           "grindSettingMax": {
-            "type": "string",
+            "type": "number",
+            "format": "double",
             "nullable": true
           },
           "bestRatedGrindSetting": {
-            "type": "string",
+            "type": "number",
+            "format": "double",
             "nullable": true
           }
         },
@@ -2265,7 +2272,8 @@
             "nullable": true
           },
           "grindSize": {
-            "type": "string",
+            "type": "number",
+            "format": "double",
             "nullable": true
           },
           "brewTimeSeconds": {
@@ -2373,8 +2381,8 @@
             "nullable": true
           },
           "mostCommonGrindSize": {
-            "type": "string",
-            "nullable": true
+            "type": "number",
+            "format": "double"
           },
           "usageCount": {
             "type": "integer",
@@ -2680,7 +2688,8 @@
             "nullable": true
           },
           "grindSize": {
-            "type": "string",
+            "type": "number",
+            "format": "double",
             "nullable": true
           },
           "brewTimeSeconds": {

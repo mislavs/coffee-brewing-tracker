@@ -15,9 +15,9 @@ public class GetBrewLogsListHandlerTests(IntegrationTestFactory factory) : Integ
         var (bean, brewer, grinder) = await SeedRequiredEntities("ordering");
         var brewLogs = new[]
         {
-            BrewLogEntry.Create(bean.Id, brewer.Id, grinder.Id, null, 18m, 300m, null, "10clicks", null, BrewRating.Good, null, null, DateTime.UtcNow.AddDays(-2)),
-            BrewLogEntry.Create(bean.Id, brewer.Id, grinder.Id, null, 18m, 300m, null, "10clicks", null, BrewRating.Average, null, null, DateTime.UtcNow),
-            BrewLogEntry.Create(bean.Id, brewer.Id, grinder.Id, null, 18m, 300m, null, "10clicks", null, BrewRating.Excellent, null, null, DateTime.UtcNow.AddDays(-1))
+            BrewLogEntry.Create(bean.Id, brewer.Id, grinder.Id, null, 18m, 300m, null, 10m, null, BrewRating.Good, null, null, DateTime.UtcNow.AddDays(-2)),
+            BrewLogEntry.Create(bean.Id, brewer.Id, grinder.Id, null, 18m, 300m, null, 10m, null, BrewRating.Average, null, null, DateTime.UtcNow),
+            BrewLogEntry.Create(bean.Id, brewer.Id, grinder.Id, null, 18m, 300m, null, 10m, null, BrewRating.Excellent, null, null, DateTime.UtcNow.AddDays(-1))
         };
         await InsertMany(brewLogs);
 
@@ -72,8 +72,8 @@ public class GetBrewLogsListHandlerTests(IntegrationTestFactory factory) : Integ
 
         await InsertMany(
         [
-            BrewLogEntry.Create(kenyaBean.Id, brewer.Id, grinder.Id, null, 18m, 300m, null, "10clicks", null, BrewRating.Good, null, null, DateTime.UtcNow),
-            BrewLogEntry.Create(ethiopiaBean.Id, brewer.Id, grinder.Id, null, 18m, 300m, null, "10clicks", null, BrewRating.Good, null, null, DateTime.UtcNow)
+            BrewLogEntry.Create(kenyaBean.Id, brewer.Id, grinder.Id, null, 18m, 300m, null, 10m, null, BrewRating.Good, null, null, DateTime.UtcNow),
+            BrewLogEntry.Create(ethiopiaBean.Id, brewer.Id, grinder.Id, null, 18m, 300m, null, 10m, null, BrewRating.Good, null, null, DateTime.UtcNow)
         ]);
 
         var query = new GetBrewLogsListQuery("KENYA", null, null);
@@ -93,9 +93,9 @@ public class GetBrewLogsListHandlerTests(IntegrationTestFactory factory) : Integ
         var (bean, brewer, grinder) = await SeedRequiredEntities("date");
         await InsertMany(
         [
-            BrewLogEntry.Create(bean.Id, brewer.Id, grinder.Id, null, 18m, 300m, null, "10clicks", null, BrewRating.Good, null, null, new DateTime(2026, 2, 1, 10, 0, 0, DateTimeKind.Utc)),
-            BrewLogEntry.Create(bean.Id, brewer.Id, grinder.Id, null, 18m, 300m, null, "10clicks", null, BrewRating.Good, null, null, new DateTime(2026, 2, 10, 10, 0, 0, DateTimeKind.Utc)),
-            BrewLogEntry.Create(bean.Id, brewer.Id, grinder.Id, null, 18m, 300m, null, "10clicks", null, BrewRating.Good, null, null, new DateTime(2026, 2, 20, 10, 0, 0, DateTimeKind.Utc))
+            BrewLogEntry.Create(bean.Id, brewer.Id, grinder.Id, null, 18m, 300m, null, 10m, null, BrewRating.Good, null, null, new DateTime(2026, 2, 1, 10, 0, 0, DateTimeKind.Utc)),
+            BrewLogEntry.Create(bean.Id, brewer.Id, grinder.Id, null, 18m, 300m, null, 10m, null, BrewRating.Good, null, null, new DateTime(2026, 2, 10, 10, 0, 0, DateTimeKind.Utc)),
+            BrewLogEntry.Create(bean.Id, brewer.Id, grinder.Id, null, 18m, 300m, null, 10m, null, BrewRating.Good, null, null, new DateTime(2026, 2, 20, 10, 0, 0, DateTimeKind.Utc))
         ]);
 
         var query = new GetBrewLogsListQuery(
@@ -151,8 +151,8 @@ public class GetBrewLogsListHandlerTests(IntegrationTestFactory factory) : Integ
 
         await InsertMany(
         [
-            BrewLogEntry.Create(availableBean.Id, brewer.Id, grinder.Id, null, 18m, 300m, null, "10clicks", null, BrewRating.Good, null, null, DateTime.UtcNow.AddDays(-1)),
-            BrewLogEntry.Create(unavailableBean.Id, brewer.Id, grinder.Id, null, 18m, 300m, null, "12clicks", null, BrewRating.Good, null, null, DateTime.UtcNow)
+            BrewLogEntry.Create(availableBean.Id, brewer.Id, grinder.Id, null, 18m, 300m, null, 10m, null, BrewRating.Good, null, null, DateTime.UtcNow.AddDays(-1)),
+            BrewLogEntry.Create(unavailableBean.Id, brewer.Id, grinder.Id, null, 18m, 300m, null, 12m, null, BrewRating.Good, null, null, DateTime.UtcNow)
         ]);
 
         // Act

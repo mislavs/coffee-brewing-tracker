@@ -1,4 +1,3 @@
-using System.Globalization;
 using CoffeeTracker.Application.Features.Grinders.Dtos;
 using CoffeeTracker.Domain.Exceptions;
 using CoffeeTracker.Infrastructure.Persistence;
@@ -40,36 +39,39 @@ public sealed class GetGrinderByIdHandler(ApplicationDbContext dbContext)
         var totalCoffeeGround = brewStats.Sum(entity => entity.Dose);
 
         var grindSettings = brewStats
-            .Where(entity => !string.IsNullOrWhiteSpace(entity.GrindSize))
-            .Select(entity => entity.GrindSize!)
+            .Where(entity => entity.GrindSize.HasValue)
+            .Select(entity => entity.GrindSize!.Value)
             .ToList();
 
-        var mostCommonGrindSetting = grindSettings
-            .GroupBy(setting => setting, StringComparer.OrdinalIgnoreCase)
-            .OrderByDescending(group => group.Count())
-            .ThenBy(group => group.Key, StringComparer.OrdinalIgnoreCase)
-            .Select(group => group.First())
-            .FirstOrDefault();
+        decimal? mostCommonGrindSetting = grindSettings.Count == 0
+            ? null
+            : grindSettings
+                .GroupBy(setting => setting)
+                .OrderByDescending(group => group.Count())
+                .ThenBy(group => group.Key)
+                .Select(group => group.Key)
+                .First();
 
-        var grindSettingMin = grindSettings
-            .OrderBy(setting => decimal.TryParse(setting, CultureInfo.InvariantCulture, out var v) ? v : decimal.MaxValue)
-            .FirstOrDefault();
+        decimal? grindSettingMin = grindSettings.Count == 0
+            ? null
+            : grindSettings.Min();
 
-        var grindSettingMax = grindSettings
-            .OrderByDescending(setting => decimal.TryParse(setting, CultureInfo.InvariantCulture, out var v) ? v : decimal.MinValue)
-            .FirstOrDefault();
+        decimal? grindSettingMax = grindSettings.Count == 0
+            ? null
+            : grindSettings.Max();
 
         var bestRatedGrindSetting = brewStats
-            .Where(entity => !string.IsNullOrWhiteSpace(entity.GrindSize) && entity.Rating.HasValue)
-            .GroupBy(entity => entity.GrindSize!, StringComparer.OrdinalIgnoreCase)
+            .Where(entity => entity.GrindSize.HasValue && entity.Rating.HasValue)
+            .GroupBy(entity => entity.GrindSize!.Value)
             .Select(group => new
             {
-                GrindSize = group.First().GrindSize!,
+                GrindSize = group.Key,
                 AverageRating = group.Average(entity => entity.Rating!.Value)
             })
             .OrderByDescending(group => group.AverageRating)
-            .ThenBy(group => group.GrindSize, StringComparer.OrdinalIgnoreCase)
+            .ThenBy(group => group.GrindSize)
             .Select(group => group.GrindSize)
+            .Cast<decimal?>()
             .FirstOrDefault();
 
         return new GrinderDto(

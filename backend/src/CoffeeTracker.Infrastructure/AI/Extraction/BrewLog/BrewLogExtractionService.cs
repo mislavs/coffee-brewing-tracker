@@ -89,8 +89,8 @@ public sealed class BrewLogExtractionService(
             - Types/formats:
               - Id fields => UUID strings or null
               - brewTimeSeconds => integers or null
-              - dose, waterAmount, waterTemperature => numbers or null
-              - grindSize, notes, adjustmentIdeas => strings or null (never arrays)
+              - dose, waterAmount, waterTemperature, grindSize => numbers or null
+              - notes, adjustmentIdeas => strings or null (never arrays)
 
             Entity catalog:
             """);

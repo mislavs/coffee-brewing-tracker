@@ -27,7 +27,7 @@ public class UpdateBrewLogHandlerTests(IntegrationTestFactory factory) : Integra
             18m,
             300m,
             93m,
-            "10clicks",
+            10m,
             180,
             BrewRating.Good,
             "Initial notes",
@@ -46,7 +46,7 @@ public class UpdateBrewLogHandlerTests(IntegrationTestFactory factory) : Integra
             20m,
             320m,
             94m,
-            "9clicks",
+            9m,
             190,
             5,
             "Updated notes",
@@ -67,7 +67,7 @@ public class UpdateBrewLogHandlerTests(IntegrationTestFactory factory) : Integra
         updatedBrewLogEntry.Should().NotBeNull();
         updatedBrewLogEntry!.Dose.Should().Be(20m);
         updatedBrewLogEntry.WaterAmount.Should().Be(320m);
-        updatedBrewLogEntry.GrindSize.Should().Be("9clicks");
+        updatedBrewLogEntry.GrindSize.Should().Be(9m);
         updatedBrewLogEntry.Rating.Should().Be(BrewRating.Excellent);
         updatedBrewLogEntry.Notes.Should().Be("Updated notes");
         updatedBrewLogEntry.AdjustmentIdeas.Should().Be("Updated ideas");
@@ -89,7 +89,7 @@ public class UpdateBrewLogHandlerTests(IntegrationTestFactory factory) : Integra
             18m,
             300m,
             null,
-            "10clicks",
+            10m,
             null,
             4,
             null,

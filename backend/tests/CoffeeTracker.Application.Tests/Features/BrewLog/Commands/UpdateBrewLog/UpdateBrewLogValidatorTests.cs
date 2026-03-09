@@ -73,10 +73,10 @@ public class UpdateBrewLogValidatorTests
     }
 
     [Fact]
-    public void Validate_WhenGrindSizeExceedsMaxLength_ShouldHaveValidationError()
+    public void Validate_WhenGrindSizeIsNegative_ShouldHaveValidationError()
     {
         // Arrange
-        var command = CreateValidCommand() with { GrindSize = new string('G', 11) };
+        var command = CreateValidCommand() with { GrindSize = -0.1m };
 
         // Act
         var result = _sut.TestValidate(command);
@@ -175,7 +175,7 @@ public class UpdateBrewLogValidatorTests
             18m,
             300m,
             93m,
-            "12 clicks",
+            12m,
             180,
             4,
             "Sweet and balanced",

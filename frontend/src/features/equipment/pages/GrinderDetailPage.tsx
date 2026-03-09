@@ -32,15 +32,15 @@ function GrinderDetailContent({ grinderId }: { grinderId: Guid }) {
               {grinder.totalCoffeeGround ?? 0}g
             </DetailField>
             <DetailField label="Most Common Grind Setting">
-              {grinder.mostCommonGrindSetting || '—'}
+              {grinder.mostCommonGrindSetting ?? '—'}
             </DetailField>
             <DetailField label="Grind Setting Range">
-              {grinder.grindSettingMin && grinder.grindSettingMax
+              {grinder.grindSettingMin != null && grinder.grindSettingMax != null
                 ? `${grinder.grindSettingMin} - ${grinder.grindSettingMax}`
                 : '—'}
             </DetailField>
             <DetailField label="Best Rated Grind Setting">
-              {grinder.bestRatedGrindSetting || '—'}
+              {grinder.bestRatedGrindSetting ?? '—'}
             </DetailField>
           </div>
         )}

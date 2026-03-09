@@ -55,9 +55,9 @@ export const brewLogFormSchema = z.object({
     (value) => value === undefined || (value >= 0 && value <= 100),
     'Water temperature must be between 0 and 100.',
   ),
-  grindSize: optionalTrimmedStringSchema.refine(
-    (value) => value === undefined || value.length <= 10,
-    'Grind size must be 10 characters or fewer.',
+  grindSize: optionalNumberSchema.refine(
+    (value) => value === undefined || value >= 0,
+    'Grind size must be zero or greater.',
   ),
   brewTimeMinutes: optionalNumberSchema.refine(
     (value) => value === undefined || (Number.isInteger(value) && value >= 0),
@@ -116,7 +116,7 @@ export function normalizeBrewLogFormValues(
     dose: values.dose,
     waterAmount: values.waterAmount,
     waterTemperature: values.waterTemperature,
-    grindSize: normalizeOptional(values.grindSize),
+    grindSize: values.grindSize,
     brewTimeSeconds: totalBrewTimeSeconds,
     rating: values.rating,
     notes: normalizeOptional(values.tastingNotes),
