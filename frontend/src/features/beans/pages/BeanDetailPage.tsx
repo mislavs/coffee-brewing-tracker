@@ -40,6 +40,9 @@ function BeanDetailContent({ beanId }: { beanId: Guid }) {
             <Link to={`/beans/${beanId}/edit`}>Edit</Link>
           </Button>
           <Button variant="outline" asChild>
+            <Link to={`/beans/new?repeatFrom=${beanId}`}>Repeat</Link>
+          </Button>
+          <Button variant="outline" asChild>
             <Link to="/beans">Back</Link>
           </Button>
         </CardAction>

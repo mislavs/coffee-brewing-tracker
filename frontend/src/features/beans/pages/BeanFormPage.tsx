@@ -1,6 +1,6 @@
 import type { Guid } from '@/lib/api-types'
-import { Navigate, useNavigate } from 'react-router-dom'
-import type { CreateBeanRequest, UpdateBeanRequest } from '@/lib/api/schemas'
+import { Navigate, useNavigate, useSearchParams } from 'react-router-dom'
+import type { BeanDto, CreateBeanRequest, UpdateBeanRequest } from '@/lib/api/schemas'
 import { BeanFormCard } from '@/features/beans/components/BeanFormCard'
 import {
   normalizeDistinctIdList,
@@ -12,6 +12,7 @@ import { toDateInputValue } from '@/features/beans/beanShared'
 import { useBean } from '@/features/beans/hooks/useBean'
 import { useCreateBean } from '@/features/beans/hooks/useCreateBean'
 import { useUpdateBean } from '@/features/beans/hooks/useUpdateBean'
+import { tryParseGuid } from '@/lib/guid'
 import { useEntityFormId } from '@/lib/useEntityFormId'
 
 function toBeanRequestBase(values: BeanFormValues): CreateBeanRequest {
@@ -47,6 +48,54 @@ function toUpdateBeanRequest(values: BeanFormValues): UpdateBeanRequest {
   }
 }
 
+function createInitialValues(): BeanFormValues {
+  return {
+    name: '',
+    roasterId: '',
+    originType: 0,
+    originCountryIds: [],
+    variety: '',
+    processingMethod: '',
+    roastProfile: 0,
+    roastDate: '',
+    altitude: undefined,
+    bagWeight: 250,
+    price: undefined,
+    isAvailable: true,
+    flavorNoteNames: [],
+  }
+}
+
+function createInitialValuesFromBean(
+  bean: BeanDto,
+  options?: {
+    clearRoastDate?: boolean
+    isAvailable?: boolean
+  },
+): BeanFormValues {
+  return {
+    name: bean.name ?? '',
+    roasterId: bean.roasterId ?? '',
+    originType: bean.originType === 1 ? 1 : 0,
+    originCountryIds:
+      bean.originCountries
+        ?.map((country) => country.id?.trim() ?? '')
+        .filter((countryId) => countryId.length > 0) ?? [],
+    variety: bean.variety ?? '',
+    processingMethod: bean.processingMethod ?? '',
+    roastProfile: bean.roastProfile ?? 0,
+    roastDate: options?.clearRoastDate ? '' : (toDateInputValue(bean.roastDate) ?? ''),
+    altitude: bean.altitude ?? undefined,
+    bagWeight: bean.bagWeight ?? 0,
+    price: bean.price ?? undefined,
+    isAvailable: options?.isAvailable ?? (bean.isAvailable ?? true),
+    flavorNoteNames:
+      bean.flavorNotes
+        ?.map((flavorNote) => flavorNote.name?.trim() ?? '')
+        .filter((name) => name.length > 0) ?? [],
+  }
+}
+
 function CreateBeanForm() {
   const navigate = useNavigate()
   const { mutateAsync, isPending } = useCreateBean()
@@ -58,21 +107,31 @@ function CreateBeanForm() {
       submitLabel="Create"
       cancelHref="/beans"
       isSubmitting={isPending}
-      initialValues={{
-        name: '',
-        roasterId: '',
-        originType: 0,
-        originCountryIds: [],
-        variety: '',
-        processingMethod: '',
-        roastProfile: 0,
-        roastDate: '',
-        altitude: undefined,
-        bagWeight: 250,
-        price: undefined,
-        isAvailable: true,
-        flavorNoteNames: [],
+      initialValues={createInitialValues()}
+      onSubmit={async (values) => {
+        await mutateAsync(toCreateBeanRequest(values))
+        navigate('/beans')
       }}
+    />
+  )
+}
+
+function RepeatBeanForm({ sourceBeanId }: { sourceBeanId: Guid }) {
+  const navigate = useNavigate()
+  const { data: bean } = useBean(sourceBeanId)
+  const { mutateAsync, isPending } = useCreateBean()
+
+  return (
+    <BeanFormCard
+      title="Create Bean (Repeat)"
+      description="Add a new bean based on a previous purchase."
+      submitLabel="Create"
+      cancelHref="/beans"
+      isSubmitting={isPending}
+      initialValues={createInitialValuesFromBean(bean, {
+        clearRoastDate: true,
+        isAvailable: true,
+      })}
       onSubmit={async (values) => {
         await mutateAsync(toCreateBeanRequest(values))
         navigate('/beans')
@@ -93,27 +152,7 @@ function EditBeanForm({ beanId }: { beanId: Guid }) {
       submitLabel="Save"
       cancelHref={`/beans/${beanId}`}
       isSubmitting={isPending}
-      initialValues={{
-        name: bean.name ?? '',
-        roasterId: bean.roasterId ?? '',
-        originType: bean.originType === 1 ? 1 : 0,
-        originCountryIds:
-          bean.originCountries
-            ?.map((country) => country.id?.trim() ?? '')
-            .filter((countryId) => countryId.length > 0) ?? [],
-        variety: bean.variety ?? '',
-        processingMethod: bean.processingMethod ?? '',
-        roastProfile: bean.roastProfile ?? 0,
-        roastDate: toDateInputValue(bean.roastDate) ?? '',
-        altitude: bean.altitude ?? undefined,
-        bagWeight: bean.bagWeight ?? 0,
-        price: bean.price ?? undefined,
-        isAvailable: bean.isAvailable ?? true,
-        flavorNoteNames:
-          bean.flavorNotes
-            ?.map((flavorNote) => flavorNote.name?.trim() ?? '')
-            .filter((name) => name.length > 0) ?? [],
-      }}
+      initialValues={createInitialValuesFromBean(bean)}
       isEditMode
       onSubmit={async (values) => {
         await mutateAsync({
@@ -129,10 +168,17 @@ function EditBeanForm({ beanId }: { beanId: Guid }) {
 
 export function BeanFormPage() {
   const formId = useEntityFormId()
+  const [searchParams] = useSearchParams()
+  const repeatFrom = tryParseGuid(searchParams.get('repeatFrom') ?? undefined)
+
   if (formId.mode === 'invalid') {
     return <Navigate to="/beans" replace />
   }
   if (formId.mode === 'create') {
+    if (repeatFrom) {
+      return <RepeatBeanForm sourceBeanId={repeatFrom} />
+    }
+
     return <CreateBeanForm />
   }
 

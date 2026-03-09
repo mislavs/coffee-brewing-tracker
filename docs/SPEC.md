@@ -101,7 +101,18 @@ Start a new brew log pre-filled with all parameters from a previous brew.
   new session.
 - Useful for iteratively dialing in a bean.
 
-### F8. Brew Rating
+### F8. Repeat Bean
+
+Start a new bean entry pre-filled with all details from a previous bean
+purchase.
+
+- All fields are copied: name, roaster, origin details, processing method,
+  roast profile, altitude, bag weight, price, and flavor notes.
+- Roast date is left blank for the new purchase.
+- Useful for re-buying the same bean while keeping purchase-specific details
+  separate.
+
+### F9. Brew Rating
 
 Each brew can be rated on a 5-level scale represented by emoji faces:
 

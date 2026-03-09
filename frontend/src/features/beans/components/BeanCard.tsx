@@ -1,4 +1,6 @@
+import { Repeat } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { Button } from '@/components/ui/button'
 import type { BeanSummaryDto } from '@/lib/api/schemas'
 import { Badge } from '@/components/ui/badge'
 import {
@@ -8,6 +10,12 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
 import {
   formatDecimal,
   formatPricePerKg,
@@ -45,10 +53,28 @@ export function BeanCard({ bean }: BeanCardProps) {
   return (
     <Card className="h-full">
       <CardHeader className="space-y-3">
-        <div
-          className={`flex h-28 w-full items-center justify-center rounded-md border text-sm font-medium ${getRoastToneClass(bean.roastProfile)}`}
-        >
-          {roastProfileLabel}
+        <div className="relative">
+          <div
+            className={`flex h-28 w-full items-center justify-center rounded-md border text-sm font-medium ${getRoastToneClass(bean.roastProfile)}`}
+          >
+            {roastProfileLabel}
+          </div>
+          {bean.id ? (
+            <div className="absolute top-2 right-2">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="icon-sm" className="bg-background/80 backdrop-blur-sm" asChild>
+                      <Link to={`/beans/new?repeatFrom=${bean.id}`} aria-label={`Repeat bean for ${name}`}>
+                        <Repeat className="size-4" />
+                      </Link>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Repeat bean</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+          ) : null}
         </div>
         <div>
           <CardTitle className="text-base">
