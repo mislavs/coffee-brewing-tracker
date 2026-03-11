@@ -68,8 +68,58 @@ public class GetBrewLogByIdHandlerTests(IntegrationTestFactory factory) : Integr
         result.RecipeName.Should().Be("Daily recipe");
         result.Accessories.Should().ContainSingle(entry => entry.Name == "Scale");
         result.BrewRatio.Should().BeApproximately(16.67m, 0.01m);
+        result.BeanCostPerCup.Should().BeNull();
         result.Rating.Should().Be(5);
         result.Notes.Should().Be("Clear cup");
+    }
+
+    [Fact]
+    public async Task Handle_WhenBeanHasPrice_ReturnsBeanCostPerCup()
+    {
+        // Arrange
+        var roaster = Roaster.Create("Roaster priced", null, null);
+        await Insert(roaster);
+        var bean = Bean.Create(
+            "Bean priced",
+            roaster.Id,
+            OriginType.SingleOrigin,
+            null,
+            null,
+            null,
+            RoastProfile.Filter,
+            null,
+            null,
+            250m,
+            20m);
+        var brewer = Brewer.Create("Kalita");
+        var grinder = Grinder.Create("EK43");
+        await Insert(bean);
+        await Insert(brewer);
+        await Insert(grinder);
+
+        var brewLogEntry = BrewLogEntry.Create(
+            bean.Id,
+            brewer.Id,
+            grinder.Id,
+            null,
+            18m,
+            300m,
+            null,
+            9m,
+            null,
+            BrewRating.Good,
+            null,
+            null,
+            DateTime.UtcNow);
+        await Insert(brewLogEntry);
+
+        var query = new GetBrewLogByIdQuery(brewLogEntry.Id);
+
+        // Act
+        var result = await Send(query);
+
+        // Assert
+        result.BeanCostPerCup.Should().Be(1.44m);
     }
 
     [Fact]

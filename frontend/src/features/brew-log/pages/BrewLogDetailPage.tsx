@@ -16,6 +16,7 @@ import {
   formatRatio,
   getRatingDisplay,
 } from '@/features/brew-log/formatters'
+import { formatPrice } from '@/features/beans/formatters'
 import { useBrewLog } from '@/features/brew-log/hooks/useBrewLog'
 import { useDeleteBrewLog } from '@/features/brew-log/hooks/useDeleteBrewLog'
 import { formatDateTime } from '@/lib/date'
@@ -182,6 +183,9 @@ function BrewLogDetailContent({ brewLogId }: { brewLogId: Guid }) {
                 <div className="grid gap-3">
                   <DetailField label="Rating" stacked>
                     {getRatingDisplay(brewLog.rating)}
+                  </DetailField>
+                  <DetailField label="Bean cost" stacked>
+                    {formatPrice(brewLog.beanCostPerCup)}
                   </DetailField>
                   <DetailField label="Brew date" stacked>
                     {formatDateTime(brewLog.brewedAt)}

@@ -1573,6 +1573,11 @@
             "type": "number",
             "format": "double",
             "nullable": true
+          },
+          "beanCostPerCup": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -1629,6 +1634,11 @@
           "rating": {
             "type": "integer",
             "format": "int32",
+            "nullable": true
+          },
+          "beanCostPerCup": {
+            "type": "number",
+            "format": "double",
             "nullable": true
           }
         },

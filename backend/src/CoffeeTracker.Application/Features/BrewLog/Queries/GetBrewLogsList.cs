@@ -58,7 +58,10 @@ public sealed class GetBrewLogsListHandler(ApplicationDbContext dbContext)
                 entity.Grinder.Name,
                 entity.GrindSize,
                 entity.BrewTimeSeconds,
-                entity.Rating.HasValue ? (int?)entity.Rating.Value : null))
+                entity.Rating.HasValue ? (int?)entity.Rating.Value : null,
+                entity.Bean.Price.HasValue && entity.Bean.BagWeight > 0m
+                    ? entity.Dose * entity.Bean.Price.Value / entity.Bean.BagWeight
+                    : null))
             .ToListAsync(cancellationToken);
     }
 }

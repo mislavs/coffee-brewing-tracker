@@ -23,23 +23,26 @@ export function formatRoastProfile(value: number | null | undefined) {
 export function formatDecimal(
   value: number | null | undefined,
   maximumFractionDigits = 2,
+  minimumFractionDigits = 0,
 ) {
   if (value === null || value === undefined) {
     return '—'
   }
 
   return new Intl.NumberFormat(undefined, {
-    minimumFractionDigits: 0,
+    minimumFractionDigits,
     maximumFractionDigits,
   }).format(value)
 }
 
-export function formatPrice(value: number | null | undefined) {
+export function formatPrice(
+  value: number | null | undefined,
+) {
   if (value === null || value === undefined) {
     return '—'
   }
 
-  return `${formatDecimal(value, 2)} €`
+  return `${formatDecimal(value, 2, 2)} €`
 }
 
 export function formatPricePerKg(

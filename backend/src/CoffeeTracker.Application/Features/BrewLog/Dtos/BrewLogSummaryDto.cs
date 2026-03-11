@@ -12,4 +12,5 @@ public sealed record BrewLogSummaryDto(
     string GrinderName,
     decimal? GrindSize,
     int? BrewTimeSeconds,
-    int? Rating);
+    int? Rating,
+    decimal? BeanCostPerCup);

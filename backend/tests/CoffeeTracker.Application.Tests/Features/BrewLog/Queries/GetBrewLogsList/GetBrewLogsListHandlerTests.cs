@@ -34,6 +34,55 @@ public class GetBrewLogsListHandlerTests(IntegrationTestFactory factory) : Integ
     }
 
     [Fact]
+    public async Task Handle_WhenBeanHasPrice_ReturnsBeanCostPerCup()
+    {
+        // Arrange
+        var roaster = Roaster.Create("Roaster cost", null, null);
+        await Insert(roaster);
+        var bean = Bean.Create(
+            "Bean cost",
+            roaster.Id,
+            OriginType.SingleOrigin,
+            null,
+            null,
+            null,
+            RoastProfile.Filter,
+            null,
+            null,
+            250m,
+            20m);
+        var brewer = Brewer.Create("Brewer cost");
+        var grinder = Grinder.Create("Grinder cost");
+        await Insert(bean);
+        await Insert(brewer);
+        await Insert(grinder);
+
+        await Insert(BrewLogEntry.Create(
+            bean.Id,
+            brewer.Id,
+            grinder.Id,
+            null,
+            18m,
+            300m,
+            null,
+            10m,
+            null,
+            BrewRating.Good,
+            null,
+            null,
+            DateTime.UtcNow));
+
+        var query = new GetBrewLogsListQuery(null, null, null);
+
+        // Act
+        var result = await Send(query);
+
+        // Assert
+        result.Should().ContainSingle();
+        result.Single().BeanCostPerCup.Should().Be(1.44m);
+    }
+
+    [Fact]
     public async Task Handle_WhenSearchProvided_FiltersByBeanNameCaseInsensitive()
     {
         // Arrange

@@ -20,6 +20,7 @@ public sealed record BrewLogDto(
     string? Notes,
     string? AdjustmentIdeas,
     DateTime BrewedAt,
-    decimal? BrewRatio);
+    decimal? BrewRatio,
+    decimal? BeanCostPerCup);
 
 public sealed record BrewLogAccessoryDto(Guid Id, string Name);

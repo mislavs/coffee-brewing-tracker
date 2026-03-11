@@ -46,6 +46,9 @@ public sealed class GetBrewLogByIdHandler(ApplicationDbContext dbContext)
                 entity.BrewedAt,
                 entity.Dose > 0m && entity.WaterAmount > 0m
                     ? entity.WaterAmount / entity.Dose
+                    : null,
+                entity.Bean.Price.HasValue && entity.Bean.BagWeight > 0m
+                    ? entity.Dose * entity.Bean.Price.Value / entity.Bean.BagWeight
                     : null))
             .FirstOrDefaultAsync(cancellationToken);
 
