@@ -32,7 +32,7 @@ public class GetRecipeByIdHandlerTests(IntegrationTestFactory factory) : Integra
     }
 
     [Fact]
-    public async Task Handle_WhenRecipeHasBrewsAcrossGrinders_ReturnsMostCommonGrindSizePerGrinder()
+    public async Task Handle_WhenRecipeHasBrewsAcrossGrinders_ReturnsAverageGrindSizePerGrinder()
     {
         // Arrange
         var roaster = Roaster.Create("Roaster", null, null);
@@ -84,13 +84,13 @@ public class GetRecipeByIdHandlerTests(IntegrationTestFactory factory) : Integra
 
         var comandanteStats = result.GrindStats.Single(entry => entry.GrinderId == comandante.Id);
         comandanteStats.GrinderName.Should().Be("Comandante");
-        comandanteStats.MostCommonGrindSize.Should().Be(20m);
-        comandanteStats.UsageCount.Should().Be(2);
+        comandanteStats.AverageGrindSize.Should().Be(20.33m);
+        comandanteStats.BrewCount.Should().Be(3);
 
         var kultraStats = result.GrindStats.Single(entry => entry.GrinderId == kultra.Id);
         kultraStats.GrinderName.Should().Be("K-Ultra");
-        kultraStats.MostCommonGrindSize.Should().Be(8.0m);
-        kultraStats.UsageCount.Should().Be(2);
+        kultraStats.AverageGrindSize.Should().Be(8.17m);
+        kultraStats.BrewCount.Should().Be(3);
     }
 
     [Fact]

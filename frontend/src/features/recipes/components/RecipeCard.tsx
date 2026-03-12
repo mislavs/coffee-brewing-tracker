@@ -34,7 +34,7 @@ export function RecipeCard({ recipe }: RecipeCardProps) {
   const name = recipe.name ?? 'Unnamed recipe'
   const brewerName = recipe.brewerName || '—'
   const grindStats = (recipe.grindStats ?? []).filter(
-    (stat) => Boolean(stat.grinderName?.trim()) && stat.mostCommonGrindSize != null,
+    (stat) => Boolean(stat.grinderName?.trim()) && stat.averageGrindSize != null,
   )
 
   return (
@@ -62,12 +62,12 @@ export function RecipeCard({ recipe }: RecipeCardProps) {
                 key={stat.grinderId ?? `${stat.grinderName ?? 'grinder'}-${index}`}
                 variant="outline"
               >
-                {stat.grinderName}: {stat.mostCommonGrindSize}
+                {stat.grinderName}: {stat.averageGrindSize}
               </Badge>
             ))
           ) : (
             <Badge variant="outline" className="text-muted-foreground">
-              Common grind: —
+              Avg grind: —
             </Badge>
           )}
         </div>

@@ -31,7 +31,8 @@ public sealed class GetGrinderByIdHandler(ApplicationDbContext dbContext)
             {
                 entity.Dose,
                 entity.GrindSize,
-                Rating = entity.Rating.HasValue ? (int?)entity.Rating.Value : null
+                entity.RecipeId,
+                RecipeName = entity.Recipe != null ? entity.Recipe.Name : null
             })
             .ToListAsync(cancellationToken);
 
@@ -43,15 +44,6 @@ public sealed class GetGrinderByIdHandler(ApplicationDbContext dbContext)
             .Select(entity => entity.GrindSize!.Value)
             .ToList();
 
-        decimal? mostCommonGrindSetting = grindSettings.Count == 0
-            ? null
-            : grindSettings
-                .GroupBy(setting => setting)
-                .OrderByDescending(group => group.Count())
-                .ThenBy(group => group.Key)
-                .Select(group => group.Key)
-                .First();
-
         decimal? grindSettingMin = grindSettings.Count == 0
             ? null
             : grindSettings.Min();
@@ -60,28 +52,28 @@ public sealed class GetGrinderByIdHandler(ApplicationDbContext dbContext)
             ? null
             : grindSettings.Max();
 
-        var bestRatedGrindSetting = brewStats
-            .Where(entity => entity.GrindSize.HasValue && entity.Rating.HasValue)
-            .GroupBy(entity => entity.GrindSize!.Value)
-            .Select(group => new
+        var recipeStats = brewStats
+            .Where(entity => entity.RecipeId.HasValue && entity.GrindSize.HasValue && entity.RecipeName is not null)
+            .GroupBy(entity => new
             {
-                GrindSize = group.Key,
-                AverageRating = group.Average(entity => entity.Rating!.Value)
+                RecipeId = entity.RecipeId!.Value,
+                RecipeName = entity.RecipeName!
             })
-            .OrderByDescending(group => group.AverageRating)
-            .ThenBy(group => group.GrindSize)
-            .Select(group => group.GrindSize)
-            .Cast<decimal?>()
-            .FirstOrDefault();
+            .Select(group => new GrinderRecipeStatsDto(
+                group.Key.RecipeId,
+                group.Key.RecipeName,
+                Math.Round(group.Average(entity => entity.GrindSize!.Value), 2),
+                group.Count()))
+            .OrderBy(stat => stat.RecipeName)
+            .ToList();
 
         return new GrinderDto(
             grinder.Id,
             grinder.Name,
             totalBrews,
             totalCoffeeGround,
-            mostCommonGrindSetting,
             grindSettingMin,
             grindSettingMax,
-            bestRatedGrindSetting);
+            recipeStats);
     }
 }

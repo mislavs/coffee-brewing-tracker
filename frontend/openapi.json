@@ -2089,11 +2089,6 @@
             "type": "number",
             "format": "double"
           },
-          "mostCommonGrindSetting": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
           "grindSettingMin": {
             "type": "number",
             "format": "double",
@@ -2104,10 +2099,34 @@
             "format": "double",
             "nullable": true
           },
-          "bestRatedGrindSetting": {
-            "type": "number",
-            "format": "double",
+          "recipeStats": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GrinderRecipeStatsDto"
+            },
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "GrinderRecipeStatsDto": {
+        "type": "object",
+        "properties": {
+          "recipeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "recipeName": {
+            "type": "string",
+            "nullable": true
+          },
+          "averageGrindSize": {
+            "type": "number",
+            "format": "double"
+          },
+          "brewCount": {
+            "type": "integer",
+            "format": "int32"
           }
         },
         "additionalProperties": false
@@ -2390,11 +2409,11 @@
             "type": "string",
             "nullable": true
           },
-          "mostCommonGrindSize": {
+          "averageGrindSize": {
             "type": "number",
             "format": "double"
           },
-          "usageCount": {
+          "brewCount": {
             "type": "integer",
             "format": "int32"
           }

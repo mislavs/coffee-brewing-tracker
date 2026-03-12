@@ -84,7 +84,7 @@ public class GetRecipesListHandlerTests(IntegrationTestFactory factory) : Integr
     }
 
     [Fact]
-    public async Task Handle_WhenRecipesHaveBrews_ReturnsMostCommonGrindSizePerGrinder()
+    public async Task Handle_WhenRecipesHaveBrews_ReturnsAverageGrindSizePerGrinder()
     {
         // Arrange
         var roaster = Roaster.Create("Roaster", null, null);
@@ -138,19 +138,19 @@ public class GetRecipesListHandlerTests(IntegrationTestFactory factory) : Integr
         dailyResult.GrindStats.Should().HaveCount(2);
         var dailyComandante = dailyResult.GrindStats.Single(stat => stat.GrinderId == comandante.Id);
         dailyComandante.GrinderName.Should().Be("Comandante");
-        dailyComandante.MostCommonGrindSize.Should().Be(20m);
-        dailyComandante.UsageCount.Should().Be(2);
+        dailyComandante.AverageGrindSize.Should().Be(20.33m);
+        dailyComandante.BrewCount.Should().Be(3);
 
         var dailyKultra = dailyResult.GrindStats.Single(stat => stat.GrinderId == kultra.Id);
         dailyKultra.GrinderName.Should().Be("K-Ultra");
-        dailyKultra.MostCommonGrindSize.Should().Be(8.5m);
-        dailyKultra.UsageCount.Should().Be(2);
+        dailyKultra.AverageGrindSize.Should().Be(8.33m);
+        dailyKultra.BrewCount.Should().Be(3);
 
         var weekendResult = result.Single(entity => entity.Id == weekendRecipe.Id);
         weekendResult.GrindStats.Should().HaveCount(1);
         var weekendComandante = weekendResult.GrindStats.Single();
         weekendComandante.GrinderId.Should().Be(comandante.Id);
-        weekendComandante.MostCommonGrindSize.Should().Be(16m);
-        weekendComandante.UsageCount.Should().Be(2);
+        weekendComandante.AverageGrindSize.Should().Be(16m);
+        weekendComandante.BrewCount.Should().Be(2);
     }
 }

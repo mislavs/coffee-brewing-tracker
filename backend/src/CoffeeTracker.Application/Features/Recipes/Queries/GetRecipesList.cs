@@ -63,25 +63,11 @@ public sealed class GetRecipesListHandler(ApplicationDbContext dbContext)
                         entry.GrinderId,
                         entry.GrinderName
                     })
-                    .Select(grinderGroup =>
-                    {
-                        var mostCommonGrind = grinderGroup
-                            .GroupBy(entry => entry.GrindSize)
-                            .Select(grindGroup => new
-                            {
-                                GrindSize = grindGroup.Key,
-                                UsageCount = grindGroup.Count()
-                            })
-                            .OrderByDescending(grindGroup => grindGroup.UsageCount)
-                            .ThenBy(grindGroup => grindGroup.GrindSize)
-                            .First();
-
-                        return new RecipeGrindStatsDto(
-                            grinderGroup.Key.GrinderId,
-                            grinderGroup.Key.GrinderName,
-                            mostCommonGrind.GrindSize,
-                            mostCommonGrind.UsageCount);
-                    })
+                    .Select(grinderGroup => new RecipeGrindStatsDto(
+                        grinderGroup.Key.GrinderId,
+                        grinderGroup.Key.GrinderName,
+                        Math.Round(grinderGroup.Average(entry => entry.GrindSize), 2),
+                        grinderGroup.Count()))
                     .OrderBy(stat => stat.GrinderName)
                     .ToList());
 

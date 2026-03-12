@@ -1,6 +1,7 @@
 import type { Guid } from '@/lib/api-types'
 import { Link, Navigate } from 'react-router-dom'
 import { DetailField } from '@/components/DetailField'
+import { StatCard } from '@/components/StatCard'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -15,6 +16,7 @@ import { useEntityFormId } from '@/lib/useEntityFormId'
 
 function GrinderDetailContent({ grinderId }: { grinderId: Guid }) {
   const { data: grinder } = useGrinder(grinderId)
+  const recipeStats = grinder.recipeStats ?? []
 
   return (
     <Card>
@@ -31,17 +33,34 @@ function GrinderDetailContent({ grinderId }: { grinderId: Guid }) {
             <DetailField label="Total Coffee Ground">
               {grinder.totalCoffeeGround ?? 0}g
             </DetailField>
-            <DetailField label="Most Common Grind Setting">
-              {grinder.mostCommonGrindSetting ?? '—'}
-            </DetailField>
             <DetailField label="Grind Setting Range">
               {grinder.grindSettingMin != null && grinder.grindSettingMax != null
                 ? `${grinder.grindSettingMin} - ${grinder.grindSettingMax}`
                 : '—'}
             </DetailField>
-            <DetailField label="Best Rated Grind Setting">
-              {grinder.bestRatedGrindSetting ?? '—'}
-            </DetailField>
+          </div>
+        )}
+        {recipeStats.length > 0 && (
+          <div className="space-y-2 pt-2">
+            <p className="font-medium text-muted-foreground">
+              Average grind size per recipe
+            </p>
+            <div className="grid gap-2 sm:grid-cols-2">
+              {recipeStats.map((stat, index) => (
+                <Link
+                  key={stat.recipeId ?? `${stat.recipeName ?? 'recipe-stat'}-${index}`}
+                  to={stat.recipeId ? `/recipes/${stat.recipeId}` : '#'}
+                  className={stat.recipeId ? 'block' : undefined}
+                >
+                  <StatCard
+                    label={stat.recipeName ?? 'Unknown recipe'}
+                    value={`${
+                      stat.averageGrindSize ?? '—'
+                    } (${formatBrewCount(stat.brewCount ?? 0)})`}
+                  />
+                </Link>
+              ))}
+            </div>
           </div>
         )}
       </CardContent>
@@ -64,4 +83,8 @@ export function GrinderDetailPage() {
   }
 
   return <GrinderDetailContent grinderId={entityId.id} />
+}
+
+function formatBrewCount(count: number) {
+  return `${count} ${count === 1 ? 'brew' : 'brews'}`
 }

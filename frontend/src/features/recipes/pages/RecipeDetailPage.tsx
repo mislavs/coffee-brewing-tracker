@@ -59,7 +59,7 @@ function RecipeDetailContent({ recipeId }: { recipeId: Guid }) {
           {grindStats.length > 0 ? (
             <div className="space-y-2 pt-2">
               <p className="font-medium text-muted-foreground">
-                Most common grind setting per grinder
+                Average grind size per grinder
               </p>
               <div className="grid gap-2 sm:grid-cols-2">
                 {grindStats.map((stat, index) => (
@@ -67,8 +67,8 @@ function RecipeDetailContent({ recipeId }: { recipeId: Guid }) {
                     key={stat.grinderId ?? `${stat.grinderName ?? 'grind-stat'}-${index}`}
                     label={stat.grinderName ?? 'Unknown grinder'}
                     value={`${
-                      stat.mostCommonGrindSize ?? '—'
-                    } (${formatBrewCount(stat.usageCount ?? 0)})`}
+                      stat.averageGrindSize ?? '—'
+                    } (${formatBrewCount(stat.brewCount ?? 0)})`}
                   />
                 ))}
               </div>
