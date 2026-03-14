@@ -1,4 +1,6 @@
+import { Wrench } from 'lucide-react'
 import { Link, useSearchParams } from 'react-router-dom'
+import { EmptyState } from '@/components/EmptyState'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -83,15 +85,24 @@ function EquipmentEntityCardList({
             ))}
           </div>
         ) : items.length === 0 ? (
-          <p className="py-8 text-center text-muted-foreground">{emptyMessage}</p>
+          <EmptyState
+            icon={<Wrench className="size-6" />}
+            title={`No ${title.toLowerCase()} yet`}
+            description={emptyMessage}
+            actionLabel={addLabel}
+            actionHref={addHref}
+          />
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {items.map((item) => (
-              <Card key={item.id ?? item.name ?? itemKeyPrefix} className="h-full">
+              <Card key={item.id ?? item.name ?? itemKeyPrefix} className="card-interactive h-full">
                 <CardHeader>
                   <CardTitle className="text-base">
                     {item.id ? (
-                      <Link to={`${detailHrefPrefix}/${item.id}`} className="hover:underline">
+                      <Link
+                        to={`${detailHrefPrefix}/${item.id}`}
+                        className="transition-colors hover:text-primary"
+                      >
                         {getName(item)}
                       </Link>
                     ) : (
@@ -177,8 +188,14 @@ function AccessoryList() {
               />
             ) : accessories.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={2} className="text-muted-foreground">
-                  No accessories yet. Add your first accessory to get started.
+                <TableCell colSpan={2}>
+                  <EmptyState
+                    icon={<Wrench className="size-6" />}
+                    title="No accessories yet"
+                    description="Add your first accessory to get started."
+                    actionLabel="Add Accessory"
+                    actionHref="/equipment/accessories/new"
+                  />
                 </TableCell>
               </TableRow>
             ) : (

@@ -26,13 +26,13 @@ export function RoasterCard({ roaster }: RoasterCardProps) {
   const beanCount = roaster.beanCount ?? 0
 
   return (
-    <Card className="h-full">
+    <Card className="card-interactive h-full">
       <CardHeader className="space-y-3">
-        <div className="bg-muted/30 flex h-28 w-full items-center justify-center overflow-hidden rounded-md border">
+        <div className="flex h-28 w-full items-center justify-center overflow-hidden rounded-lg border bg-gradient-to-br from-muted/20 to-muted/40">
           {logoUrl ? (
-            <img src={logoUrl} alt={`${name} logo`} className="h-full w-full object-contain" />
+            <img src={logoUrl} alt={`${name} logo`} className="h-full w-full object-contain p-2" />
           ) : (
-            <span className="text-muted-foreground text-xl font-semibold">
+            <span className="text-2xl font-bold tracking-tight text-muted-foreground/70">
               {getInitials(name)}
             </span>
           )}
@@ -40,19 +40,22 @@ export function RoasterCard({ roaster }: RoasterCardProps) {
         <div>
           <CardTitle className="text-base">
             {roaster.id ? (
-              <Link to={`/roasters/${roaster.id}`} className="hover:underline">
+              <Link
+                to={`/roasters/${roaster.id}`}
+                className="transition-colors hover:text-primary"
+              >
                 {name}
               </Link>
             ) : (
               name
             )}
           </CardTitle>
-          <CardDescription>
-            {city} • {country}
+          <CardDescription className="mt-0.5">
+            {city} · {country}
           </CardDescription>
         </div>
       </CardHeader>
-      <CardContent className="flex flex-wrap gap-2">
+      <CardContent className="flex flex-wrap gap-1.5">
         <Badge variant="secondary">{beanCount} beans</Badge>
         <Badge variant="outline">{formatPricePerKg(roaster.avgPricePerKg)}</Badge>
       </CardContent>

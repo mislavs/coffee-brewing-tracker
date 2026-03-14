@@ -69,12 +69,16 @@ function BrewLogDetailContent({ brewLogId }: { brewLogId: Guid }) {
           <CardTitle>{brewLog.beanName ?? 'Brew log entry'}</CardTitle>
         </CardHeader>
         <CardContent className="text-sm">
-          <div className="grid gap-6 md:grid-cols-2">
-            <div className="space-y-6">
-              <section className="space-y-3">
-                <p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
-                  Equipment
-                </p>
+          <div className="grid gap-8 md:grid-cols-2">
+            <div className="space-y-8">
+              <section className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <div className="h-px flex-1 bg-border" />
+                  <p className="text-xs font-semibold tracking-widest uppercase text-muted-foreground">
+                    Equipment
+                  </p>
+                  <div className="h-px flex-1 bg-border" />
+                </div>
                 <div className="grid gap-3">
                   <DetailField label="Bean" stacked>
                     {brewLog.beanId ? (
@@ -124,28 +128,42 @@ function BrewLogDetailContent({ brewLogId }: { brewLogId: Guid }) {
                 </div>
               </section>
 
-              <section className="space-y-3">
-                <p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
-                  Notes
+              <section className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <div className="h-px flex-1 bg-border" />
+                  <p className="text-xs font-semibold tracking-widest uppercase text-muted-foreground">
+                    Notes
+                  </p>
+                  <div className="h-px flex-1 bg-border" />
+                </div>
+                <p className="whitespace-pre-wrap leading-relaxed text-muted-foreground">
+                  {brewLog.notes || '—'}
                 </p>
-                <p className="whitespace-pre-wrap text-muted-foreground">{brewLog.notes || '—'}</p>
               </section>
 
-              <section className="space-y-3">
-                <p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
-                  Adjustments
-                </p>
-                <p className="whitespace-pre-wrap text-muted-foreground">
+              <section className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <div className="h-px flex-1 bg-border" />
+                  <p className="text-xs font-semibold tracking-widest uppercase text-muted-foreground">
+                    Adjustments
+                  </p>
+                  <div className="h-px flex-1 bg-border" />
+                </div>
+                <p className="whitespace-pre-wrap leading-relaxed text-muted-foreground">
                   {brewLog.adjustmentIdeas || '—'}
                 </p>
               </section>
             </div>
 
-            <div className="space-y-6">
-              <section className="space-y-3">
-                <p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
-                  Brew Parameters
-                </p>
+            <div className="space-y-8">
+              <section className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <div className="h-px flex-1 bg-border" />
+                  <p className="text-xs font-semibold tracking-widest uppercase text-muted-foreground">
+                    Brew Parameters
+                  </p>
+                  <div className="h-px flex-1 bg-border" />
+                </div>
                 <div className="grid gap-3">
                   <DetailField label="Dose" stacked>
                     {brewLog.dose !== null && brewLog.dose !== undefined
@@ -176,10 +194,14 @@ function BrewLogDetailContent({ brewLogId }: { brewLogId: Guid }) {
                 </div>
               </section>
 
-              <section className="space-y-3">
-                <p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
-                  Result
-                </p>
+              <section className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <div className="h-px flex-1 bg-border" />
+                  <p className="text-xs font-semibold tracking-widest uppercase text-muted-foreground">
+                    Result
+                  </p>
+                  <div className="h-px flex-1 bg-border" />
+                </div>
                 <div className="grid gap-3">
                   <DetailField label="Rating" stacked>
                     {getRatingDisplay(brewLog.rating)}

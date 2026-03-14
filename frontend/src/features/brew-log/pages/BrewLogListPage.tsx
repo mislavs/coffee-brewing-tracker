@@ -1,5 +1,6 @@
-import { Mic } from 'lucide-react'
+import { Coffee, Mic } from 'lucide-react'
 import { Link, useSearchParams } from 'react-router-dom'
+import { EmptyState } from '@/components/EmptyState'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -159,9 +160,13 @@ export function BrewLogListPage() {
             ))}
           </div>
         ) : brewLogs.length === 0 ? (
-          <p className="text-muted-foreground">
-            No brew logs yet. Add your first brew to get started.
-          </p>
+          <EmptyState
+            icon={<Coffee className="size-6" />}
+            title="No brews yet"
+            description="Log your first brew to start tracking your coffee journey."
+            actionLabel="Log Brew"
+            actionHref="/brew-log/new"
+          />
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {brewLogs.map((brewLog) => (

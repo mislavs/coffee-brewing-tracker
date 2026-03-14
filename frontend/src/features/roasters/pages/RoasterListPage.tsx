@@ -1,4 +1,6 @@
+import { Store } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { EmptyState } from '@/components/EmptyState'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -45,9 +47,13 @@ export function RoasterListPage() {
             ))}
           </div>
         ) : roasters.length === 0 ? (
-          <p className="text-muted-foreground">
-            No roasters yet. Add your first roaster to get started.
-          </p>
+          <EmptyState
+            icon={<Store className="size-6" />}
+            title="No roasters yet"
+            description="Add your first roaster to organize your beans by source."
+            actionLabel="Add Roaster"
+            actionHref="/roasters/new"
+          />
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {roasters.map((roaster) => (

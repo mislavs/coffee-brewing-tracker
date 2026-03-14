@@ -38,23 +38,26 @@ export function RecipeCard({ recipe }: RecipeCardProps) {
   )
 
   return (
-    <Card className="h-full">
+    <Card className="card-interactive h-full">
       <CardHeader className="space-y-3">
         <div>
           <CardTitle className="text-base">
             {recipe.id ? (
-              <Link to={`/recipes/${recipe.id}`} className="hover:underline">
+              <Link
+                to={`/recipes/${recipe.id}`}
+                className="transition-colors hover:text-primary"
+              >
                 {name}
               </Link>
             ) : (
               name
             )}
           </CardTitle>
-          <CardDescription>{brewerName}</CardDescription>
+          <CardDescription className="mt-0.5">{brewerName}</CardDescription>
         </div>
       </CardHeader>
       <CardContent className="space-y-3">
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-1.5">
           <Badge variant="secondary">{brewerName}</Badge>
           {grindStats.length > 0 ? (
             grindStats.map((stat, index) => (
@@ -71,7 +74,9 @@ export function RecipeCard({ recipe }: RecipeCardProps) {
             </Badge>
           )}
         </div>
-        <p className="text-muted-foreground text-sm">{truncateDescription(recipe.description)}</p>
+        <p className="text-muted-foreground text-sm leading-relaxed">
+          {truncateDescription(recipe.description)}
+        </p>
       </CardContent>
     </Card>
   )

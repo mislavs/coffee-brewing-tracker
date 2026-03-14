@@ -48,17 +48,17 @@ export function BrewLogCard({ brewLog }: BrewLogCardProps) {
       : (brewLog.grinderName ?? '—')
 
   return (
-    <Card className="h-full py-4">
-      <CardHeader className="space-y-1 px-3 pt-2.5 pb-0.5">
+    <Card className="card-interactive h-full py-4">
+      <CardHeader className="space-y-1.5 px-4 pt-2.5 pb-0.5">
         <div className="flex items-start justify-between gap-2">
-          <Badge variant="secondary" className="w-fit">
+          <Badge variant="secondary" className="w-fit font-semibold">
             {formatDateTime(brewLog.brewedAt)}
           </Badge>
           {brewLog.id ? (
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon-sm" asChild>
+                  <Button variant="ghost" size="icon-sm" className="rounded-lg" asChild>
                     <Link
                       to={`/brew-log/new?repeatFrom=${brewLog.id}`}
                       aria-label={`Repeat brew for ${beanDisplayName}`}
@@ -72,9 +72,12 @@ export function BrewLogCard({ brewLog }: BrewLogCardProps) {
             </TooltipProvider>
           ) : null}
         </div>
-        <CardTitle className="text-base leading-none">
+        <CardTitle className="text-base leading-snug">
           {brewLog.id ? (
-            <Link to={`/brew-log/${brewLog.id}`} className="hover:underline">
+            <Link
+              to={`/brew-log/${brewLog.id}`}
+              className="transition-colors hover:text-primary"
+            >
               {beanDisplayName}
             </Link>
           ) : (
@@ -83,24 +86,24 @@ export function BrewLogCard({ brewLog }: BrewLogCardProps) {
         </CardTitle>
       </CardHeader>
       <CardContent className="px-4 pt-0">
-        <div className="rounded-md border bg-muted/20 px-2.5 py-1">
-          <dl className="grid grid-cols-[max-content_1fr] gap-x-3 gap-y-1.5 text-sm">
-            <dt className="text-muted-foreground">Brewer:</dt>
+        <div className="rounded-lg border bg-muted/15 px-3 py-2.5">
+          <dl className="grid grid-cols-[max-content_1fr] gap-x-3 gap-y-2 text-sm">
+            <dt className="text-muted-foreground">Brewer</dt>
             <dd className="font-medium text-foreground">{brewerName}</dd>
 
-            <dt className="text-muted-foreground">Recipe:</dt>
+            <dt className="text-muted-foreground">Recipe</dt>
             <dd className="font-medium text-foreground">{recipeName}</dd>
 
-            <dt className="text-muted-foreground">Bean / Water:</dt>
+            <dt className="text-muted-foreground">Bean / Water</dt>
             <dd className="font-medium text-foreground">{doseAndWater}</dd>
 
-            <dt className="text-muted-foreground">Grinder:</dt>
+            <dt className="text-muted-foreground">Grinder</dt>
             <dd className="font-medium text-foreground">{grinderAndSetting}</dd>
 
-            <dt className="text-muted-foreground">Time:</dt>
+            <dt className="text-muted-foreground">Time</dt>
             <dd className="font-medium text-foreground">{formatBrewTime(brewLog.brewTimeSeconds)}</dd>
 
-            <dt className="text-muted-foreground">Rating:</dt>
+            <dt className="text-muted-foreground">Rating</dt>
             <dd className="font-medium text-foreground">{getRatingDisplay(brewLog.rating)}</dd>
           </dl>
         </div>

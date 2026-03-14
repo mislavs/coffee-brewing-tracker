@@ -49,12 +49,16 @@ function BeanDetailContent({ beanId }: { beanId: Guid }) {
         <CardTitle>{bean.name ?? 'Unnamed bean'}</CardTitle>
       </CardHeader>
       <CardContent className="text-sm">
-        <div className="grid gap-6 md:grid-cols-2">
-          <div className="space-y-6">
-            <section className="space-y-3">
-              <p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
-                Origin
-              </p>
+        <div className="grid gap-8 md:grid-cols-2">
+          <div className="space-y-8">
+            <section className="space-y-4">
+              <div className="flex items-center gap-2">
+                <div className="h-px flex-1 bg-border" />
+                <p className="text-xs font-semibold tracking-widest uppercase text-muted-foreground">
+                  Origin
+                </p>
+                <div className="h-px flex-1 bg-border" />
+              </div>
               <div className="grid gap-3">
                 <DetailField label="Roaster" stacked>
                   {bean.roasterId ? (
@@ -107,11 +111,15 @@ function BeanDetailContent({ beanId }: { beanId: Guid }) {
             </section>
           </div>
 
-          <div className="space-y-6">
-            <section className="space-y-3">
-              <p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
-                Roast and Purchase
-              </p>
+          <div className="space-y-8">
+            <section className="space-y-4">
+              <div className="flex items-center gap-2">
+                <div className="h-px flex-1 bg-border" />
+                <p className="text-xs font-semibold tracking-widest uppercase text-muted-foreground">
+                  Roast & Purchase
+                </p>
+                <div className="h-px flex-1 bg-border" />
+              </div>
               <div className="grid gap-3">
                 <DetailField label="Roast Profile" stacked>
                   {formatRoastProfile(bean.roastProfile)}
@@ -132,10 +140,14 @@ function BeanDetailContent({ beanId }: { beanId: Guid }) {
               </div>
             </section>
 
-            <section className="space-y-3">
-              <p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
-                Stock
-              </p>
+            <section className="space-y-4">
+              <div className="flex items-center gap-2">
+                <div className="h-px flex-1 bg-border" />
+                <p className="text-xs font-semibold tracking-widest uppercase text-muted-foreground">
+                  Stock
+                </p>
+                <div className="h-px flex-1 bg-border" />
+              </div>
               <div className="space-y-2">
                 <p className={isLowStock ? 'font-medium text-destructive' : 'font-medium'}>
                   {formatDecimal(clampedRemainingQuantity)} g / {formatDecimal(bean.bagWeight)} g
@@ -144,10 +156,14 @@ function BeanDetailContent({ beanId }: { beanId: Guid }) {
               </div>
             </section>
 
-            <section className="space-y-3">
-              <p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
-                Tasting
-              </p>
+            <section className="space-y-4">
+              <div className="flex items-center gap-2">
+                <div className="h-px flex-1 bg-border" />
+                <p className="text-xs font-semibold tracking-widest uppercase text-muted-foreground">
+                  Tasting
+                </p>
+                <div className="h-px flex-1 bg-border" />
+              </div>
               {bean.flavorNotes && bean.flavorNotes.length > 0 ? (
                 <div className="flex flex-wrap gap-2">
                   {bean.flavorNotes

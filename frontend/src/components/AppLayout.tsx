@@ -1,5 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Globe, X } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
+import {
+  BookOpen,
+  Coffee,
+  Globe,
+  Icon as LucideLabIcon,
+  Store,
+  Wrench,
+  X,
+} from 'lucide-react'
+import { coffeeBean } from '@lucide/lab'
 import { DashboardStats } from '@/components/DashboardStats'
 import { SettingsButton } from '@/components/SettingsButton'
 import { Button } from '@/components/ui/button'
@@ -29,6 +39,13 @@ import {
 import { cn } from '@/lib/utils'
 
 const expandedMapHeightClass = 'h-[42rem] md:h-[46rem]'
+
+const navIcons: Record<string, LucideIcon> = {
+  'brew-log': Coffee,
+  equipment: Wrench,
+  recipes: BookOpen,
+  roasters: Store,
+}
 
 export function AppLayout() {
   const { settings } = useSettings()
@@ -148,35 +165,49 @@ export function AppLayout() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <header className="relative z-30 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/75">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-3 px-4 py-3 sm:px-6 lg:px-8">
-          <div className="text-sm font-semibold tracking-wide">BeanMeridian</div>
+      <header className="sticky top-0 z-30 border-b bg-background/90 backdrop-blur-lg supports-[backdrop-filter]:bg-background/70">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-4 px-4 py-3 sm:px-6 lg:px-8">
+          <NavLink
+            to="/"
+            className="group flex items-center gap-2 transition-opacity hover:opacity-80"
+          >
+            <div className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-sm">
+              <Coffee className="size-4" />
+            </div>
+            <span className="text-base font-bold tracking-tight">BeanMeridian</span>
+          </NavLink>
           <nav className="flex flex-1 flex-wrap gap-1">
-            {featureRoutes.map((route) => (
-              <NavLink
-                key={route.href}
-                to={route.href}
-                onMouseEnter={() => prefetchFeature(route.path)}
-                onFocus={() => prefetchFeature(route.path)}
-                onTouchStart={() => prefetchFeature(route.path)}
-                className={({ isActive }) =>
-                  cn(
-                    'rounded-md px-3 py-2 text-sm transition-colors',
-                    isActive
-                      ? 'bg-primary text-primary-foreground'
-                      : 'text-muted-foreground hover:bg-muted hover:text-foreground',
-                  )
-                }
-              >
-                {route.title}
-              </NavLink>
-            ))}
+            {featureRoutes.map((route) => {
+              const Icon = navIcons[route.path]
+              return (
+                <NavLink
+                  key={route.href}
+                  to={route.href}
+                  onMouseEnter={() => prefetchFeature(route.path)}
+                  onFocus={() => prefetchFeature(route.path)}
+                  onTouchStart={() => prefetchFeature(route.path)}
+                  className={({ isActive }) =>
+                    cn(
+                      'flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200',
+                      isActive
+                        ? 'bg-primary text-primary-foreground shadow-sm'
+                        : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+                    )
+                  }
+                >
+                  {Icon ? <Icon className="size-3.5" /> : null}
+                  {route.path === 'beans' ? <LucideLabIcon iconNode={coffeeBean} className="size-3.5" /> : null}
+                  {route.title}
+                </NavLink>
+              )
+            })}
           </nav>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-0.5">
             <Button
               type="button"
               variant={isMapExpanded ? 'secondary' : 'ghost'}
               size="icon"
+              className="rounded-lg"
               aria-label={isMapExpanded ? 'Close map view' : 'Open map view'}
               aria-expanded={isMapExpanded}
               aria-pressed={isMapExpanded}

@@ -1,4 +1,6 @@
+import { BookOpen } from 'lucide-react'
 import { Link, useSearchParams } from 'react-router-dom'
+import { EmptyState } from '@/components/EmptyState'
 import { Button } from '@/components/ui/button'
 import { CardSkeleton } from '@/components/skeletons/CardSkeleton'
 import {
@@ -93,9 +95,13 @@ export function RecipeListPage() {
             ))}
           </div>
         ) : recipes.length === 0 ? (
-          <p className="text-muted-foreground">
-            No recipes yet. Add your first recipe to get started.
-          </p>
+          <EmptyState
+            icon={<BookOpen className="size-6" />}
+            title="No recipes yet"
+            description="Create your first recipe to save your favorite brew methods."
+            actionLabel="Add Recipe"
+            actionHref="/recipes/new"
+          />
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {recipes.map((recipe, index) => (

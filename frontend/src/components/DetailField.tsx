@@ -10,16 +10,20 @@ export function DetailField({ label, children, stacked = false }: DetailFieldPro
   if (stacked) {
     return (
       <div className="space-y-1">
-        <p className="font-medium text-muted-foreground">{label}</p>
-        {children}
+        <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+          {label}
+        </p>
+        <div className="text-sm">{children}</div>
       </div>
     )
   }
 
   return (
-    <div>
-      <span className="font-medium text-muted-foreground">{label}:</span>{' '}
-      {children}
+    <div className="flex items-baseline gap-2">
+      <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+        {label}
+      </span>
+      <span className="text-sm">{children}</span>
     </div>
   )
 }

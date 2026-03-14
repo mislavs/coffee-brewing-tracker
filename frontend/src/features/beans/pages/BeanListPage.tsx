@@ -1,4 +1,6 @@
+import { Leaf } from 'lucide-react'
 import { Link, useSearchParams } from 'react-router-dom'
+import { EmptyState } from '@/components/EmptyState'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -149,9 +151,13 @@ export function BeanListPage() {
             ))}
           </div>
         ) : beans.length === 0 ? (
-          <p className="text-muted-foreground">
-            No beans yet. Add your first bean to get started.
-          </p>
+          <EmptyState
+            icon={<Leaf className="size-6" />}
+            title="No beans yet"
+            description="Add your first bean to start building your coffee library."
+            actionLabel="Add Bean"
+            actionHref="/beans/new"
+          />
         ) : (
           <>
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">

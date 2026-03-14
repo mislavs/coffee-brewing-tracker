@@ -31,11 +31,11 @@ function RoasterDetailContent({ roasterId }: { roasterId: Guid }) {
   return (
     <Card>
       <CardHeader className="space-y-4">
-        <div className="bg-muted/30 flex h-44 w-full items-center justify-center overflow-hidden rounded-md border">
+        <div className="flex h-44 w-full items-center justify-center overflow-hidden rounded-xl border bg-gradient-to-br from-muted/20 to-muted/40">
           {logoUrl ? (
-            <img src={logoUrl} alt={`${name} logo`} className="h-full w-full object-contain" />
+            <img src={logoUrl} alt={`${name} logo`} className="h-full w-full object-contain p-4" />
           ) : (
-            <span className="text-muted-foreground text-3xl font-semibold">
+            <span className="text-4xl font-bold tracking-tight text-muted-foreground/60">
               {getInitials(name)}
             </span>
           )}
@@ -43,10 +43,12 @@ function RoasterDetailContent({ roasterId }: { roasterId: Guid }) {
         <CardTitle>{name}</CardTitle>
         <CardDescription>Roaster details</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-2 text-sm">
-        <DetailField label="City">{roaster.city || '—'}</DetailField>
-        <DetailField label="Country">{roaster.countryName || '—'}</DetailField>
-        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+      <CardContent className="space-y-6 text-sm">
+        <div className="grid gap-3 sm:grid-cols-2">
+          <DetailField label="City" stacked>{roaster.city || '—'}</DetailField>
+          <DetailField label="Country" stacked>{roaster.countryName || '—'}</DetailField>
+        </div>
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           <StatCard label="Beans" value={`${beanCount}`} />
           <StatCard
             label="Avg Price per Kg"
@@ -66,10 +68,14 @@ function RoasterDetailContent({ roasterId }: { roasterId: Guid }) {
             value={formatBrewRating(roaster.avgBrewRating)}
           />
         </div>
-        <div className="space-y-1 pt-2">
+        <div className="space-y-2 pt-2">
           <div className="flex items-center gap-2">
-            <p className="font-medium text-muted-foreground">Beans</p>
+            <div className="h-px flex-1 bg-border" />
+            <p className="text-xs font-semibold tracking-widest uppercase text-muted-foreground">
+              Beans
+            </p>
             <Badge variant="secondary">{beanCount}</Badge>
+            <div className="h-px flex-1 bg-border" />
           </div>
           {roaster.beans && roaster.beans.length > 0 ? (
             <ul className="list-inside list-disc">

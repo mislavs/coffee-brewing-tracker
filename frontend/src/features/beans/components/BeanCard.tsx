@@ -29,13 +29,13 @@ type BeanCardProps = {
 function getRoastToneClass(roastProfile: number | null | undefined) {
   switch (roastProfile) {
     case 0:
-      return 'border-amber-200 bg-amber-50 text-amber-900'
+      return 'border-amber-200/60 bg-gradient-to-br from-amber-50 to-amber-100/80 text-amber-900'
     case 1:
-      return 'border-stone-300 bg-stone-200 text-stone-900'
+      return 'border-stone-300/60 bg-gradient-to-br from-stone-100 to-stone-200/80 text-stone-900'
     case 2:
-      return 'border-orange-200 bg-orange-100 text-orange-900'
+      return 'border-orange-200/60 bg-gradient-to-br from-orange-50 to-orange-100/80 text-orange-900'
     default:
-      return 'border-muted bg-muted/40 text-muted-foreground'
+      return 'border-muted bg-gradient-to-br from-muted/30 to-muted/50 text-muted-foreground'
   }
 }
 
@@ -51,11 +51,11 @@ export function BeanCard({ bean }: BeanCardProps) {
   )
 
   return (
-    <Card className="h-full">
+    <Card className="card-interactive h-full">
       <CardHeader className="space-y-3">
         <div className="relative">
           <div
-            className={`flex h-28 w-full items-center justify-center rounded-md border text-sm font-medium ${getRoastToneClass(bean.roastProfile)}`}
+            className={`flex h-28 w-full items-center justify-center rounded-lg border text-sm font-semibold ${getRoastToneClass(bean.roastProfile)}`}
           >
             {roastProfileLabel}
           </div>
@@ -64,7 +64,7 @@ export function BeanCard({ bean }: BeanCardProps) {
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button variant="ghost" size="icon-sm" className="bg-background/80 backdrop-blur-sm" asChild>
+                    <Button variant="ghost" size="icon-sm" className="rounded-lg bg-background/80 backdrop-blur-sm" asChild>
                       <Link to={`/beans/new?repeatFrom=${bean.id}`} aria-label={`Repeat bean for ${name}`}>
                         <Repeat className="size-4" />
                       </Link>
@@ -79,17 +79,20 @@ export function BeanCard({ bean }: BeanCardProps) {
         <div>
           <CardTitle className="text-base">
             {bean.id ? (
-              <Link to={`/beans/${bean.id}`} className="hover:underline">
+              <Link
+                to={`/beans/${bean.id}`}
+                className="transition-colors hover:text-primary"
+              >
                 {name}
               </Link>
             ) : (
               name
             )}
           </CardTitle>
-          <CardDescription>{roasterName}</CardDescription>
+          <CardDescription className="mt-0.5">{roasterName}</CardDescription>
         </div>
       </CardHeader>
-      <CardContent className="flex flex-wrap gap-2">
+      <CardContent className="flex flex-wrap gap-1.5">
         <Badge variant="secondary">{roastProfileLabel}</Badge>
         {bean.isAvailable === false ? (
           <Badge variant="outline" className="text-muted-foreground">
