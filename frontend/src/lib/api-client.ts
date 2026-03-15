@@ -211,6 +211,7 @@ export const apiClient = {
             queryParameters
               ? {
                   search: queryParameters.search,
+                  beanId: queryParameters.beanId,
                   dateFrom: toIsoDateQueryValue(queryParameters.dateFrom),
                   dateTo: toIsoDateQueryValue(queryParameters.dateTo),
                   includeUnavailableBeans: queryParameters.includeUnavailableBeans,

@@ -480,6 +480,14 @@
             }
           },
           {
+            "name": "beanId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
             "name": "dateFrom",
             "in": "query",
             "schema": {

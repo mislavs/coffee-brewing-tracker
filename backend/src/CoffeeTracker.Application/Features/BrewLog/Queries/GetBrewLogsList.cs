@@ -7,6 +7,7 @@ namespace CoffeeTracker.Application.Features.BrewLog.Queries;
 
 public sealed record GetBrewLogsListQuery(
     string? Search,
+    Guid? BeanId,
     DateTime? DateFrom,
     DateTime? DateTo,
     bool IncludeUnavailableBeans = false)
@@ -32,6 +33,11 @@ public sealed class GetBrewLogsListHandler(ApplicationDbContext dbContext)
         {
             var searchTerm = request.Search.Trim();
             query = query.Where(entity => EF.Functions.ILike(entity.Bean.Name, $"%{searchTerm}%"));
+        }
+
+        if (request.BeanId.HasValue)
+        {
+            query = query.Where(entity => entity.BeanId == request.BeanId.Value);
         }
 
         if (request.DateFrom.HasValue)

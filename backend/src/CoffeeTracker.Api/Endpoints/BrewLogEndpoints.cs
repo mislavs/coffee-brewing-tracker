@@ -57,6 +57,7 @@ public static class BrewLogEndpoints
 
     private static async Task<Ok<IReadOnlyList<BrewLogSummaryDto>>> GetBrewLogs(
         string? search,
+        Guid? beanId,
         DateTime? dateFrom,
         DateTime? dateTo,
         bool? includeUnavailableBeans,
@@ -64,7 +65,7 @@ public static class BrewLogEndpoints
         CancellationToken cancellationToken)
     {
         var brewLogs = await sender.Send(
-            new GetBrewLogsListQuery(search, dateFrom, dateTo, includeUnavailableBeans ?? false),
+            new GetBrewLogsListQuery(search, beanId, dateFrom, dateTo, includeUnavailableBeans ?? false),
             cancellationToken);
         return TypedResults.Ok(brewLogs);
     }
