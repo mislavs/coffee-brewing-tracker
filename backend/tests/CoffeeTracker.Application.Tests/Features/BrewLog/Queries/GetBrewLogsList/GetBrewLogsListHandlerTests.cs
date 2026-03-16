@@ -21,16 +21,19 @@ public class GetBrewLogsListHandlerTests(IntegrationTestFactory factory) : Integ
         };
         await InsertMany(brewLogs);
 
-        var query = new GetBrewLogsListQuery(null, null, null);
+        var query = new GetBrewLogsListQuery(null, null, null, null);
 
         // Act
         var result = await Send(query);
 
         // Assert
-        result.Should().HaveCount(3);
-        result.Select(entry => entry.BrewedAt)
+        result.Items.Should().HaveCount(3);
+        result.Items.Select(entry => entry.BrewedAt)
             .Should()
             .BeInDescendingOrder();
+        result.TotalCount.Should().Be(3);
+        result.Page.Should().Be(1);
+        result.PageSize.Should().Be(12);
     }
 
     [Fact]
@@ -72,14 +75,14 @@ public class GetBrewLogsListHandlerTests(IntegrationTestFactory factory) : Integ
             null,
             DateTime.UtcNow));
 
-        var query = new GetBrewLogsListQuery(null, null, null);
+        var query = new GetBrewLogsListQuery(null, null, null, null);
 
         // Act
         var result = await Send(query);
 
         // Assert
-        result.Should().ContainSingle();
-        result.Single().BeanCostPerCup.Should().Be(1.44m);
+        result.Items.Should().ContainSingle();
+        result.Items.Single().BeanCostPerCup.Should().Be(1.44m);
     }
 
     [Fact]
@@ -125,14 +128,14 @@ public class GetBrewLogsListHandlerTests(IntegrationTestFactory factory) : Integ
             BrewLogEntry.Create(ethiopiaBean.Id, brewer.Id, grinder.Id, null, 18m, 300m, null, 10m, null, BrewRating.Good, null, null, DateTime.UtcNow)
         ]);
 
-        var query = new GetBrewLogsListQuery("KENYA", null, null);
+        var query = new GetBrewLogsListQuery("KENYA", null, null, null);
 
         // Act
         var result = await Send(query);
 
         // Assert
-        result.Should().ContainSingle();
-        result.Single().BeanName.Should().Be("Kenya AB");
+        result.Items.Should().ContainSingle();
+        result.Items.Single().BeanName.Should().Be("Kenya AB");
     }
 
     [Fact]
@@ -149,6 +152,7 @@ public class GetBrewLogsListHandlerTests(IntegrationTestFactory factory) : Integ
 
         var query = new GetBrewLogsListQuery(
             null,
+            null,
             new DateTime(2026, 2, 5, 0, 0, 0, DateTimeKind.Utc),
             new DateTime(2026, 2, 15, 23, 59, 59, DateTimeKind.Utc));
 
@@ -156,8 +160,8 @@ public class GetBrewLogsListHandlerTests(IntegrationTestFactory factory) : Integ
         var result = await Send(query);
 
         // Assert
-        result.Should().ContainSingle();
-        result.Single().BrewedAt.Should().Be(new DateTime(2026, 2, 10, 10, 0, 0, DateTimeKind.Utc));
+        result.Items.Should().ContainSingle();
+        result.Items.Single().BrewedAt.Should().Be(new DateTime(2026, 2, 10, 10, 0, 0, DateTimeKind.Utc));
     }
 
     [Fact]
@@ -205,17 +209,46 @@ public class GetBrewLogsListHandlerTests(IntegrationTestFactory factory) : Integ
         ]);
 
         // Act
-        var defaultResult = await Send(new GetBrewLogsListQuery(null, null, null));
-        var includeUnavailableResult = await Send(new GetBrewLogsListQuery(null, null, null, true));
+        var defaultResult = await Send(new GetBrewLogsListQuery(null, null, null, null));
+        var includeUnavailableResult = await Send(new GetBrewLogsListQuery(null, null, null, null, true));
 
         // Assert
-        defaultResult.Should().ContainSingle();
-        defaultResult.Single().BeanName.Should().Be("Available Bean");
+        defaultResult.Items.Should().ContainSingle();
+        defaultResult.Items.Single().BeanName.Should().Be("Available Bean");
 
-        includeUnavailableResult.Should().HaveCount(2);
-        includeUnavailableResult.Select(entry => entry.BeanName)
+        includeUnavailableResult.Items.Should().HaveCount(2);
+        includeUnavailableResult.Items.Select(entry => entry.BeanName)
             .Should()
             .Contain(["Available Bean", "Unavailable Bean"]);
+    }
+
+    [Fact]
+    public async Task Handle_WhenPageAndPageSizeProvided_ReturnsRequestedPageWithPaginationMetadata()
+    {
+        // Arrange
+        var (bean, brewer, grinder) = await SeedRequiredEntities("pagination");
+        var brewedAt = DateTime.UtcNow;
+        await InsertMany(
+        [
+            BrewLogEntry.Create(bean.Id, brewer.Id, grinder.Id, null, 18m, 300m, null, 10m, null, BrewRating.Good, null, null, brewedAt),
+            BrewLogEntry.Create(bean.Id, brewer.Id, grinder.Id, null, 18m, 300m, null, 10m, null, BrewRating.Good, null, null, brewedAt.AddDays(-1)),
+            BrewLogEntry.Create(bean.Id, brewer.Id, grinder.Id, null, 18m, 300m, null, 10m, null, BrewRating.Good, null, null, brewedAt.AddDays(-2))
+        ]);
+
+        var query = new GetBrewLogsListQuery(null, null, null, null, false, 2, 1);
+
+        // Act
+        var result = await Send(query);
+
+        // Assert
+        result.Items.Should().ContainSingle();
+        result.Items.Single().BrewedAt.Should().Be(brewedAt.AddDays(-1));
+        result.Page.Should().Be(2);
+        result.PageSize.Should().Be(1);
+        result.TotalCount.Should().Be(3);
+        result.TotalPages.Should().Be(3);
+        result.HasPreviousPage.Should().BeTrue();
+        result.HasNextPage.Should().BeTrue();
     }
 
     private async Task<(Bean Bean, Brewer Brewer, Grinder Grinder)> SeedRequiredEntities(string suffix)

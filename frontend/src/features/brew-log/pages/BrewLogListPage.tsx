@@ -1,4 +1,5 @@
-import { Coffee, Mic } from 'lucide-react'
+import { useCallback } from 'react'
+import { ChevronLeft, ChevronRight, Coffee, Mic } from 'lucide-react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { EmptyState } from '@/components/EmptyState'
 import { Button } from '@/components/ui/button'
@@ -9,6 +10,13 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+} from '@/components/ui/pagination'
 import { BrewLogCardSkeleton } from '@/components/skeletons/BrewLogCardSkeleton'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Input } from '@/components/ui/input'
@@ -18,20 +26,99 @@ import { useBrewLogs } from '@/features/brew-log/hooks/useBrewLogs'
 import { useFeatures } from '@/hooks/useFeatures'
 import { useDebouncedSearchParam } from '@/hooks/useDebouncedSearchParam'
 
+const BREW_LOG_PAGE_SIZE = 12
+
+function parsePageParam(value: string | null) {
+  const parsed = Number.parseInt(value ?? '1', 10)
+
+  if (Number.isNaN(parsed) || parsed < 1) {
+    return 1
+  }
+
+  return parsed
+}
+
+function getPaginationItems(currentPage: number, totalPages: number) {
+  if (totalPages <= 7) {
+    return Array.from({ length: totalPages }, (_, index) => index + 1)
+  }
+
+  const items: Array<number | 'start-ellipsis' | 'end-ellipsis'> = [1]
+  const siblingStart = Math.max(2, currentPage - 1)
+  const siblingEnd = Math.min(totalPages - 1, currentPage + 1)
+
+  if (siblingStart > 2) {
+    items.push('start-ellipsis')
+  }
+
+  for (let page = siblingStart; page <= siblingEnd; page += 1) {
+    items.push(page)
+  }
+
+  if (siblingEnd < totalPages - 1) {
+    items.push('end-ellipsis')
+  }
+
+  items.push(totalPages)
+
+  return items
+}
+
 export function BrewLogListPage() {
   const [searchParams, setSearchParams] = useSearchParams()
   const search = searchParams.get('search') ?? ''
   const dateFrom = searchParams.get('dateFrom') ?? ''
   const dateTo = searchParams.get('dateTo') ?? ''
   const includeUnavailable = searchParams.get('includeUnavailable') === 'true'
+  const page = parsePageParam(searchParams.get('page'))
+  const setFilterSearchParams = useCallback(
+    (
+      nextInit: Parameters<typeof setSearchParams>[0],
+      navigateOptions?: Parameters<typeof setSearchParams>[1],
+    ) => {
+      setSearchParams(
+        (previous) => {
+          const nextValue = typeof nextInit === 'function' ? nextInit(previous) : nextInit
+          const next =
+            nextValue instanceof URLSearchParams ||
+            Array.isArray(nextValue) ||
+            typeof nextValue === 'string'
+              ? new URLSearchParams(nextValue)
+              : new URLSearchParams()
+
+          if (
+            nextValue &&
+            !(nextValue instanceof URLSearchParams) &&
+            !Array.isArray(nextValue) &&
+            typeof nextValue !== 'string'
+          ) {
+            for (const [key, value] of Object.entries(nextValue)) {
+              if (Array.isArray(value)) {
+                for (const item of value) {
+                  next.append(key, item)
+                }
+              } else {
+                next.set(key, value)
+              }
+            }
+          }
+
+          next.delete('page')
+          return next
+        },
+        navigateOptions,
+      )
+    },
+    [setSearchParams],
+  )
   const [searchDraft, setSearchDraft] = useDebouncedSearchParam({
     paramName: 'search',
     value: search,
-    setSearchParams,
+    setSearchParams: setFilterSearchParams,
   })
 
   const setDateFilter = (name: 'dateFrom' | 'dateTo', nextIsoDate: string | undefined) => {
-    setSearchParams(
+    setFilterSearchParams(
       (previous) => {
         const next = new URLSearchParams(previous)
         if (nextIsoDate) {
@@ -47,7 +134,7 @@ export function BrewLogListPage() {
   }
 
   const handleToggleUnavailable = (checked: boolean) => {
-    setSearchParams(
+    setFilterSearchParams(
       (previous) => {
         const next = new URLSearchParams(previous)
         if (checked) {
@@ -62,12 +149,38 @@ export function BrewLogListPage() {
     )
   }
 
-  const { data: brewLogs = [], isPending } = useBrewLogs(
+  const setPage = (nextPage: number) => {
+    const normalizedPage = Math.max(nextPage, 1)
+
+    setSearchParams((previous) => {
+      const next = new URLSearchParams(previous)
+      if (normalizedPage === 1) {
+        next.delete('page')
+      } else {
+        next.set('page', normalizedPage.toString())
+      }
+
+      return next
+    })
+  }
+
+  const { data: brewLogsPage, isPending } = useBrewLogs(
     search,
     dateFrom,
     dateTo,
     includeUnavailable,
+    undefined,
+    page,
+    BREW_LOG_PAGE_SIZE,
   )
+  const brewLogs = brewLogsPage?.items ?? []
+  const totalCount = brewLogsPage?.totalCount ?? 0
+  const pageSize = brewLogsPage?.pageSize ?? BREW_LOG_PAGE_SIZE
+  const totalPages = Math.max(1, brewLogsPage?.totalPages ?? 1)
+  const currentPage = brewLogsPage?.page ?? page
+  const showingFrom = totalCount === 0 ? 0 : (currentPage - 1) * pageSize + 1
+  const showingTo = totalCount === 0 ? 0 : Math.min(currentPage * pageSize, totalCount)
+  const paginationItems = getPaginationItems(currentPage, totalPages)
   const { data: features } = useFeatures()
 
   return (
@@ -168,13 +281,67 @@ export function BrewLogListPage() {
             actionHref="/brew-log/new"
           />
         ) : (
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-            {brewLogs.map((brewLog) => (
-              <BrewLogCard
-                key={brewLog.id ?? `${brewLog.beanName ?? 'brew'}-${brewLog.brewedAt ?? ''}`}
-                brewLog={brewLog}
-              />
-            ))}
+          <div className="space-y-4">
+            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+              {brewLogs.map((brewLog) => (
+                <BrewLogCard
+                  key={brewLog.id ?? `${brewLog.beanName ?? 'brew'}-${brewLog.brewedAt ?? ''}`}
+                  brewLog={brewLog}
+                />
+              ))}
+            </div>
+
+            <div className="flex flex-col gap-4 border-t pt-4 sm:flex-row sm:items-center sm:justify-between">
+              <p className="text-sm text-muted-foreground">
+                Showing {showingFrom}-{showingTo} of {totalCount}
+              </p>
+
+              <Pagination className="mx-0 w-auto justify-start sm:justify-end">
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationLink asChild size="default">
+                      <button
+                        type="button"
+                        onClick={() => setPage(currentPage - 1)}
+                        disabled={currentPage <= 1}
+                      >
+                        <ChevronLeft className="size-4" />
+                        <span>Previous</span>
+                      </button>
+                    </PaginationLink>
+                  </PaginationItem>
+
+                  {paginationItems.map((item) =>
+                    typeof item === 'number' ? (
+                      <PaginationItem key={item}>
+                        <PaginationLink asChild isActive={item === currentPage}>
+                          <button type="button" onClick={() => setPage(item)}>
+                            {item}
+                          </button>
+                        </PaginationLink>
+                      </PaginationItem>
+                    ) : (
+                      <PaginationItem key={item}>
+                        <PaginationEllipsis />
+                      </PaginationItem>
+                    ),
+                  )}
+
+                  <PaginationItem>
+                    <PaginationLink asChild size="default">
+                      <button
+                        type="button"
+                        onClick={() => setPage(currentPage + 1)}
+                        disabled={currentPage >= totalPages}
+                      >
+                        <span>Next</span>
+                        <ChevronRight className="size-4" />
+                      </button>
+                    </PaginationLink>
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            </div>
           </div>
         )}
       </CardContent>

@@ -6,6 +6,8 @@ export const brewLogQueryKeys = {
     dateFrom?: string
     dateTo?: string
     includeUnavailableBeans?: boolean
+    page?: number
+    pageSize?: number
   }) =>
     ['brew-logs', params] as const,
   detail: (id: string) => ['brew-logs', id] as const,

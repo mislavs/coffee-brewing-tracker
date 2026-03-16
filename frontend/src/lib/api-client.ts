@@ -61,7 +61,7 @@ import type {
   BeanDto,
   BeanSummaryDto,
   BrewLogDto,
-  BrewLogSummaryDto,
+  BrewLogSummaryDtoPaginatedList,
   BrewerDto,
   BrewerSummaryDto,
   CountryDto,
@@ -111,6 +111,8 @@ type QueryRequest<TQueryParameters> = {
 type BrewLogsQueryParameters = Omit<GetBrewLogsParams, 'dateFrom' | 'dateTo'> & {
   dateFrom?: string | Date
   dateTo?: string | Date
+  page?: number
+  pageSize?: number
 }
 
 const jsonRequestHeaders = {
@@ -206,7 +208,7 @@ export const apiClient = {
       get: (request?: QueryRequest<BrewLogsQueryParameters>) => {
         const queryParameters = request?.queryParameters
 
-        return requestJson<BrewLogSummaryDto[]>(
+        return requestJson<BrewLogSummaryDtoPaginatedList>(
           getGetBrewLogsUrl(
             queryParameters
               ? {
@@ -215,6 +217,8 @@ export const apiClient = {
                   dateFrom: toIsoDateQueryValue(queryParameters.dateFrom),
                   dateTo: toIsoDateQueryValue(queryParameters.dateTo),
                   includeUnavailableBeans: queryParameters.includeUnavailableBeans,
+                  page: queryParameters.page,
+                  pageSize: queryParameters.pageSize,
                 }
               : undefined,
           ),

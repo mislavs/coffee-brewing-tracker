@@ -30,13 +30,16 @@ import { useEntityFormId } from '@/lib/useEntityFormId'
 
 function BeanDetailContent({ beanId }: { beanId: Guid }) {
   const { data: bean } = useBean(beanId)
-  const { data: brewLogs = [], isPending: isBrewLogsPending } = useBrewLogs(
+  const { data: brewLogsPage, isPending: isBrewLogsPending } = useBrewLogs(
     undefined,
     undefined,
     undefined,
     true,
     beanId,
+    1,
+    100,
   )
+  const brewLogs = brewLogsPage?.items ?? []
   const bagWeight = bean.bagWeight ?? 0
   const remainingQuantity = bean.remainingQuantity ?? bagWeight
   const clampedRemainingQuantity = Math.max(remainingQuantity, 0)

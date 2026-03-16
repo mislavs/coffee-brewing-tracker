@@ -23,6 +23,12 @@ export function useDebouncedSearchParam({
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       const normalized = draft.trim()
+      const normalizedValue = value.trim()
+
+      if (normalized === normalizedValue) {
+        return
+      }
+
       setSearchParams(
         (previous) => {
           const next = new URLSearchParams(previous)
@@ -39,7 +45,7 @@ export function useDebouncedSearchParam({
     }, delay)
 
     return () => clearTimeout(timeoutId)
-  }, [delay, draft, paramName, setSearchParams])
+  }, [delay, draft, paramName, setSearchParams, value])
 
   return [draft, setDraft] as const
 }

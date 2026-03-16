@@ -1,4 +1,5 @@
 using CoffeeTracker.Api.Contracts.BrewLogs;
+using CoffeeTracker.Application.Common;
 using CoffeeTracker.Application.Features.BrewLog.Commands;
 using CoffeeTracker.Application.Features.BrewLog.Commands.ParseVoiceBrewLog;
 using CoffeeTracker.Application.Features.BrewLog.Dtos;
@@ -55,17 +56,26 @@ public static class BrewLogEndpoints
         return app;
     }
 
-    private static async Task<Ok<IReadOnlyList<BrewLogSummaryDto>>> GetBrewLogs(
+    private static async Task<Ok<PaginatedList<BrewLogSummaryDto>>> GetBrewLogs(
         string? search,
         Guid? beanId,
         DateTime? dateFrom,
         DateTime? dateTo,
         bool? includeUnavailableBeans,
+        int? page,
+        int? pageSize,
         ISender sender,
         CancellationToken cancellationToken)
     {
         var brewLogs = await sender.Send(
-            new GetBrewLogsListQuery(search, beanId, dateFrom, dateTo, includeUnavailableBeans ?? false),
+            new GetBrewLogsListQuery(
+                search,
+                beanId,
+                dateFrom,
+                dateTo,
+                includeUnavailableBeans ?? false,
+                page ?? 1,
+                pageSize ?? 12),
             cancellationToken);
         return TypedResults.Ok(brewLogs);
     }

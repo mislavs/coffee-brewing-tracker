@@ -1,3 +1,4 @@
+using CoffeeTracker.Application.Common;
 using CoffeeTracker.Application.Features.BrewLog.Dtos;
 using CoffeeTracker.Infrastructure.Persistence;
 using MediatR;
@@ -10,13 +11,15 @@ public sealed record GetBrewLogsListQuery(
     Guid? BeanId,
     DateTime? DateFrom,
     DateTime? DateTo,
-    bool IncludeUnavailableBeans = false)
-    : IRequest<IReadOnlyList<BrewLogSummaryDto>>;
+    bool IncludeUnavailableBeans = false,
+    int Page = 1,
+    int PageSize = 12)
+    : IRequest<PaginatedList<BrewLogSummaryDto>>;
 
 public sealed class GetBrewLogsListHandler(ApplicationDbContext dbContext)
-    : IRequestHandler<GetBrewLogsListQuery, IReadOnlyList<BrewLogSummaryDto>>
+    : IRequestHandler<GetBrewLogsListQuery, PaginatedList<BrewLogSummaryDto>>
 {
-    public async Task<IReadOnlyList<BrewLogSummaryDto>> Handle(
+    public async Task<PaginatedList<BrewLogSummaryDto>> Handle(
         GetBrewLogsListQuery request,
         CancellationToken cancellationToken)
     {
@@ -50,8 +53,14 @@ public sealed class GetBrewLogsListHandler(ApplicationDbContext dbContext)
             query = query.Where(entity => entity.BrewedAt <= request.DateTo.Value);
         }
 
-        return await query
+        var page = Math.Max(request.Page, 1);
+        var pageSize = Math.Max(request.PageSize, 1);
+        var totalCount = await query.CountAsync(cancellationToken);
+
+        var items = await query
             .OrderByDescending(entity => entity.BrewedAt)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
             .Select(entity => new BrewLogSummaryDto(
                 entity.Id,
                 entity.BrewedAt,
@@ -69,5 +78,7 @@ public sealed class GetBrewLogsListHandler(ApplicationDbContext dbContext)
                     ? entity.Dose * entity.Bean.Price.Value / entity.Bean.BagWeight
                     : null))
             .ToListAsync(cancellationToken);
+
+        return new PaginatedList<BrewLogSummaryDto>(items, page, pageSize, totalCount);
     }
 }
