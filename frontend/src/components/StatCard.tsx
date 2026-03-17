@@ -3,10 +3,11 @@ import type { ReactNode } from 'react'
 type StatCardProps = {
   label: string
   value: string
+  subtitle?: string
   icon?: ReactNode
 }
 
-export function StatCard({ label, value, icon }: StatCardProps) {
+export function StatCard({ label, value, subtitle, icon }: StatCardProps) {
   return (
     <div className="group relative overflow-hidden rounded-lg border bg-card p-4">
       <div className="flex items-start justify-between gap-3">
@@ -14,7 +15,12 @@ export function StatCard({ label, value, icon }: StatCardProps) {
           <p className="text-muted-foreground text-xs font-medium uppercase tracking-wider">
             {label}
           </p>
-          <p className="text-xl font-bold tracking-tight">{value}</p>
+          <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+            <p className="text-xl font-bold tracking-tight">{value}</p>
+            {subtitle ? (
+              <p className="text-muted-foreground text-[11px] whitespace-nowrap">{subtitle}</p>
+            ) : null}
+          </div>
         </div>
         {icon ? (
           <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">

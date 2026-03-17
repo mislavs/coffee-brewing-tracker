@@ -1,11 +1,15 @@
-import { Coffee, Compass, Droplets, Package } from 'lucide-react'
+import { Clock3, Coffee, Compass, Droplets, Package } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
+import { cn } from '@/lib/utils'
 import { useDashboardStats } from '@/hooks/useDashboardStats'
 import { useSettings } from '@/hooks/useSettings'
 import { StatCard } from '@/components/StatCard'
 
 const wholeNumberFormatter = new Intl.NumberFormat()
+const consumptionFormatter = new Intl.NumberFormat(undefined, {
+  maximumFractionDigits: 1,
+})
 
 export function DashboardStats() {
   const { settings } = useSettings()
@@ -55,10 +59,18 @@ export function DashboardStats() {
   const coffeeAvailableGrams = data?.coffeeAvailableGrams ?? 0
   const beansExplored = data?.beansExplored ?? 0
   const totalCoffeeConsumedGrams = data?.totalCoffeeConsumedGrams ?? 0
+  const estimatedDaysRemaining = data?.estimatedDaysRemaining
+  const averageDailyConsumptionGrams = data?.averageDailyConsumptionGrams
+  const hasEstimatedDaysRemaining = estimatedDaysRemaining != null
 
   return (
     <section className="animate-fade-in">
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div
+        className={cn(
+          'grid items-start gap-4 sm:grid-cols-2',
+          hasEstimatedDaysRemaining ? 'xl:grid-cols-5' : 'xl:grid-cols-4',
+        )}
+      >
         <StatCard
           label="Total brews"
           value={wholeNumberFormatter.format(totalBrews)}
@@ -69,6 +81,18 @@ export function DashboardStats() {
           value={`${wholeNumberFormatter.format(coffeeAvailableGrams)} g`}
           icon={<Package className="size-4" />}
         />
+        {hasEstimatedDaysRemaining ? (
+          <StatCard
+            label="Days of coffee left"
+            value={`${wholeNumberFormatter.format(estimatedDaysRemaining)} days`}
+            subtitle={
+              averageDailyConsumptionGrams != null
+                ? `at ${consumptionFormatter.format(averageDailyConsumptionGrams)} g/day`
+                : undefined
+            }
+            icon={<Clock3 className="size-4" />}
+          />
+        ) : null}
         <StatCard
           label="Beans explored"
           value={wholeNumberFormatter.format(beansExplored)}

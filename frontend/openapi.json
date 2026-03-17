@@ -2099,6 +2099,16 @@
           "totalCoffeeConsumedGrams": {
             "type": "number",
             "format": "double"
+          },
+          "estimatedDaysRemaining": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "averageDailyConsumptionGrams": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
           }
         },
         "additionalProperties": false

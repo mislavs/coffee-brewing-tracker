@@ -4,4 +4,6 @@ public sealed record DashboardStatsDto(
     int TotalBrews,
     decimal CoffeeAvailableGrams,
     int BeansExplored,
-    decimal TotalCoffeeConsumedGrams);
+    decimal TotalCoffeeConsumedGrams,
+    int? EstimatedDaysRemaining,
+    decimal? AverageDailyConsumptionGrams);
