@@ -6,6 +6,8 @@
 .cursor
 .codex
 .aspire
+.env
+.env.*
 
 node_modules/
 dist/

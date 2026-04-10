@@ -10,9 +10,6 @@ WORKDIR /app
 
 COPY . ./
 
-ARG VITE_API_URL=http://localhost:8080
-ENV VITE_API_URL=$VITE_API_URL
-
 RUN npm run build
 
 FROM nginx:1.29-alpine AS runtime
@@ -20,5 +17,7 @@ WORKDIR /usr/share/nginx/html
 
 COPY --from=build /app/dist ./
 COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY docker-entrypoint.d/40-runtime-config.sh /docker-entrypoint.d/40-runtime-config.sh
+RUN chmod +x /docker-entrypoint.d/40-runtime-config.sh
 
 EXPOSE 80
