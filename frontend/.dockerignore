@@ -1,0 +1,16 @@
+.git
+.gitignore
+.vs
+.idea
+.vscode
+.cursor
+.codex
+.aspire
+
+node_modules/
+dist/
+coverage/
+
+*.log
+*.swp
+*.tmp
