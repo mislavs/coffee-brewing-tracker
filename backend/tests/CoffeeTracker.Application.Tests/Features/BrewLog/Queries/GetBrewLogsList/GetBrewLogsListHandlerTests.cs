@@ -227,7 +227,7 @@ public class GetBrewLogsListHandlerTests(IntegrationTestFactory factory) : Integ
     {
         // Arrange
         var (bean, brewer, grinder) = await SeedRequiredEntities("pagination");
-        var brewedAt = DateTime.UtcNow;
+        var brewedAt = new DateTime(2026, 4, 10, 12, 30, 45, DateTimeKind.Utc);
         await InsertMany(
         [
             BrewLogEntry.Create(bean.Id, brewer.Id, grinder.Id, null, 18m, 300m, null, 10m, null, BrewRating.Good, null, null, brewedAt),
