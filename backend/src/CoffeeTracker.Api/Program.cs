@@ -2,6 +2,7 @@ using CoffeeTracker.Api.ExceptionHandlers;
 using CoffeeTracker.Api.Endpoints;
 using CoffeeTracker.Application;
 using CoffeeTracker.Infrastructure;
+using CoffeeTracker.Infrastructure.Persistence;
 using Serilog;
 
 Log.Logger = new LoggerConfiguration()
@@ -37,6 +38,11 @@ try
     });
 
     var app = builder.Build();
+
+    if (!app.Environment.IsDevelopment())
+    {
+        await DatabaseMigrator.MigrateAsync(app.Services);
+    }
 
     if (app.Environment.IsDevelopment())
     {
