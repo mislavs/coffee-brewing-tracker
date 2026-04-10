@@ -28,6 +28,28 @@ npm install
 npm run dev
 ```
 
+Local dev continues to use `VITE_API_URL` from `.env` or the Aspire-provided value.
+
+## API URL Configuration
+
+The frontend resolves its API base URL in this order:
+
+1. `window.__APP_CONFIG__.apiUrl` from `/config.js`
+2. `VITE_API_URL`
+3. `http://localhost:5081`
+
+The app now loads `/config.js` before the Vite bundle. The default file lives at `public/config.js` and initializes `window.__APP_CONFIG__` as an empty object.
+
+This is intended to support future container startup configuration without rebuilding the frontend image. A container entrypoint can generate `/config.js` with content like:
+
+```js
+window.__APP_CONFIG__ = {
+  apiUrl: 'http://your-server:5081',
+}
+```
+
+Aspire and local Vite development do not need this override because they can continue providing `VITE_API_URL`.
+
 ## Scripts
 
 - `npm run dev` - start Vite dev server
