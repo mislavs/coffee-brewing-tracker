@@ -67,7 +67,7 @@ public sealed class UploadRoasterLogoHandler(ApplicationDbContext dbContext)
 
     private static string NormalizeLogoFileName(string fileName, string contentType)
     {
-        var name = Path.GetFileNameWithoutExtension(Path.GetFileName(fileName));
+        var name = Path.GetFileNameWithoutExtension(Path.GetFileName(fileName.Replace('\\', '/')));
         if (string.IsNullOrWhiteSpace(name))
         {
             name = "roaster-logo";
