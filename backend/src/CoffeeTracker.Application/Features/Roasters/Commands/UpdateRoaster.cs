@@ -10,7 +10,8 @@ public sealed record UpdateRoasterCommand(
     Guid Id,
     string Name,
     string? City,
-    Guid? CountryId) : IRequest;
+    Guid? CountryId,
+    string? WebsiteUrl = null) : IRequest;
 
 public sealed class UpdateRoasterValidator : AbstractValidator<UpdateRoasterCommand>
 {
@@ -26,6 +27,18 @@ public sealed class UpdateRoasterValidator : AbstractValidator<UpdateRoasterComm
         RuleFor(command => command.City)
             .MaximumLength(100);
 
+        RuleFor(command => command.WebsiteUrl)
+            .MaximumLength(2048);
+
+        RuleFor(command => command.WebsiteUrl)
+            .Must(BeValidAbsoluteUrl)
+            .When(command => !string.IsNullOrWhiteSpace(command.WebsiteUrl))
+            .WithMessage("Website URL must be a valid absolute URL.");
+    }
+
+    private static bool BeValidAbsoluteUrl(string? websiteUrl)
+    {
+        return System.Uri.TryCreate(websiteUrl, UriKind.Absolute, out _);
     }
 }
 
@@ -52,7 +65,7 @@ public sealed class UpdateRoasterHandler(ApplicationDbContext dbContext) : IRequ
             }
         }
 
-        roaster.Update(request.Name, request.City, request.CountryId);
+        roaster.Update(request.Name, request.City, request.CountryId, request.WebsiteUrl);
         await dbContext.SaveChangesAsync(cancellationToken);
     }
 }

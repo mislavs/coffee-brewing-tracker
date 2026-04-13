@@ -23,6 +23,7 @@ export function RoasterCard({ roaster }: RoasterCardProps) {
   const name = roaster.name ?? 'Unnamed roaster'
   const city = roaster.city || '—'
   const country = roaster.countryName || '—'
+  const websiteUrl = roaster.websiteUrl || null
   const beanCount = roaster.beanCount ?? 0
 
   return (
@@ -53,6 +54,16 @@ export function RoasterCard({ roaster }: RoasterCardProps) {
           <CardDescription className="mt-0.5">
             {city} · {country}
           </CardDescription>
+          {websiteUrl ? (
+            <a
+              href={websiteUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-1 block truncate text-sm text-primary hover:underline"
+            >
+              {websiteUrl}
+            </a>
+          ) : null}
         </div>
       </CardHeader>
       <CardContent className="flex flex-wrap gap-1.5">

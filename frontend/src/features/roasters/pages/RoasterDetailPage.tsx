@@ -44,9 +44,23 @@ function RoasterDetailContent({ roasterId }: { roasterId: Guid }) {
         <CardDescription>Roaster details</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6 text-sm">
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           <DetailField label="City" stacked>{roaster.city || '—'}</DetailField>
           <DetailField label="Country" stacked>{roaster.countryName || '—'}</DetailField>
+          <DetailField label="Website" stacked>
+            {roaster.websiteUrl ? (
+              <a
+                href={roaster.websiteUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="break-all hover:underline"
+              >
+                {roaster.websiteUrl}
+              </a>
+            ) : (
+              '—'
+            )}
+          </DetailField>
         </div>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           <StatCard label="Beans" value={`${beanCount}`} />

@@ -37,7 +37,12 @@ public class UpdateRoasterValidatorTests
     public void Validate_WhenIdAndNameAreProvided_ShouldNotHaveValidationErrors()
     {
         // Arrange
-        var command = new UpdateRoasterCommand(Guid.NewGuid(), "Kawa", "City", null);
+        var command = new UpdateRoasterCommand(
+            Guid.NewGuid(),
+            "Kawa",
+            "City",
+            null,
+            "https://kawa.example.com");
 
         // Act
         var result = _sut.TestValidate(command);
@@ -45,5 +50,37 @@ public class UpdateRoasterValidatorTests
         // Assert
         result.ShouldNotHaveValidationErrorFor(entry => entry.Id);
         result.ShouldNotHaveValidationErrorFor(entry => entry.Name);
+        result.ShouldNotHaveValidationErrorFor(entry => entry.WebsiteUrl);
+    }
+
+    [Fact]
+    public void Validate_WhenWebsiteUrlIsTooLong_ShouldHaveValidationError()
+    {
+        // Arrange
+        var command = new UpdateRoasterCommand(
+            Guid.NewGuid(),
+            "Kawa",
+            "City",
+            null,
+            $"https://{new string('a', 2040)}.com");
+
+        // Act
+        var result = _sut.TestValidate(command);
+
+        // Assert
+        result.ShouldHaveValidationErrorFor(entry => entry.WebsiteUrl);
+    }
+
+    [Fact]
+    public void Validate_WhenWebsiteUrlIsInvalid_ShouldHaveValidationError()
+    {
+        // Arrange
+        var command = new UpdateRoasterCommand(Guid.NewGuid(), "Kawa", "City", null, "not-a-url");
+
+        // Act
+        var result = _sut.TestValidate(command);
+
+        // Assert
+        result.ShouldHaveValidationErrorFor(entry => entry.WebsiteUrl);
     }
 }

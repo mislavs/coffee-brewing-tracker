@@ -16,6 +16,13 @@ export const roasterFormSchema = z.object({
     .trim()
     .uuid('Country must be a valid identifier.')
     .optional(),
+  websiteUrl: z
+    .string()
+    .trim()
+    .url('Website URL must be a valid URL.')
+    .max(2048, 'Website URL must be 2048 characters or fewer.')
+    .optional()
+    .or(z.literal('')),
 })
 
 export type RoasterFormValues = z.infer<typeof roasterFormSchema>

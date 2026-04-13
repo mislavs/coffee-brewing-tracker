@@ -11,12 +11,13 @@ public class Roaster
     {
     }
 
-    private Roaster(Guid id, string name, string? city, Guid? countryId)
+    private Roaster(Guid id, string name, string? city, Guid? countryId, string? websiteUrl)
     {
         Id = id;
         Name = EntityNormalization.NormalizeRequired(name, nameof(name));
         City = EntityNormalization.NormalizeOptional(city);
         CountryId = countryId;
+        WebsiteUrl = EntityNormalization.NormalizeOptional(websiteUrl);
     }
 
     public Guid Id { get; private set; }
@@ -29,22 +30,25 @@ public class Roaster
 
     public Country? Country { get; private set; }
 
+    public string? WebsiteUrl { get; private set; }
+
     public string? LogoFileName { get; private set; }
 
     public byte[]? LogoData { get; private set; }
 
     public IReadOnlyCollection<Bean> Beans => _beans.AsReadOnly();
 
-    public static Roaster Create(string name, string? city, Guid? countryId)
+    public static Roaster Create(string name, string? city, Guid? countryId, string? websiteUrl = null)
     {
-        return new Roaster(Guid.NewGuid(), name, city, countryId);
+        return new Roaster(Guid.NewGuid(), name, city, countryId, websiteUrl);
     }
 
-    public void Update(string name, string? city, Guid? countryId)
+    public void Update(string name, string? city, Guid? countryId, string? websiteUrl = null)
     {
         Name = EntityNormalization.NormalizeRequired(name, nameof(name));
         City = EntityNormalization.NormalizeOptional(city);
         CountryId = countryId;
+        WebsiteUrl = EntityNormalization.NormalizeOptional(websiteUrl);
     }
 
     public void SetLogo(string fileName, byte[] data)

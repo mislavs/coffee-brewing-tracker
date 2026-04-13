@@ -7,7 +7,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CoffeeTracker.Application.Features.Roasters.Commands;
 
-public sealed record CreateRoasterCommand(string Name, string? City, Guid? CountryId) : IRequest<Guid>;
+public sealed record CreateRoasterCommand(
+    string Name,
+    string? City,
+    Guid? CountryId,
+    string? WebsiteUrl = null) : IRequest<Guid>;
 
 public sealed class CreateRoasterValidator : AbstractValidator<CreateRoasterCommand>
 {
@@ -20,6 +24,18 @@ public sealed class CreateRoasterValidator : AbstractValidator<CreateRoasterComm
         RuleFor(command => command.City)
             .MaximumLength(100);
 
+        RuleFor(command => command.WebsiteUrl)
+            .MaximumLength(2048);
+
+        RuleFor(command => command.WebsiteUrl)
+            .Must(BeValidAbsoluteUrl)
+            .When(command => !string.IsNullOrWhiteSpace(command.WebsiteUrl))
+            .WithMessage("Website URL must be a valid absolute URL.");
+    }
+
+    private static bool BeValidAbsoluteUrl(string? websiteUrl)
+    {
+        return System.Uri.TryCreate(websiteUrl, UriKind.Absolute, out _);
     }
 }
 
@@ -39,7 +55,7 @@ public sealed class CreateRoasterHandler(ApplicationDbContext dbContext)
             }
         }
 
-        var roaster = Roaster.Create(request.Name, request.City, request.CountryId);
+        var roaster = Roaster.Create(request.Name, request.City, request.CountryId, request.WebsiteUrl);
         dbContext.Roasters.Add(roaster);
         await dbContext.SaveChangesAsync(cancellationToken);
         return roaster.Id;

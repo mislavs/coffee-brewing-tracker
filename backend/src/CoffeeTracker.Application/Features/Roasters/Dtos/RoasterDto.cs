@@ -6,6 +6,7 @@ public sealed record RoasterDto(
     string? City,
     Guid? CountryId,
     string? CountryName,
+    string? WebsiteUrl,
     IReadOnlyList<RoasterBeanSummaryDto> Beans,
     int BeanCount,
     decimal? AvgPricePerKg,

@@ -15,7 +15,12 @@ public class UpdateRoasterHandlerTests(IntegrationTestFactory factory) : Integra
         // Arrange
         var roaster = Roaster.Create("Kawa", "Warsaw", null);
         await Insert(roaster);
-        var command = new UpdateRoasterCommand(roaster.Id, "Kawa Roasters", "Krakow", null);
+        var command = new UpdateRoasterCommand(
+            roaster.Id,
+            "Kawa Roasters",
+            "Krakow",
+            null,
+            "https://kawaroasters.example.com");
 
         // Act
         await Send(command);
@@ -28,6 +33,7 @@ public class UpdateRoasterHandlerTests(IntegrationTestFactory factory) : Integra
         updated.Should().NotBeNull();
         updated!.Name.Should().Be("Kawa Roasters");
         updated.City.Should().Be("Krakow");
+        updated.WebsiteUrl.Should().Be("https://kawaroasters.example.com");
     }
 
     [Fact]

@@ -165,6 +165,14 @@ export function RoasterFormCard({
             <FieldErrorText message={form.formState.errors.countryId?.message} />
           </div>
 
+          <div className="space-y-2">
+            <label htmlFor="websiteUrl" className="text-sm font-medium">
+              Website URL
+            </label>
+            <Input id="websiteUrl" type="url" {...form.register('websiteUrl')} />
+            <FieldErrorText message={form.formState.errors.websiteUrl?.message} />
+          </div>
+
           <ImageUpload
             id="logo"
             label="Logo"

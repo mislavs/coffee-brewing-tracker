@@ -11,16 +11,18 @@ public class RoasterTests
         // Arrange
         const string name = "  Kawa  ";
         const string city = "  Warsaw  ";
+        const string websiteUrl = "  https://kawa.example.com  ";
         var countryId = Guid.NewGuid();
 
         // Act
-        var roaster = Roaster.Create(name, city, countryId);
+        var roaster = Roaster.Create(name, city, countryId, websiteUrl);
 
         // Assert
         roaster.Id.Should().NotBeEmpty();
         roaster.Name.Should().Be("Kawa");
         roaster.City.Should().Be("Warsaw");
         roaster.CountryId.Should().Be(countryId);
+        roaster.WebsiteUrl.Should().Be("https://kawa.example.com");
     }
 
     [Fact]
@@ -30,12 +32,13 @@ public class RoasterTests
         const string name = "Kawa";
 
         // Act
-        var roaster = Roaster.Create(name, "   ", null);
+        var roaster = Roaster.Create(name, "   ", null, "   ");
 
         // Assert
         roaster.Name.Should().Be("Kawa");
         roaster.City.Should().BeNull();
         roaster.CountryId.Should().BeNull();
+        roaster.WebsiteUrl.Should().BeNull();
     }
 
     [Fact]
@@ -60,12 +63,13 @@ public class RoasterTests
         var updatedCountryId = Guid.NewGuid();
 
         // Act
-        roaster.Update("  Kawa Roasters  ", "  Krakow  ", updatedCountryId);
+        roaster.Update("  Kawa Roasters  ", "  Krakow  ", updatedCountryId, "  https://kawaroasters.example.com  ");
 
         // Assert
         roaster.Name.Should().Be("Kawa Roasters");
         roaster.City.Should().Be("Krakow");
         roaster.CountryId.Should().Be(updatedCountryId);
+        roaster.WebsiteUrl.Should().Be("https://kawaroasters.example.com");
     }
 
     [Fact]

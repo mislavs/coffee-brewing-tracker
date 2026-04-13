@@ -15,7 +15,7 @@ public class GetRoasterByIdHandlerTests(IntegrationTestFactory factory) : Integr
         // Arrange
         var country = Country.Create("Poland", string.Empty, string.Empty);
         await Insert(country);
-        var roaster = Roaster.Create("Kawa", "Warsaw", country.Id);
+        var roaster = Roaster.Create("Kawa", "Warsaw", country.Id, "https://kawa.example.com");
         await Insert(roaster);
         var query = new GetRoasterByIdQuery(roaster.Id);
 
@@ -28,6 +28,7 @@ public class GetRoasterByIdHandlerTests(IntegrationTestFactory factory) : Integr
         result.City.Should().Be("Warsaw");
         result.CountryId.Should().Be(country.Id);
         result.CountryName.Should().Be("Poland");
+        result.WebsiteUrl.Should().Be("https://kawa.example.com");
         result.Beans.Should().BeEmpty();
         result.BeanCount.Should().Be(0);
         result.AvgPricePerKg.Should().BeNull();
@@ -45,7 +46,7 @@ public class GetRoasterByIdHandlerTests(IntegrationTestFactory factory) : Integr
         // Arrange
         var country = Country.Create("Poland", string.Empty, string.Empty);
         await Insert(country);
-        var roaster = Roaster.Create("Kawa", "Warsaw", country.Id);
+        var roaster = Roaster.Create("Kawa", "Warsaw", country.Id, "https://kawa.example.com");
         await Insert(roaster);
         var kenya = Country.Create("Kenya", string.Empty, string.Empty);
         var ethiopia = Country.Create("Ethiopia", string.Empty, string.Empty);
@@ -117,6 +118,7 @@ public class GetRoasterByIdHandlerTests(IntegrationTestFactory factory) : Integr
         result.TopRoastProfile.Should().Be("Filter");
         result.BrewCount.Should().Be(2);
         result.AvgBrewRating.Should().Be(4.5m);
+        result.WebsiteUrl.Should().Be("https://kawa.example.com");
         result.HasLogo.Should().BeFalse();
         result.LogoUrl.Should().BeNull();
     }

@@ -17,6 +17,9 @@ public class RoasterConfiguration : IEntityTypeConfiguration<Roaster>
         builder.Property(roaster => roaster.City)
             .HasMaxLength(100);
 
+        builder.Property(roaster => roaster.WebsiteUrl)
+            .HasMaxLength(2048);
+
         builder.Property(roaster => roaster.LogoFileName)
             .HasMaxLength(255);
 

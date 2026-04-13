@@ -11,7 +11,7 @@ public class CreateRoasterHandlerTests(IntegrationTestFactory factory) : Integra
     public async Task Handle_WhenCommandIsValid_CreatesRoaster()
     {
         // Arrange
-        var command = new CreateRoasterCommand("Kawa", "Warsaw", null);
+        var command = new CreateRoasterCommand("Kawa", "Warsaw", null, "https://kawa.example.com");
 
         // Act
         var roasterId = await Send(command);
@@ -24,5 +24,6 @@ public class CreateRoasterHandlerTests(IntegrationTestFactory factory) : Integra
         roaster!.Name.Should().Be("Kawa");
         roaster.City.Should().Be("Warsaw");
         roaster.CountryId.Should().BeNull();
+        roaster.WebsiteUrl.Should().Be("https://kawa.example.com");
     }
 }

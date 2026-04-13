@@ -6,6 +6,7 @@ const roasterFieldNames: Record<string, keyof RoasterFormValues> = {
   name: 'name',
   city: 'city',
   countryId: 'countryId',
+  websiteUrl: 'websiteUrl',
 }
 
 export function applyRoasterFormServerErrors(

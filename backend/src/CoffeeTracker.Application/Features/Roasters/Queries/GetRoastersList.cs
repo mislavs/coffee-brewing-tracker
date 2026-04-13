@@ -24,6 +24,7 @@ public sealed class GetRoastersListHandler(ApplicationDbContext dbContext)
                 entity.City,
                 entity.CountryId,
                 CountryName = entity.Country != null ? entity.Country.Name : null,
+                entity.WebsiteUrl,
                 BeanCount = entity.Beans.Count(),
                 AvgPricePerKg = entity.Beans
                     .Where(bean => bean.Price.HasValue && bean.BagWeight > 0)
@@ -40,6 +41,7 @@ public sealed class GetRoastersListHandler(ApplicationDbContext dbContext)
                 entity.City,
                 entity.CountryId,
                 entity.CountryName,
+                entity.WebsiteUrl,
                 entity.BeanCount,
                 entity.AvgPricePerKg,
                 entity.HasLogo,

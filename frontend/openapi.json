@@ -2067,6 +2067,10 @@
             "type": "string",
             "format": "uuid",
             "nullable": true
+          },
+          "websiteUrl": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -2566,6 +2570,10 @@
             "type": "string",
             "nullable": true
           },
+          "websiteUrl": {
+            "type": "string",
+            "nullable": true
+          },
           "beans": {
             "type": "array",
             "items": {
@@ -2630,6 +2638,10 @@
             "nullable": true
           },
           "countryName": {
+            "type": "string",
+            "nullable": true
+          },
+          "websiteUrl": {
             "type": "string",
             "nullable": true
           },
@@ -2867,6 +2879,10 @@
           "countryId": {
             "type": "string",
             "format": "uuid",
+            "nullable": true
+          },
+          "websiteUrl": {
+            "type": "string",
             "nullable": true
           }
         },

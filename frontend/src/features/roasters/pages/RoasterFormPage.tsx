@@ -27,12 +27,14 @@ function CreateRoasterForm() {
         name: '',
         city: '',
         countryId: undefined,
+        websiteUrl: '',
       }}
       onSubmit={async (values, logo) => {
         const response = await mutateAsync({
           name: values.name.trim(),
           city: normalizeOptional(values.city),
           countryId: normalizeOptional(values.countryId),
+          websiteUrl: normalizeOptional(values.websiteUrl),
         })
 
         if (logo.file && !response?.id) {
@@ -70,6 +72,7 @@ function EditRoasterForm({ roasterId }: { roasterId: Guid }) {
         name: roaster.name ?? '',
         city: roaster.city ?? '',
         countryId: roaster.countryId ?? undefined,
+        websiteUrl: roaster.websiteUrl ?? '',
       }}
       onSubmit={async (values, logo) => {
         await mutateAsync({
@@ -78,6 +81,7 @@ function EditRoasterForm({ roasterId }: { roasterId: Guid }) {
             name: values.name.trim(),
             city: normalizeOptional(values.city),
             countryId: normalizeOptional(values.countryId),
+            websiteUrl: normalizeOptional(values.websiteUrl),
           },
         })
 
