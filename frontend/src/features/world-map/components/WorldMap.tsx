@@ -44,7 +44,7 @@ function getMapHeightClass(compact: boolean, mapHeightClassName?: string) {
     return mapHeightClassName
   }
 
-  return compact ? 'h-[34rem]' : 'h-[48rem]'
+  return compact ? 'h-[22rem] sm:h-[34rem]' : 'h-[32rem] sm:h-[48rem]'
 }
 
 function getCountryFill(beanCount: number, maxBeanCount: number, isHovered: boolean) {
@@ -137,7 +137,7 @@ function WorldMapComponent({
         </div>
       ) : null}
       {isError && countryStats.length === 0 ? (
-        <div className="mb-3 flex items-center justify-between gap-3 rounded-md border bg-muted/20 p-3">
+        <div className="mb-3 flex flex-col gap-3 rounded-md border bg-muted/20 p-3 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-muted-foreground text-xs">
             Stats are unavailable. Showing base map only.
           </p>

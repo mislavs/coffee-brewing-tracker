@@ -194,11 +194,12 @@ export function DateTimePicker({
   }
 
   return (
-    <div className={cn('flex items-center gap-2', className)}>
+    <div className={cn('flex flex-col gap-2 sm:flex-row sm:items-center', className)}>
       <Input
         id={id}
         type="text"
         inputMode="text"
+        className="w-full"
         placeholder={placeholder}
         value={draft}
         onChange={(event) => {
@@ -229,18 +230,18 @@ export function DateTimePicker({
             <CalendarIcon className="size-4" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-auto p-3" align="end">
+        <PopoverContent className="w-auto max-w-[calc(100vw-2rem)] p-3" align="end">
           <div className="space-y-3">
             <Calendar mode="single" selected={selectedDate} onSelect={handleCalendarSelect} />
             <div className="space-y-2 border-t pt-3">
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <Input
                   id={`${id ?? 'date-time'}-hour`}
                   type="text"
                   inputMode="numeric"
                   placeholder="HH"
                   value={hourDraft}
-                  className="w-16 text-center"
+                  className="w-14 text-center sm:w-16"
                   onChange={(event) => {
                     setHourOverride(event.target.value.replace(/\D/g, '').slice(0, 2))
                   }}
@@ -259,7 +260,7 @@ export function DateTimePicker({
                   inputMode="numeric"
                   placeholder="mm"
                   value={minuteDraft}
-                  className="w-16 text-center"
+                  className="w-14 text-center sm:w-16"
                   onChange={(event) => {
                     setMinuteOverride(event.target.value.replace(/\D/g, '').slice(0, 2))
                   }}

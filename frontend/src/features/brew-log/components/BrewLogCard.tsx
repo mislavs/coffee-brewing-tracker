@@ -72,7 +72,7 @@ export function BrewLogCard({ brewLog }: BrewLogCardProps) {
             </TooltipProvider>
           ) : null}
         </div>
-        <CardTitle className="text-base leading-snug">
+        <CardTitle className="break-words text-base leading-snug">
           {brewLog.id ? (
             <Link
               to={`/brew-log/${brewLog.id}`}
@@ -87,24 +87,28 @@ export function BrewLogCard({ brewLog }: BrewLogCardProps) {
       </CardHeader>
       <CardContent className="px-4 pt-0">
         <div className="rounded-lg border bg-muted/15 px-3 py-2.5">
-          <dl className="grid grid-cols-[max-content_1fr] gap-x-3 gap-y-2 text-sm">
+          <dl className="grid grid-cols-[max-content_minmax(0,1fr)] gap-x-3 gap-y-2 text-sm">
             <dt className="text-muted-foreground">Brewer</dt>
-            <dd className="font-medium text-foreground">{brewerName}</dd>
+            <dd className="min-w-0 break-words font-medium text-foreground">{brewerName}</dd>
 
             <dt className="text-muted-foreground">Recipe</dt>
-            <dd className="font-medium text-foreground">{recipeName}</dd>
+            <dd className="min-w-0 break-words font-medium text-foreground">{recipeName}</dd>
 
             <dt className="text-muted-foreground">Bean / Water</dt>
-            <dd className="font-medium text-foreground">{doseAndWater}</dd>
+            <dd className="min-w-0 break-words font-medium text-foreground">{doseAndWater}</dd>
 
             <dt className="text-muted-foreground">Grinder</dt>
-            <dd className="font-medium text-foreground">{grinderAndSetting}</dd>
+            <dd className="min-w-0 break-words font-medium text-foreground">{grinderAndSetting}</dd>
 
             <dt className="text-muted-foreground">Time</dt>
-            <dd className="font-medium text-foreground">{formatBrewTime(brewLog.brewTimeSeconds)}</dd>
+            <dd className="min-w-0 break-words font-medium text-foreground">
+              {formatBrewTime(brewLog.brewTimeSeconds)}
+            </dd>
 
             <dt className="text-muted-foreground">Rating</dt>
-            <dd className="font-medium text-foreground">{getRatingDisplay(brewLog.rating)}</dd>
+            <dd className="min-w-0 break-words font-medium text-foreground">
+              {getRatingDisplay(brewLog.rating)}
+            </dd>
           </dl>
         </div>
       </CardContent>

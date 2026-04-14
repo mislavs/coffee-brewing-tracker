@@ -136,7 +136,7 @@ export function BrewLogFormCard({
 
   return (
     <Card>
-      <CardHeader className="flex flex-row items-start justify-between gap-4">
+      <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="space-y-1.5">
           <CardTitle>{title}</CardTitle>
           <CardDescription>{description}</CardDescription>
@@ -166,7 +166,7 @@ export function BrewLogFormCard({
           <FieldErrorText message={form.formState.errors.root?.serverError?.message} />
 
           <CardFooter className="px-0 pb-0">
-            <div className="flex items-center gap-2">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
               <Button type="submit" disabled={isSubmitting}>
                 {isSubmitting ? 'Saving...' : submitLabel}
               </Button>

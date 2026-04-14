@@ -5,6 +5,7 @@ import {
   Coffee,
   Globe,
   Icon as LucideLabIcon,
+  Menu,
   Store,
   Wrench,
   X,
@@ -13,6 +14,14 @@ import { coffeeBean } from '@lucide/lab'
 import { DashboardStats } from '@/components/DashboardStats'
 import { SettingsButton } from '@/components/SettingsButton'
 import { Button } from '@/components/ui/button'
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { WorldMap } from '@/features/world-map/components/WorldMap'
@@ -38,7 +47,7 @@ import {
 } from '@/lib/routePreload'
 import { cn } from '@/lib/utils'
 
-const expandedMapHeightClass = 'h-[42rem] md:h-[46rem]'
+const expandedMapHeightClass = 'h-[30rem] md:h-[42rem] lg:h-[46rem]'
 
 const navIcons: Record<string, LucideIcon> = {
   'brew-log': Coffee,
@@ -51,6 +60,7 @@ export function AppLayout() {
   const { settings } = useSettings()
   const navigate = useNavigate()
   const [isMapExpanded, setIsMapExpanded] = useState(false)
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false)
   const hasPrefetchedRoasters = useRef(false)
   const hasPrefetchedBeans = useRef(false)
   const hasPrefetchedBrewLog = useRef(false)
@@ -163,46 +173,87 @@ export function AppLayout() {
     }
   }, [isMapExpanded])
 
+  const renderFeatureLinks = useCallback(
+    ({ mobile = false, onNavigate }: { mobile?: boolean; onNavigate?: () => void } = {}) =>
+      featureRoutes.map((route) => {
+        const Icon = navIcons[route.path]
+
+        return (
+          <NavLink
+            key={route.href}
+            to={route.href}
+            onMouseEnter={() => prefetchFeature(route.path)}
+            onFocus={() => prefetchFeature(route.path)}
+            onTouchStart={() => prefetchFeature(route.path)}
+            onClick={onNavigate}
+            className={({ isActive }) =>
+              cn(
+                'flex items-center gap-1.5 rounded-lg font-medium transition-all duration-200',
+                mobile ? 'w-full px-4 py-3 text-base' : 'px-3 py-2 text-sm',
+                isActive
+                  ? 'bg-primary text-primary-foreground shadow-sm'
+                  : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+              )
+            }
+          >
+            {Icon ? <Icon className="size-3.5" /> : null}
+            {route.path === 'beans' ? (
+              <LucideLabIcon iconNode={coffeeBean} className="size-3.5" />
+            ) : null}
+            <span className="truncate">{route.title}</span>
+          </NavLink>
+        )
+      }),
+    [prefetchFeature],
+  )
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="sticky top-0 z-30 border-b bg-background/90 backdrop-blur-lg supports-[backdrop-filter]:bg-background/70">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-4 px-4 py-3 sm:px-6 lg:px-8">
+        <div className="mx-auto flex max-w-7xl flex-nowrap items-center gap-2 px-4 py-3 sm:gap-4 sm:px-6 md:flex-wrap lg:px-8">
+          <Sheet open={isMobileNavOpen} onOpenChange={setIsMobileNavOpen}>
+            <SheetTrigger asChild>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="rounded-lg md:hidden"
+                aria-label="Open navigation menu"
+                title="Open navigation menu"
+              >
+                <Menu className="size-4" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-[18rem] gap-0 p-0">
+              <SheetHeader className="border-b px-4 py-4">
+                <SheetTitle>Navigate</SheetTitle>
+                <SheetDescription>
+                  Jump between coffee tracking features.
+                </SheetDescription>
+              </SheetHeader>
+              <nav className="flex flex-1 flex-col gap-1 p-3">
+                {renderFeatureLinks({
+                  mobile: true,
+                  onNavigate: () => setIsMobileNavOpen(false),
+                })}
+              </nav>
+            </SheetContent>
+          </Sheet>
           <NavLink
             to="/"
-            className="group flex items-center gap-2 transition-opacity hover:opacity-80"
+            className="group flex min-w-0 items-center gap-2 transition-opacity hover:opacity-80"
           >
             <div className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-sm">
               <Coffee className="size-4" />
             </div>
-            <span className="text-base font-bold tracking-tight">BeanMeridian</span>
+            <span className="hidden text-base font-bold tracking-tight min-[360px]:inline">
+              BeanMeridian
+            </span>
           </NavLink>
-          <nav className="flex flex-1 flex-wrap gap-1">
-            {featureRoutes.map((route) => {
-              const Icon = navIcons[route.path]
-              return (
-                <NavLink
-                  key={route.href}
-                  to={route.href}
-                  onMouseEnter={() => prefetchFeature(route.path)}
-                  onFocus={() => prefetchFeature(route.path)}
-                  onTouchStart={() => prefetchFeature(route.path)}
-                  className={({ isActive }) =>
-                    cn(
-                      'flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200',
-                      isActive
-                        ? 'bg-primary text-primary-foreground shadow-sm'
-                        : 'text-muted-foreground hover:bg-muted hover:text-foreground',
-                    )
-                  }
-                >
-                  {Icon ? <Icon className="size-3.5" /> : null}
-                  {route.path === 'beans' ? <LucideLabIcon iconNode={coffeeBean} className="size-3.5" /> : null}
-                  {route.title}
-                </NavLink>
-              )
-            })}
+          <nav className="hidden flex-1 flex-wrap gap-1 md:flex">
+            {renderFeatureLinks()}
           </nav>
-          <div className="flex items-center gap-0.5">
+          <div className="ml-auto flex shrink-0 items-center gap-0.5">
             <Button
               type="button"
               variant={isMapExpanded ? 'secondary' : 'ghost'}
@@ -229,7 +280,7 @@ export function AppLayout() {
             'relative left-1/2 w-screen -translate-x-1/2 overflow-hidden origin-top transform-gpu transition-[margin-top,height] duration-[900ms] ease-in-out motion-reduce:transition-none',
             isMapExpanded
               ? 'pointer-events-auto z-20 mt-8 h-[calc(100dvh-6rem)]'
-              : 'pointer-events-none z-0 -mt-20 h-[34rem]',
+              : 'pointer-events-none z-0 -mt-20 h-[22rem] sm:h-[34rem]',
           )}
           aria-hidden={!isMapExpanded}
         >

@@ -18,7 +18,7 @@ export function EmptyState({
   actionHref,
 }: EmptyStateProps) {
   return (
-    <div className="animate-fade-up flex flex-col items-center justify-center gap-4 py-16 text-center">
+    <div className="animate-fade-up flex flex-col items-center justify-center gap-4 py-8 text-center sm:py-16">
       <div className="flex size-14 items-center justify-center rounded-2xl bg-muted text-muted-foreground">
         {icon}
       </div>

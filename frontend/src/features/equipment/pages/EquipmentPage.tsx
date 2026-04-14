@@ -172,64 +172,119 @@ function AccessoryList() {
         </Button>
       </CardHeader>
       <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Compatible Brewers</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {isPending && accessories.length === 0 ? (
-              <TableRowSkeleton
-                columns={2}
-                rowCount={4}
-                columnWidthClasses={['w-2/3', 'w-5/6']}
-              />
-            ) : accessories.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={2}>
-                  <EmptyState
-                    icon={<Wrench className="size-6" />}
-                    title="No accessories yet"
-                    description="Add your first accessory to get started."
-                    actionLabel="Add Accessory"
-                    actionHref="/equipment/accessories/new"
+        {isPending && accessories.length === 0 ? (
+          <>
+            <div className="space-y-3 md:hidden">
+              {Array.from({ length: 3 }).map((_, index) => (
+                <CardSkeleton key={`accessory-card-skeleton-${index}`} badgeCount={0} />
+              ))}
+            </div>
+            <div className="hidden md:block">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Compatible Brewers</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  <TableRowSkeleton
+                    columns={2}
+                    rowCount={4}
+                    columnWidthClasses={['w-2/3', 'w-5/6']}
                   />
-                </TableCell>
-              </TableRow>
-            ) : (
-              accessories.map((accessory) => {
+                </TableBody>
+              </Table>
+            </div>
+          </>
+        ) : accessories.length === 0 ? (
+          <EmptyState
+            icon={<Wrench className="size-6" />}
+            title="No accessories yet"
+            description="Add your first accessory to get started."
+            actionLabel="Add Accessory"
+            actionHref="/equipment/accessories/new"
+          />
+        ) : (
+          <>
+            <div className="space-y-3 md:hidden">
+              {accessories.map((accessory) => {
                 const brewerNames =
                   accessory.compatibleBrewers
                     ?.map((b) => b.name?.trim() ?? '')
                     .filter((n) => n.length > 0) ?? []
 
                 return (
-                  <TableRow key={accessory.id ?? accessory.name ?? 'accessory'}>
-                    <TableCell className="font-medium">
-                      {accessory.id ? (
-                        <Link
-                          to={`/equipment/accessories/${accessory.id}`}
-                          className="hover:underline"
-                        >
-                          {accessory.name ?? 'Unnamed accessory'}
-                        </Link>
-                      ) : (
-                        (accessory.name ?? 'Unnamed accessory')
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {brewerNames.length > 0
-                        ? brewerNames.join(', ')
-                        : '—'}
-                    </TableCell>
-                  </TableRow>
+                  <Card
+                    key={accessory.id ?? accessory.name ?? 'accessory'}
+                    className="card-interactive h-full py-4"
+                  >
+                    <CardHeader className="space-y-2 px-4 py-0">
+                      <CardTitle className="break-words text-base leading-snug">
+                        {accessory.id ? (
+                          <Link
+                            to={`/equipment/accessories/${accessory.id}`}
+                            className="transition-colors hover:text-primary"
+                          >
+                            {accessory.name ?? 'Unnamed accessory'}
+                          </Link>
+                        ) : (
+                          (accessory.name ?? 'Unnamed accessory')
+                        )}
+                      </CardTitle>
+                      <div className="space-y-1">
+                        <p className="text-muted-foreground text-xs font-medium uppercase tracking-wider">
+                          Compatible brewers
+                        </p>
+                        <p className="break-words text-sm text-foreground">
+                          {brewerNames.length > 0 ? brewerNames.join(', ') : '—'}
+                        </p>
+                      </div>
+                    </CardHeader>
+                  </Card>
                 )
-              })
-            )}
-          </TableBody>
-        </Table>
+              })}
+            </div>
+            <div className="hidden md:block">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Compatible Brewers</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {accessories.map((accessory) => {
+                    const brewerNames =
+                      accessory.compatibleBrewers
+                        ?.map((b) => b.name?.trim() ?? '')
+                        .filter((n) => n.length > 0) ?? []
+
+                    return (
+                      <TableRow key={accessory.id ?? accessory.name ?? 'accessory'}>
+                        <TableCell className="font-medium">
+                          {accessory.id ? (
+                            <Link
+                              to={`/equipment/accessories/${accessory.id}`}
+                              className="hover:underline"
+                            >
+                              {accessory.name ?? 'Unnamed accessory'}
+                            </Link>
+                          ) : (
+                            (accessory.name ?? 'Unnamed accessory')
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {brewerNames.length > 0 ? brewerNames.join(', ') : '—'}
+                        </TableCell>
+                      </TableRow>
+                    )
+                  })}
+                </TableBody>
+              </Table>
+            </div>
+          </>
+        )}
       </CardContent>
     </Card>
   )
@@ -255,7 +310,7 @@ export function EquipmentPage() {
 
   return (
     <Tabs value={tab} onValueChange={handleTabChange}>
-      <TabsList>
+      <TabsList className="w-full sm:w-fit">
         <TabsTrigger value="brewers">Brewers</TabsTrigger>
         <TabsTrigger value="grinders">Grinders</TabsTrigger>
         <TabsTrigger value="accessories">Accessories</TabsTrigger>

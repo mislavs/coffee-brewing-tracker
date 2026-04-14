@@ -18,7 +18,7 @@ export function StatCard({ label, value, subtitle, icon }: StatCardProps) {
           <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
             <p className="text-xl font-bold tracking-tight">{value}</p>
             {subtitle ? (
-              <p className="text-muted-foreground text-[11px] whitespace-nowrap">{subtitle}</p>
+              <p className="text-muted-foreground text-[11px]">{subtitle}</p>
             ) : null}
           </div>
         </div>

@@ -190,7 +190,7 @@ export function BrewLogListPage() {
           <CardTitle>Brew Log</CardTitle>
           <CardDescription>Browse and manage your brew history.</CardDescription>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           {features?.voiceBrewLogParsing ? (
             <Button variant="outline" asChild>
               <Link to="/brew-log/new?dictate=true">
@@ -296,8 +296,8 @@ export function BrewLogListPage() {
                 Showing {showingFrom}-{showingTo} of {totalCount}
               </p>
 
-              <Pagination className="mx-0 w-auto justify-start sm:justify-end">
-                <PaginationContent>
+              <Pagination className="mx-0 w-full justify-start overflow-x-auto sm:w-auto sm:justify-end">
+                <PaginationContent className="min-w-max">
                   <PaginationItem>
                     <PaginationLink asChild size="default">
                       <button
@@ -306,7 +306,7 @@ export function BrewLogListPage() {
                         disabled={currentPage <= 1}
                       >
                         <ChevronLeft className="size-4" />
-                        <span>Previous</span>
+                        <span className="hidden sm:inline">Previous</span>
                       </button>
                     </PaginationLink>
                   </PaginationItem>
@@ -334,7 +334,7 @@ export function BrewLogListPage() {
                         onClick={() => setPage(currentPage + 1)}
                         disabled={currentPage >= totalPages}
                       >
-                        <span>Next</span>
+                        <span className="hidden sm:inline">Next</span>
                         <ChevronRight className="size-4" />
                       </button>
                     </PaginationLink>
