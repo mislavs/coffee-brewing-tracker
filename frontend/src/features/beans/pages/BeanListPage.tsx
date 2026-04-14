@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { CardSkeleton } from '@/components/skeletons/CardSkeleton'
+import { getSkeletonVisibilityClassName } from '@/components/skeletons/utils'
 import {
   Select,
   SelectContent,
@@ -140,13 +141,7 @@ export function BeanListPage() {
               <CardSkeleton
                 key={`bean-skeleton-${index}`}
                 badgeCount={3}
-                className={
-                  index === 3
-                    ? 'hidden sm:block'
-                    : index >= 4
-                      ? 'hidden xl:block'
-                      : undefined
-                }
+                className={getSkeletonVisibilityClassName(index)}
               />
             ))}
           </div>

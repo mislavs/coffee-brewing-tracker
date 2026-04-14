@@ -3,6 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom'
 import { EmptyState } from '@/components/EmptyState'
 import { Button } from '@/components/ui/button'
 import { CardSkeleton } from '@/components/skeletons/CardSkeleton'
+import { getSkeletonVisibilityClassName } from '@/components/skeletons/utils'
 import {
   Card,
   CardContent,
@@ -84,13 +85,7 @@ export function RecipeListPage() {
             {Array.from({ length: 6 }).map((_, index) => (
               <CardSkeleton
                 key={`recipe-skeleton-${index}`}
-                className={
-                  index === 3
-                    ? 'hidden sm:block'
-                    : index >= 4
-                      ? 'hidden xl:block'
-                      : undefined
-                }
+                className={getSkeletonVisibilityClassName(index)}
               />
             ))}
           </div>

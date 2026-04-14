@@ -18,6 +18,7 @@ import {
   PaginationLink,
 } from '@/components/ui/pagination'
 import { BrewLogCardSkeleton } from '@/components/skeletons/BrewLogCardSkeleton'
+import { getSkeletonVisibilityClassName } from '@/components/skeletons/utils'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Input } from '@/components/ui/input'
 import { Switch } from '@/components/ui/switch'
@@ -262,13 +263,7 @@ export function BrewLogListPage() {
             {Array.from({ length: 6 }).map((_, index) => (
               <BrewLogCardSkeleton
                 key={`brew-log-skeleton-${index}`}
-                className={
-                  index === 3
-                    ? 'hidden sm:block'
-                    : index >= 4
-                      ? 'hidden xl:block'
-                      : undefined
-                }
+                className={getSkeletonVisibilityClassName(index)}
               />
             ))}
           </div>

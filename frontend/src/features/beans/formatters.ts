@@ -2,7 +2,6 @@ import {
   originTypeLabels,
   roastProfileLabels,
 } from '@/features/beans/beanShared'
-import { formatDate } from '@/lib/date'
 
 export function formatOriginType(value: number | null | undefined) {
   if (value === null || value === undefined) {
@@ -54,8 +53,4 @@ export function formatPricePerKg(
   }
 
   return `${formatDecimal(value, 2)} € / kg`
-}
-
-export function formatRoastDate(value: unknown) {
-  return formatDate(value)
 }

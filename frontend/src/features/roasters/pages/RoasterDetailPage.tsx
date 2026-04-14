@@ -1,6 +1,7 @@
 import type { Guid } from '@/lib/api-types'
 import { Link, Navigate } from 'react-router-dom'
 import { DetailField } from '@/components/DetailField'
+import { SectionDivider } from '@/components/SectionDivider'
 import { StatCard } from '@/components/StatCard'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -83,14 +84,10 @@ function RoasterDetailContent({ roasterId }: { roasterId: Guid }) {
           />
         </div>
         <div className="space-y-2 pt-2">
-          <div className="flex items-center gap-2">
-            <div className="h-px flex-1 bg-border" />
-            <p className="text-xs font-semibold tracking-widest uppercase text-muted-foreground">
-              Beans
-            </p>
-            <Badge variant="secondary">{beanCount}</Badge>
-            <div className="h-px flex-1 bg-border" />
-          </div>
+          <SectionDivider
+            label="Beans"
+            suffix={<Badge variant="secondary">{beanCount}</Badge>}
+          />
           {roaster.beans && roaster.beans.length > 0 ? (
             <ul className="list-inside list-disc">
               {roaster.beans.map((bean) => (

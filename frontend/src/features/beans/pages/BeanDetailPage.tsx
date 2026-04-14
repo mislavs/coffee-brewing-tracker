@@ -4,6 +4,7 @@ import { Link, Navigate } from 'react-router-dom'
 import { EmptyState } from '@/components/EmptyState'
 import { BrewLogCardSkeleton } from '@/components/skeletons/BrewLogCardSkeleton'
 import { DetailField } from '@/components/DetailField'
+import { SectionDivider } from '@/components/SectionDivider'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -20,12 +21,12 @@ import {
   formatOriginType,
   formatPrice,
   formatPricePerKg,
-  formatRoastDate,
   formatRoastProfile,
 } from '@/features/beans/formatters'
 import { useBean } from '@/features/beans/hooks/useBean'
 import { BrewLogCard } from '@/features/brew-log/components/BrewLogCard'
 import { useBrewLogs } from '@/features/brew-log/hooks/useBrewLogs'
+import { formatDate } from '@/lib/date'
 import { useEntityFormId } from '@/lib/useEntityFormId'
 
 function BeanDetailContent({ beanId }: { beanId: Guid }) {
@@ -69,13 +70,7 @@ function BeanDetailContent({ beanId }: { beanId: Guid }) {
           <div className="grid gap-8 md:grid-cols-2">
             <div className="space-y-8">
               <section className="space-y-4">
-                <div className="flex items-center gap-2">
-                  <div className="h-px flex-1 bg-border" />
-                  <p className="text-xs font-semibold tracking-widest uppercase text-muted-foreground">
-                    Origin
-                  </p>
-                  <div className="h-px flex-1 bg-border" />
-                </div>
+                <SectionDivider label="Origin" />
                 <div className="grid gap-3">
                   <DetailField label="Roaster" stacked>
                     {bean.roasterId ? (
@@ -130,19 +125,13 @@ function BeanDetailContent({ beanId }: { beanId: Guid }) {
 
             <div className="space-y-8">
               <section className="space-y-4">
-                <div className="flex items-center gap-2">
-                  <div className="h-px flex-1 bg-border" />
-                  <p className="text-xs font-semibold tracking-widest uppercase text-muted-foreground">
-                    Roast & Purchase
-                  </p>
-                  <div className="h-px flex-1 bg-border" />
-                </div>
+                <SectionDivider label="Roast & Purchase" />
                 <div className="grid gap-3">
                   <DetailField label="Roast Profile" stacked>
                     {formatRoastProfile(bean.roastProfile)}
                   </DetailField>
                   <DetailField label="Roast Date" stacked>
-                    {formatRoastDate(bean.roastDate)}
+                    {formatDate(bean.roastDate)}
                   </DetailField>
                   <DetailField label="Bag Weight" stacked>
                     {bean.bagWeight ?? '—'}
@@ -158,13 +147,7 @@ function BeanDetailContent({ beanId }: { beanId: Guid }) {
               </section>
 
               <section className="space-y-4">
-                <div className="flex items-center gap-2">
-                  <div className="h-px flex-1 bg-border" />
-                  <p className="text-xs font-semibold tracking-widest uppercase text-muted-foreground">
-                    Stock
-                  </p>
-                  <div className="h-px flex-1 bg-border" />
-                </div>
+                <SectionDivider label="Stock" />
                 <div className="space-y-2">
                   <p className={isLowStock ? 'font-medium text-destructive' : 'font-medium'}>
                     {formatDecimal(clampedRemainingQuantity)} g / {formatDecimal(bean.bagWeight)} g
@@ -174,13 +157,7 @@ function BeanDetailContent({ beanId }: { beanId: Guid }) {
               </section>
 
               <section className="space-y-4">
-                <div className="flex items-center gap-2">
-                  <div className="h-px flex-1 bg-border" />
-                  <p className="text-xs font-semibold tracking-widest uppercase text-muted-foreground">
-                    Tasting
-                  </p>
-                  <div className="h-px flex-1 bg-border" />
-                </div>
+                <SectionDivider label="Tasting" />
                 {bean.flavorNotes && bean.flavorNotes.length > 0 ? (
                   <div className="flex flex-wrap gap-2">
                     {bean.flavorNotes

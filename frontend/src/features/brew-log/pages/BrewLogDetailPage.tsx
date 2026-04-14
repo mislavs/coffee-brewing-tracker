@@ -3,6 +3,7 @@ import type { Guid } from '@/lib/api-types'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { DeleteConfirmationDialog } from '@/components/DeleteConfirmationDialog'
 import { DetailField } from '@/components/DetailField'
+import { SectionDivider } from '@/components/SectionDivider'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -72,13 +73,7 @@ function BrewLogDetailContent({ brewLogId }: { brewLogId: Guid }) {
           <div className="grid gap-8 md:grid-cols-2">
             <div className="space-y-8">
               <section className="space-y-4">
-                <div className="flex items-center gap-2">
-                  <div className="h-px flex-1 bg-border" />
-                  <p className="text-xs font-semibold tracking-widest uppercase text-muted-foreground">
-                    Equipment
-                  </p>
-                  <div className="h-px flex-1 bg-border" />
-                </div>
+                <SectionDivider label="Equipment" />
                 <div className="grid gap-3">
                   <DetailField label="Bean" stacked>
                     {brewLog.beanId ? (
@@ -129,26 +124,14 @@ function BrewLogDetailContent({ brewLogId }: { brewLogId: Guid }) {
               </section>
 
               <section className="space-y-4">
-                <div className="flex items-center gap-2">
-                  <div className="h-px flex-1 bg-border" />
-                  <p className="text-xs font-semibold tracking-widest uppercase text-muted-foreground">
-                    Notes
-                  </p>
-                  <div className="h-px flex-1 bg-border" />
-                </div>
+                <SectionDivider label="Notes" />
                 <p className="whitespace-pre-wrap leading-relaxed text-muted-foreground">
                   {brewLog.notes || '—'}
                 </p>
               </section>
 
               <section className="space-y-4">
-                <div className="flex items-center gap-2">
-                  <div className="h-px flex-1 bg-border" />
-                  <p className="text-xs font-semibold tracking-widest uppercase text-muted-foreground">
-                    Adjustments
-                  </p>
-                  <div className="h-px flex-1 bg-border" />
-                </div>
+                <SectionDivider label="Adjustments" />
                 <p className="whitespace-pre-wrap leading-relaxed text-muted-foreground">
                   {brewLog.adjustmentIdeas || '—'}
                 </p>
@@ -157,13 +140,7 @@ function BrewLogDetailContent({ brewLogId }: { brewLogId: Guid }) {
 
             <div className="space-y-8">
               <section className="space-y-4">
-                <div className="flex items-center gap-2">
-                  <div className="h-px flex-1 bg-border" />
-                  <p className="text-xs font-semibold tracking-widest uppercase text-muted-foreground">
-                    Brew Parameters
-                  </p>
-                  <div className="h-px flex-1 bg-border" />
-                </div>
+                <SectionDivider label="Brew Parameters" />
                 <div className="grid gap-3">
                   <DetailField label="Dose" stacked>
                     {brewLog.dose !== null && brewLog.dose !== undefined
@@ -195,13 +172,7 @@ function BrewLogDetailContent({ brewLogId }: { brewLogId: Guid }) {
               </section>
 
               <section className="space-y-4">
-                <div className="flex items-center gap-2">
-                  <div className="h-px flex-1 bg-border" />
-                  <p className="text-xs font-semibold tracking-widest uppercase text-muted-foreground">
-                    Result
-                  </p>
-                  <div className="h-px flex-1 bg-border" />
-                </div>
+                <SectionDivider label="Result" />
                 <div className="grid gap-3">
                   <DetailField label="Rating" stacked>
                     {getRatingDisplay(brewLog.rating)}

@@ -17,10 +17,10 @@ import {
 import {
   formatDecimal,
   formatPrice,
-  formatRoastDate,
 } from '@/features/beans/formatters'
 import { useParseBeanImage } from '@/features/beans/hooks/useParseBeanImage'
 import type { ParseBeanImageResponse } from '@/lib/api/schemas'
+import { formatDate } from '@/lib/date'
 
 type ImageExtractionDialogProps = {
   open: boolean
@@ -75,7 +75,7 @@ function buildExtractedFields(result: ParseBeanImageResponse): ExtractedField[] 
   if (result.roastDate) {
     fields.push({
       label: 'Roast date',
-      value: formatRoastDate(result.roastDate),
+      value: formatDate(result.roastDate),
     })
   }
 

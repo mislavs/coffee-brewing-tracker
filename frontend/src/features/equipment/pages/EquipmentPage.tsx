@@ -159,6 +159,13 @@ function GrinderList() {
 
 function AccessoryList() {
   const { data: accessories = [], isPending } = useAccessories()
+  const accessoriesWithBrewerNames = accessories.map((accessory) => ({
+    accessory,
+    brewerNames:
+      accessory.compatibleBrewers
+        ?.map((brewer) => brewer.name?.trim() ?? '')
+        .filter((name) => name.length > 0) ?? [],
+  }))
 
   return (
     <Card>
@@ -208,12 +215,7 @@ function AccessoryList() {
         ) : (
           <>
             <div className="space-y-3 md:hidden">
-              {accessories.map((accessory) => {
-                const brewerNames =
-                  accessory.compatibleBrewers
-                    ?.map((b) => b.name?.trim() ?? '')
-                    .filter((n) => n.length > 0) ?? []
-
+              {accessoriesWithBrewerNames.map(({ accessory, brewerNames }) => {
                 return (
                   <Card
                     key={accessory.id ?? accessory.name ?? 'accessory'}
@@ -254,12 +256,7 @@ function AccessoryList() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {accessories.map((accessory) => {
-                    const brewerNames =
-                      accessory.compatibleBrewers
-                        ?.map((b) => b.name?.trim() ?? '')
-                        .filter((n) => n.length > 0) ?? []
-
+                  {accessoriesWithBrewerNames.map(({ accessory, brewerNames }) => {
                     return (
                       <TableRow key={accessory.id ?? accessory.name ?? 'accessory'}>
                         <TableCell className="font-medium">

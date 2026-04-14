@@ -10,6 +10,7 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { CardSkeleton } from '@/components/skeletons/CardSkeleton'
+import { getSkeletonVisibilityClassName } from '@/components/skeletons/utils'
 import { RoasterCard } from '@/features/roasters/components/RoasterCard'
 import { useRoasters } from '@/features/roasters/hooks/useRoasters'
 
@@ -36,13 +37,7 @@ export function RoasterListPage() {
               <CardSkeleton
                 key={`roaster-skeleton-${index}`}
                 badgeCount={2}
-                className={
-                  index === 3
-                    ? 'hidden sm:block'
-                    : index >= 4
-                      ? 'hidden xl:block'
-                      : undefined
-                }
+                className={getSkeletonVisibilityClassName(index)}
               />
             ))}
           </div>

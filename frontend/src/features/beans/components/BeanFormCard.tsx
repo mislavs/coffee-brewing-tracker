@@ -545,7 +545,7 @@ export function BeanFormCard({
 
             <FieldErrorText message={form.formState.errors.root?.serverError?.message} />
 
-            <CardFooter className="px-0 pb-0">
+            <CardFooter className="px-0 pb-0 sm:px-0">
               <div className="flex items-center gap-2">
                 <Button type="submit" disabled={isSubmitting}>
                   {isSubmitting ? 'Saving...' : submitLabel}

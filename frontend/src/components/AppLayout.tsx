@@ -36,15 +36,15 @@ import { recipeQueryKeys } from '@/features/recipes/queryKeys'
 import { roasterQueryKeys } from '@/features/roasters/queryKeys'
 import { apiClient } from '@/lib/api-client'
 import { useSettings } from '@/hooks/useSettings'
-import { featureRoutes } from '@/lib/navigation'
 import { queryClient } from '@/lib/queryClient'
 import {
+  featureRoutes,
   preloadBeanFeatureRoutes,
   preloadBrewLogFeatureRoutes,
   preloadEquipmentFeatureRoutes,
   preloadRecipeFeatureRoutes,
   preloadRoasterFeatureRoutes,
-} from '@/lib/routePreload'
+} from '@/lib/routeRegistry'
 import { cn } from '@/lib/utils'
 
 const expandedMapHeightClass = 'h-[30rem] md:h-[42rem] lg:h-[46rem]'

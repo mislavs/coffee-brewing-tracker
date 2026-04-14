@@ -165,7 +165,7 @@ export function BrewLogFormCard({
 
           <FieldErrorText message={form.formState.errors.root?.serverError?.message} />
 
-          <CardFooter className="px-0 pb-0">
+          <CardFooter className="px-0 pb-0 sm:px-0">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
               <Button type="submit" disabled={isSubmitting}>
                 {isSubmitting ? 'Saving...' : submitLabel}

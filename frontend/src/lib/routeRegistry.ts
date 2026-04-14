@@ -16,14 +16,6 @@ export const featureRoutes: FeatureRoute[] = [
 
 export const defaultFeatureRoute = '/brew-log'
 
-export const implementedFeaturePaths = [
-  'roasters',
-  'beans',
-  'equipment',
-  'recipes',
-  'brew-log',
-]
-
 export const loadRoasterDetailPage = () =>
   import('@/features/roasters/pages/RoasterDetailPage')
 
@@ -44,9 +36,6 @@ export const loadBrewLogDetailPage = () =>
 
 export const loadBrewLogFormPage = () =>
   import('@/features/brew-log/pages/BrewLogFormPage')
-
-export const loadEquipmentPage = () =>
-  import('@/features/equipment/pages/EquipmentPage')
 
 export const loadBrewerDetailPage = () =>
   import('@/features/equipment/pages/BrewerDetailPage')
@@ -84,7 +73,6 @@ export function preloadBrewLogFeatureRoutes() {
 
 export function preloadEquipmentFeatureRoutes() {
   void Promise.all([
-    loadEquipmentPage(),
     loadBrewerDetailPage(),
     loadBrewerFormPage(),
     loadGrinderDetailPage(),
@@ -117,6 +105,7 @@ const BrewLogDetailPage = lazyPage(loadBrewLogDetailPage, 'BrewLogDetailPage')
 const RoasterDetailPage = lazyPage(loadRoasterDetailPage, 'RoasterDetailPage')
 const RoasterFormPage = lazyPage(loadRoasterFormPage, 'RoasterFormPage')
 const BeanDetailPage = lazyPage(loadBeanDetailPage, 'BeanDetailPage')
+const BeanFormPage = lazyPage(loadBeanFormPage, 'BeanFormPage')
 const BrewerDetailPage = lazyPage(loadBrewerDetailPage, 'BrewerDetailPage')
 const BrewerFormPage = lazyPage(loadBrewerFormPage, 'BrewerFormPage')
 const GrinderDetailPage = lazyPage(loadGrinderDetailPage, 'GrinderDetailPage')
@@ -135,6 +124,8 @@ export const lazyAppRoutes: LazyAppRoute[] = [
   { path: 'brew-log/new', component: BrewLogFormPage },
   { path: 'brew-log/:id', component: BrewLogDetailPage },
   { path: 'brew-log/:id/edit', component: BrewLogFormPage },
+  { path: 'beans/new', component: BeanFormPage },
+  { path: 'beans/:id/edit', component: BeanFormPage },
   { path: 'roasters/new', component: RoasterFormPage },
   { path: 'roasters/:id', component: RoasterDetailPage },
   { path: 'roasters/:id/edit', component: RoasterFormPage },
