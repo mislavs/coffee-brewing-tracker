@@ -48,3 +48,5 @@ backend/models/*.bin
 
 # Kiota generated API client
 frontend/src/lib/api/generated/
+
+aspire.config.json
