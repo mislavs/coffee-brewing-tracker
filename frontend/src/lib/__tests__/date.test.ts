@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  formatAgeInDays,
   formatDate,
   formatDateTime,
   toDisplayDate,
@@ -30,6 +31,23 @@ describe('date utilities', () => {
     it('formats valid date-time values and returns placeholder for invalid values', () => {
       expect(formatDateTime('2025-03-05T14:30:45')).toBe('05.03.2025 14:30')
       expect(formatDateTime('bad-value')).toBe('—')
+    })
+  })
+
+  describe('formatAgeInDays', () => {
+    it('returns day counts for valid values', () => {
+      const today = new Date('2025-03-17T09:30:00')
+
+      expect(formatAgeInDays('2025-03-05', today)).toBe('12 days')
+      expect(formatAgeInDays({ year: 2025, month: 3, day: 16 }, today)).toBe('1 day')
+      expect(formatAgeInDays(new Date(2025, 2, 17, 23, 59), today)).toBe('0 days')
+    })
+
+    it('returns relative text for future dates and null for invalid values', () => {
+      const today = new Date('2025-03-17T09:30:00')
+
+      expect(formatAgeInDays('2025-03-18', today)).toBe('in 1 day')
+      expect(formatAgeInDays('bad-value', today)).toBeNull()
     })
   })
 

@@ -21,6 +21,7 @@ import {
   formatPricePerKg,
   formatRoastProfile,
 } from '@/features/beans/formatters'
+import { formatAgeInDays } from '@/lib/date'
 
 type BeanCardProps = {
   bean: BeanSummaryDto
@@ -43,6 +44,7 @@ export function BeanCard({ bean }: BeanCardProps) {
   const name = bean.name ?? 'Unnamed bean'
   const roasterName = bean.roasterName || '—'
   const roastProfileLabel = formatRoastProfile(bean.roastProfile)
+  const roastAge = formatAgeInDays(bean.roastDate)
   const isLowStock = Boolean(
     bean.bagWeight &&
       bean.remainingQuantity !== null &&
@@ -94,6 +96,7 @@ export function BeanCard({ bean }: BeanCardProps) {
       </CardHeader>
       <CardContent className="flex flex-wrap gap-1.5">
         <Badge variant="secondary">{roastProfileLabel}</Badge>
+        {roastAge ? <Badge variant="outline">{roastAge}</Badge> : null}
         {bean.isAvailable === false ? (
           <Badge variant="outline" className="text-muted-foreground">
             Unavailable

@@ -7,6 +7,7 @@ public sealed record BeanSummaryDto(
     string Name,
     string RoasterName,
     RoastProfile RoastProfile,
+    DateOnly? RoastDate,
     decimal BagWeight,
     decimal? PricePerKg,
     bool IsAvailable,

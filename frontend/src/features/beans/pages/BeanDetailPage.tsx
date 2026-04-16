@@ -26,7 +26,7 @@ import {
 import { useBean } from '@/features/beans/hooks/useBean'
 import { BrewLogCard } from '@/features/brew-log/components/BrewLogCard'
 import { useBrewLogs } from '@/features/brew-log/hooks/useBrewLogs'
-import { formatDate } from '@/lib/date'
+import { formatAgeInDays, formatDate } from '@/lib/date'
 import { useEntityFormId } from '@/lib/useEntityFormId'
 
 function BeanDetailContent({ beanId }: { beanId: Guid }) {
@@ -48,6 +48,8 @@ function BeanDetailContent({ beanId }: { beanId: Guid }) {
   const remainingPercentage = bagWeight > 0
     ? Math.min(100, (clampedRemainingQuantity / bagWeight) * 100)
     : 0
+  const formattedRoastDate = formatDate(bean.roastDate)
+  const roastAge = formatAgeInDays(bean.roastDate)
 
   return (
     <div className="space-y-6">
@@ -131,7 +133,7 @@ function BeanDetailContent({ beanId }: { beanId: Guid }) {
                     {formatRoastProfile(bean.roastProfile)}
                   </DetailField>
                   <DetailField label="Roast Date" stacked>
-                    {formatDate(bean.roastDate)}
+                    {roastAge ? `${formattedRoastDate} (${roastAge})` : formattedRoastDate}
                   </DetailField>
                   <DetailField label="Bag Weight" stacked>
                     {bean.bagWeight ?? '—'}

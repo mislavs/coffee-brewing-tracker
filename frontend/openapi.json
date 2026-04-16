@@ -1470,6 +1470,11 @@
           "roastProfile": {
             "$ref": "#/components/schemas/RoastProfile"
           },
+          "roastDate": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
           "bagWeight": {
             "type": "number",
             "format": "double"

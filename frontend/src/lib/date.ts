@@ -4,6 +4,12 @@ const DISPLAY_DATE_PATTERN = /^(\d{2})\.(\d{2})\.(\d{4})$/
 const ISO_DATE_TIME_PATTERN = /^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2})(?::\d{2}(?:\.\d{1,3})?)?$/
 const DISPLAY_DATE_TIME_PATTERN = /^(\d{2})\.(\d{2})\.(\d{4})\s+(\d{2}):(\d{2})$/
 
+type DateParts = {
+  year: number
+  month: number
+  day: number
+}
+
 function pad2(value: number) {
   return String(value).padStart(2, '0')
 }
@@ -67,6 +73,51 @@ function toValidDate(value: unknown) {
   return null
 }
 
+function toDateParts(value: unknown): DateParts | null {
+  if (typeof value === 'string') {
+    const trimmed = value.trim()
+    if (!trimmed) {
+      return null
+    }
+
+    const isoMatch = ISO_DATE_PATTERN.exec(trimmed)
+    if (isoMatch) {
+      const [, yearText, monthText, dayText] = isoMatch
+      const year = Number(yearText)
+      const month = Number(monthText)
+      const day = Number(dayText)
+      return isValidDateParts(year, month, day) ? { year, month, day } : null
+    }
+  }
+
+  if (value && typeof value === 'object') {
+    const parts = value as { year?: unknown; month?: unknown; day?: unknown }
+    if (
+      typeof parts.year === 'number' &&
+      typeof parts.month === 'number' &&
+      typeof parts.day === 'number' &&
+      isValidDateParts(parts.year, parts.month, parts.day)
+    ) {
+      return {
+        year: parts.year,
+        month: parts.month,
+        day: parts.day,
+      }
+    }
+  }
+
+  const parsed = toValidDate(value)
+  if (!parsed) {
+    return null
+  }
+
+  return {
+    year: parsed.getFullYear(),
+    month: parsed.getMonth() + 1,
+    day: parsed.getDate(),
+  }
+}
+
 function formatDateFromDateOnlyObject(value: unknown) {
   if (!value || typeof value !== 'object') {
     return null
@@ -121,6 +172,21 @@ export function formatDate(value: unknown) {
     pad2(parsed.getMonth() + 1),
     pad2(parsed.getDate()),
   )
+}
+
+export function formatAgeInDays(value: unknown, today: Date = new Date()) {
+  const dateParts = toDateParts(value)
+  if (!dateParts || Number.isNaN(today.getTime())) {
+    return null
+  }
+
+  const targetDay = Date.UTC(dateParts.year, dateParts.month - 1, dateParts.day)
+  const currentDay = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate())
+  const dayDifference = Math.round((currentDay - targetDay) / (1000 * 60 * 60 * 24))
+  const absoluteDays = Math.abs(dayDifference)
+  const dayLabel = `${absoluteDays} day${absoluteDays === 1 ? '' : 's'}`
+
+  return dayDifference >= 0 ? dayLabel : `in ${dayLabel}`
 }
 
 export function formatDateTime(value: unknown) {

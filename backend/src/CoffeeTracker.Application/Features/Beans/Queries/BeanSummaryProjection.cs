@@ -13,6 +13,7 @@ public static class BeanSummaryProjection
             entity.Name,
             entity.Roaster.Name,
             entity.RoastProfile,
+            entity.RoastDate,
             entity.BagWeight,
             entity.Price.HasValue && entity.BagWeight > 0
                 ? entity.Price.Value / (entity.BagWeight / 1000m)
