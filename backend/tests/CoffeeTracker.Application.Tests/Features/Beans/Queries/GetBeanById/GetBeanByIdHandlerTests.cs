@@ -33,6 +33,7 @@ public class GetBeanByIdHandlerTests(IntegrationTestFactory factory) : Integrati
             1800,
             250m,
             40m);
+        bean.SetImage("kenya-ab.png", [1, 2, 3]);
         bean.SetFlavorNotes([citrus, chocolate]);
         await Insert(bean);
 
@@ -51,6 +52,8 @@ public class GetBeanByIdHandlerTests(IntegrationTestFactory factory) : Integrati
         result.OriginCountries.Single().Name.Should().Be("Kenya");
         result.PricePerKg.Should().Be(160m);
         result.RemainingQuantity.Should().Be(250m);
+        result.HasImage.Should().BeTrue();
+        result.ImageUrl.Should().Be($"/api/beans/{bean.Id}/image");
         result.FlavorNotes.Select(entity => entity.Name)
             .Should()
             .Contain(["Citrus", "Chocolate"]);

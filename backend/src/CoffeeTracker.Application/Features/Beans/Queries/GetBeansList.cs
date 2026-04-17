@@ -38,9 +38,13 @@ public sealed class GetBeansListHandler(ApplicationDbContext dbContext)
                 entity.OriginCountries.Any(country => country.Id == request.CountryId.Value));
         }
 
-        return await query
+        var beans = await query
             .OrderBy(entity => entity.Name)
-            .Select(BeanSummaryProjection.ToDto(dbContext))
+            .Select(BeanSummaryProjection.ToData(dbContext))
             .ToListAsync(cancellationToken);
+
+        return beans
+            .Select(BeanSummaryProjection.ToDto)
+            .ToList();
     }
 }

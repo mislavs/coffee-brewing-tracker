@@ -19,5 +19,7 @@ public sealed record BeanDto(
     decimal? Price,
     decimal? PricePerKg,
     IReadOnlyList<FlavorNoteDto> FlavorNotes,
+    bool HasImage,
+    string? ImageUrl,
     bool IsAvailable,
     decimal RemainingQuantity);

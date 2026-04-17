@@ -24,12 +24,16 @@ public sealed class GetCountryBeansListHandler(ApplicationDbContext dbContext)
             throw new NotFoundException($"Country '{request.CountryId}' was not found.");
         }
 
-        return await dbContext.Beans
+        var beans = await dbContext.Beans
             .AsNoTracking()
             .Where(entity => entity.OriginCountries.Any(country => country.Id == request.CountryId))
             .Where(entity => entity.IsAvailable)
             .OrderBy(entity => entity.Name)
-            .Select(BeanSummaryProjection.ToDto(dbContext))
+            .Select(BeanSummaryProjection.ToData(dbContext))
             .ToListAsync(cancellationToken);
+
+        return beans
+            .Select(BeanSummaryProjection.ToDto)
+            .ToList();
     }
 }

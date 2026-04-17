@@ -1,4 +1,4 @@
-import type { CreateBeanRequest } from '@/lib/api/schemas'
+import type { CreateBeanRequest, CreateBeanResponse } from '@/lib/api/schemas'
 import { apiClient } from '@/lib/api-client'
 import {
   beanQueryKeys,
@@ -8,7 +8,7 @@ import {
 import { useEntityMutation } from '@/lib/useEntityMutation'
 
 export function useCreateBean() {
-  return useEntityMutation<CreateBeanRequest>({
+  return useEntityMutation<CreateBeanRequest, CreateBeanResponse | undefined>({
     mutationFn: (request) => apiClient.api.beans.post(request),
     invalidateKeys: [beanQueryKeys.all, countryQueryKeys.all, flavorNoteQueryKeys.all],
     successMessage: 'Bean created.',

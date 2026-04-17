@@ -7,12 +7,14 @@ type UseEntityMutationOptions<TInput, TResult> = {
   mutationFn: (input: TInput) => Promise<TResult>
   invalidateKeys: InvalidateKeys<TInput>
   successMessage: string
+  shouldToast?: (variables: TInput) => boolean
 }
 
 export function useEntityMutation<TInput, TResult = unknown>({
   mutationFn,
   invalidateKeys,
   successMessage,
+  shouldToast,
 }: UseEntityMutationOptions<TInput, TResult>) {
   const queryClient = useQueryClient()
 
@@ -28,7 +30,9 @@ export function useEntityMutation<TInput, TResult = unknown>({
         queryClient.invalidateQueries({ queryKey })
       }
 
-      toast.success(successMessage)
+      if (shouldToast === undefined || shouldToast(variables)) {
+        toast.success(successMessage)
+      }
     },
   })
 }

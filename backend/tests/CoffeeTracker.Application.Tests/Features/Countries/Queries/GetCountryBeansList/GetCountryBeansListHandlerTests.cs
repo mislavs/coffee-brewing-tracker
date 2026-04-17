@@ -25,6 +25,7 @@ public class GetCountryBeansListHandlerTests(IntegrationTestFactory factory) : I
             Bean.Create("Alpha Bean", roaster.Id, OriginType.SingleOrigin, [kenya], null, null, RoastProfile.Filter, null, null, 250m, 40m),
             Bean.Create("Ethiopia Bean", roaster.Id, OriginType.SingleOrigin, [ethiopia], null, null, RoastProfile.Filter, null, null, 250m, 35m)
         };
+        beans[1].SetImage("alpha-bean.png", [1, 2, 3]);
         await InsertMany(beans);
         var query = new GetCountryBeansListQuery(kenya.Id);
 
@@ -36,6 +37,10 @@ public class GetCountryBeansListHandlerTests(IntegrationTestFactory factory) : I
         result.Select(entry => entry.Name)
             .Should()
             .ContainInOrder("Alpha Bean", "Zulu Bean");
+        result[0].HasImage.Should().BeTrue();
+        result[0].ImageUrl.Should().Be($"/api/beans/{beans[1].Id}/image");
+        result[1].HasImage.Should().BeFalse();
+        result[1].ImageUrl.Should().BeNull();
     }
 
     [Fact]

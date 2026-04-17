@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
   Controller,
@@ -9,6 +9,7 @@ import {
 } from 'react-hook-form'
 import { ImagePlus } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { ImageUpload } from '@/components/ImageUpload'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -96,10 +97,16 @@ type BeanFormCardProps = {
   description: string
   submitLabel: string
   initialValues: BeanFormValues
-  onSubmit: (values: BeanFormValues) => Promise<void>
+  onSubmit: (values: BeanFormValues, image: BeanImageSubmission) => Promise<void>
   isSubmitting: boolean
   cancelHref: string
   isEditMode?: boolean
+  existingImageUrl?: string | null
+}
+
+export type BeanImageSubmission = {
+  file: File | null
+  removeExistingImage: boolean
 }
 
 export function BeanFormCard({
@@ -111,6 +118,7 @@ export function BeanFormCard({
   isSubmitting,
   cancelHref,
   isEditMode = false,
+  existingImageUrl,
 }: BeanFormCardProps) {
   const form = useForm<BeanFormInput, undefined, BeanFormValues>({
     resolver: zodResolver(beanFormSchema),
@@ -125,7 +133,13 @@ export function BeanFormCard({
 
   const [isCreateRoasterOpen, setIsCreateRoasterOpen] = useState(false)
   const [isImageExtractionOpen, setIsImageExtractionOpen] = useState(false)
+  const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null)
+  const [removeExistingImage, setRemoveExistingImage] = useState(false)
   const watchedRoastDate = useWatch({ control: form.control, name: 'roastDate' })
+  const selectedImagePreviewUrl = useMemo(
+    () => (selectedImageFile ? URL.createObjectURL(selectedImageFile) : null),
+    [selectedImageFile],
+  )
 
   const roasterOptions = useMemo(
     () =>
@@ -173,6 +187,16 @@ export function BeanFormCard({
   const flavorNotesError = getFieldErrorMessage(
     form.formState.errors.flavorNoteNames,
   )
+  const effectiveImagePreviewUrl =
+    selectedImagePreviewUrl ?? (removeExistingImage ? null : existingImageUrl ?? null)
+
+  useEffect(() => {
+    return () => {
+      if (selectedImagePreviewUrl) {
+        URL.revokeObjectURL(selectedImagePreviewUrl)
+      }
+    }
+  }, [selectedImagePreviewUrl])
 
   const toCountryNames = (countryIds: string[]) =>
     countryIds.flatMap((countryId) => {
@@ -190,7 +214,10 @@ export function BeanFormCard({
     form.clearErrors('root.serverError')
 
     try {
-      await onSubmit(values)
+      await onSubmit(values, {
+        file: selectedImageFile,
+        removeExistingImage: removeExistingImage && !selectedImageFile,
+      })
     } catch (error) {
       applyBeanFormServerErrors(error, form.setError)
     }
@@ -276,6 +303,32 @@ export function BeanFormCard({
         </CardHeader>
         <CardContent>
           <form className="space-y-4" onSubmit={submitForm}>
+            <ImageUpload
+              id="bean-image"
+              label="Bean Image"
+              previewUrl={effectiveImagePreviewUrl}
+              previewAlt="Bean image preview"
+              onFileSelected={(file) => {
+                setSelectedImageFile(file)
+                if (file) {
+                  setRemoveExistingImage(false)
+                }
+              }}
+              onRemove={() => {
+                if (selectedImageFile) {
+                  setSelectedImageFile(null)
+                  return
+                }
+
+                if (existingImageUrl) {
+                  setRemoveExistingImage(true)
+                }
+              }}
+              accept="image/png,image/jpeg,image/webp"
+              helperText="PNG, JPEG, or WebP. Max 5 MB."
+              disabled={isSubmitting}
+            />
+
             <div className="space-y-2">
               <label htmlFor="name" className="text-sm font-medium">
                 Name

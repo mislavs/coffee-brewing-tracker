@@ -22,15 +22,17 @@ public sealed class DeleteRoasterLogoHandler(ApplicationDbContext dbContext)
 {
     public async Task Handle(DeleteRoasterLogoCommand request, CancellationToken cancellationToken)
     {
-        var roaster = await dbContext.Roasters
-            .FirstOrDefaultAsync(entity => entity.Id == request.Id, cancellationToken);
+        var rowsAffected = await dbContext.Roasters
+            .Where(entity => entity.Id == request.Id)
+            .ExecuteUpdateAsync(
+                setters => setters
+                    .SetProperty(entity => entity.LogoFileName, (string?)null)
+                    .SetProperty(entity => entity.LogoData, (byte[]?)null),
+                cancellationToken);
 
-        if (roaster is null)
+        if (rowsAffected == 0)
         {
             throw new NotFoundException($"Roaster '{request.Id}' was not found.");
         }
-
-        roaster.RemoveLogo();
-        await dbContext.SaveChangesAsync(cancellationToken);
     }
 }

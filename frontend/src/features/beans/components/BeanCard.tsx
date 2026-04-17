@@ -5,7 +5,6 @@ import type { BeanSummaryDto } from '@/lib/api/schemas'
 import { Badge } from '@/components/ui/badge'
 import {
   Card,
-  CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
@@ -21,6 +20,10 @@ import {
   formatPricePerKg,
   formatRoastProfile,
 } from '@/features/beans/formatters'
+import {
+  getBeanInitials,
+  resolveBeanImageUrl,
+} from '@/features/beans/beanPresentation'
 import { formatAgeInDays } from '@/lib/date'
 
 type BeanCardProps = {
@@ -44,6 +47,8 @@ export function BeanCard({ bean }: BeanCardProps) {
   const name = bean.name ?? 'Unnamed bean'
   const roasterName = bean.roasterName || '—'
   const roastProfileLabel = formatRoastProfile(bean.roastProfile)
+  const imageUrl = resolveBeanImageUrl(bean.imageUrl)
+  const initials = getBeanInitials(bean.name)
   const roastAge = formatAgeInDays(bean.roastDate)
   const isLowStock = Boolean(
     bean.bagWeight &&
@@ -54,15 +59,23 @@ export function BeanCard({ bean }: BeanCardProps) {
 
   return (
     <Card className="card-interactive h-full">
-      <CardHeader className="space-y-3">
-        <div className="relative">
+      <CardHeader className="flex flex-row items-start gap-4 space-y-0">
+        <div className="relative shrink-0">
           <div
-            className={`flex h-28 w-full items-center justify-center rounded-lg border text-sm font-semibold ${getRoastToneClass(bean.roastProfile)}`}
+            className={
+              imageUrl
+                ? 'flex aspect-[3/4] w-24 items-center justify-center overflow-hidden rounded-lg border bg-muted/20'
+                : `flex aspect-[3/4] w-24 items-center justify-center rounded-lg border text-xl font-semibold ${getRoastToneClass(bean.roastProfile)}`
+            }
           >
-            {roastProfileLabel}
+            {imageUrl ? (
+              <img src={imageUrl} alt={`${name} bean`} className="h-full w-full object-cover" />
+            ) : (
+              <span>{initials}</span>
+            )}
           </div>
           {bean.id ? (
-            <div className="absolute top-2 right-2">
+            <div className="absolute top-1 right-1">
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -78,38 +91,40 @@ export function BeanCard({ bean }: BeanCardProps) {
             </div>
           ) : null}
         </div>
-        <div>
-          <CardTitle className="text-base">
-            {bean.id ? (
-              <Link
-                to={`/beans/${bean.id}`}
-                className="transition-colors hover:text-primary"
-              >
-                {name}
-              </Link>
-            ) : (
-              name
-            )}
-          </CardTitle>
-          <CardDescription className="mt-0.5">{roasterName}</CardDescription>
+        <div className="flex min-w-0 flex-1 flex-col gap-2">
+          <div>
+            <CardTitle className="text-base">
+              {bean.id ? (
+                <Link
+                  to={`/beans/${bean.id}`}
+                  className="transition-colors hover:text-primary"
+                >
+                  {name}
+                </Link>
+              ) : (
+                name
+              )}
+            </CardTitle>
+            <CardDescription className="mt-0.5">{roasterName}</CardDescription>
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            <Badge variant="secondary">{roastProfileLabel}</Badge>
+            {roastAge ? <Badge variant="outline">{roastAge}</Badge> : null}
+            {bean.isAvailable === false ? (
+              <Badge variant="outline" className="text-muted-foreground">
+                Unavailable
+              </Badge>
+            ) : null}
+            <Badge variant="outline">{formatPricePerKg(bean.pricePerKg)}</Badge>
+            <Badge
+              variant="outline"
+              className={isLowStock ? 'border-destructive/40 text-destructive' : undefined}
+            >
+              Remaining: {formatDecimal(bean.remainingQuantity)} g
+            </Badge>
+          </div>
         </div>
       </CardHeader>
-      <CardContent className="flex flex-wrap gap-1.5">
-        <Badge variant="secondary">{roastProfileLabel}</Badge>
-        {roastAge ? <Badge variant="outline">{roastAge}</Badge> : null}
-        {bean.isAvailable === false ? (
-          <Badge variant="outline" className="text-muted-foreground">
-            Unavailable
-          </Badge>
-        ) : null}
-        <Badge variant="outline">{formatPricePerKg(bean.pricePerKg)}</Badge>
-        <Badge
-          variant="outline"
-          className={isLowStock ? 'border-destructive/40 text-destructive' : undefined}
-        >
-          Remaining: {formatDecimal(bean.remainingQuantity)} g
-        </Badge>
-      </CardContent>
     </Card>
   )
 }

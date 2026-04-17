@@ -23,6 +23,7 @@ public class GetBeansListHandlerTests(IntegrationTestFactory factory) : Integrat
             Bean.Create("Zulu Bean", roaster.Id, OriginType.Blend, [brazil], null, null, RoastProfile.Omni, null, null, 250m, 30m),
             Bean.Create("Alpha Bean", roaster.Id, OriginType.SingleOrigin, [kenya], null, null, RoastProfile.Filter, null, null, 250m, 40m)
         };
+        beans[1].SetImage("alpha-bean.png", [1, 2, 3]);
         await InsertMany(beans);
 
         var query = new GetBeansListQuery(null);
@@ -35,6 +36,10 @@ public class GetBeansListHandlerTests(IntegrationTestFactory factory) : Integrat
         result.Select(entity => entity.Name)
             .Should()
             .ContainInOrder("Alpha Bean", "Zulu Bean");
+        result[0].HasImage.Should().BeTrue();
+        result[0].ImageUrl.Should().Be($"/api/beans/{beans[1].Id}/image");
+        result[1].HasImage.Should().BeFalse();
+        result[1].ImageUrl.Should().BeNull();
     }
 
     [Fact]

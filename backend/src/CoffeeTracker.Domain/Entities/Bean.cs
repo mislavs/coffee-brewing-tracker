@@ -5,6 +5,7 @@ namespace CoffeeTracker.Domain.Entities;
 
 public class Bean
 {
+    private const int MaxImageFileNameLength = 255;
     private readonly List<FlavorNote> _flavorNotes = [];
     private readonly List<Country> _originCountries = [];
 
@@ -63,6 +64,10 @@ public class Bean
     public decimal BagWeight { get; private set; }
 
     public decimal? Price { get; private set; }
+
+    public string? ImageFileName { get; private set; }
+
+    public byte[]? ImageData { get; private set; }
 
     public bool IsAvailable { get; private set; } = true;
 
@@ -133,6 +138,32 @@ public class Bean
     public void SetAvailability(bool isAvailable)
     {
         IsAvailable = isAvailable;
+    }
+
+    public void SetImage(string fileName, byte[] data)
+    {
+        var normalizedFileName = EntityNormalization.NormalizeRequired(fileName, nameof(fileName));
+        if (normalizedFileName.Length > MaxImageFileNameLength)
+        {
+            throw new ArgumentException(
+                $"Image file name must be {MaxImageFileNameLength} characters or fewer.",
+                nameof(fileName));
+        }
+
+        ArgumentNullException.ThrowIfNull(data);
+        if (data.Length == 0)
+        {
+            throw new ArgumentException("Image data cannot be empty.", nameof(data));
+        }
+
+        ImageFileName = normalizedFileName;
+        ImageData = data.ToArray();
+    }
+
+    public void RemoveImage()
+    {
+        ImageFileName = null;
+        ImageData = null;
     }
 
     public void SetFlavorNotes(IEnumerable<FlavorNote> flavorNotes)

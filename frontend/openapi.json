@@ -257,6 +257,94 @@
         }
       }
     },
+    "/api/beans/{id}/image": {
+      "put": {
+        "tags": [
+          "Beans"
+        ],
+        "operationId": "UploadBeanImage",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              },
+              "encoding": {
+                "file": {
+                  "style": "form"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Beans"
+        ],
+        "operationId": "GetBeanImage",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Beans"
+        ],
+        "operationId": "DeleteBeanImage",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
     "/api/beans/{id}/availability": {
       "patch": {
         "tags": [
@@ -1428,6 +1516,13 @@
             },
             "nullable": true
           },
+          "hasImage": {
+            "type": "boolean"
+          },
+          "imageUrl": {
+            "type": "string",
+            "nullable": true
+          },
           "isAvailable": {
             "type": "boolean"
           },
@@ -1482,6 +1577,13 @@
           "pricePerKg": {
             "type": "number",
             "format": "double",
+            "nullable": true
+          },
+          "hasImage": {
+            "type": "boolean"
+          },
+          "imageUrl": {
+            "type": "string",
             "nullable": true
           },
           "isAvailable": {

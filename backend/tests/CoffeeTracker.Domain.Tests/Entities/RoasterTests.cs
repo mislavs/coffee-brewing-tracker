@@ -116,6 +116,23 @@ public class RoasterTests
     }
 
     [Fact]
+    public void SetLogo_WhenDataIsEmpty_DoesNotMutateLogoFileName()
+    {
+        // Arrange
+        var roaster = Roaster.Create("Kawa", "Warsaw", null);
+        roaster.SetLogo("existing.png", [1, 2, 3]);
+
+        // Act
+        Action act = () => roaster.SetLogo("new-logo.png", []);
+
+        // Assert
+        act.Should().Throw<ArgumentException>()
+            .WithParameterName("data");
+        roaster.LogoFileName.Should().Be("existing.png");
+        roaster.LogoData.Should().Equal(1, 2, 3);
+    }
+
+    [Fact]
     public void SetLogo_WhenFileNameExceedsMaxLength_ThrowsArgumentException()
     {
         // Arrange
@@ -128,6 +145,24 @@ public class RoasterTests
         // Assert
         act.Should().Throw<ArgumentException>()
             .WithParameterName("fileName");
+    }
+
+    [Fact]
+    public void SetLogo_WhenFileNameExceedsMaxLength_DoesNotMutateLogoFileName()
+    {
+        // Arrange
+        var roaster = Roaster.Create("Kawa", "Warsaw", null);
+        roaster.SetLogo("existing.png", [1, 2, 3]);
+        var fileName = $"{new string('a', 252)}.png";
+
+        // Act
+        Action act = () => roaster.SetLogo(fileName, [4, 5, 6]);
+
+        // Assert
+        act.Should().Throw<ArgumentException>()
+            .WithParameterName("fileName");
+        roaster.LogoFileName.Should().Be("existing.png");
+        roaster.LogoData.Should().Equal(1, 2, 3);
     }
 
     [Fact]

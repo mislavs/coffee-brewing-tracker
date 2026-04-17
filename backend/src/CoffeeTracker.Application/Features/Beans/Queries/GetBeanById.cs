@@ -16,10 +16,31 @@ public sealed class GetBeanByIdHandler(ApplicationDbContext dbContext)
     {
         var bean = await dbContext.Beans
             .AsNoTracking()
-            .Include(entity => entity.Roaster)
-            .Include(entity => entity.OriginCountries)
-            .Include(entity => entity.FlavorNotes)
-            .FirstOrDefaultAsync(entity => entity.Id == request.Id, cancellationToken);
+            .Where(entity => entity.Id == request.Id)
+            .Select(entity => new
+            {
+                entity.Id,
+                entity.Name,
+                entity.RoasterId,
+                RoasterName = entity.Roaster.Name,
+                entity.OriginType,
+                OriginCountries = entity.OriginCountries
+                    .Select(country => new { country.Id, country.Name })
+                    .ToList(),
+                entity.Variety,
+                entity.ProcessingMethod,
+                entity.RoastProfile,
+                entity.RoastDate,
+                entity.Altitude,
+                entity.BagWeight,
+                entity.Price,
+                FlavorNotes = entity.FlavorNotes
+                    .Select(note => new { note.Id, note.Name })
+                    .ToList(),
+                HasImage = entity.ImageData != null,
+                entity.IsAvailable
+            })
+            .FirstOrDefaultAsync(cancellationToken);
 
         if (bean is null)
         {
@@ -31,11 +52,15 @@ public sealed class GetBeanByIdHandler(ApplicationDbContext dbContext)
             .Where(entry => entry.BeanId == request.Id)
             .SumAsync(entry => (decimal?)entry.Dose, cancellationToken) ?? 0m;
 
+        var pricePerKg = bean.Price.HasValue && bean.BagWeight > 0
+            ? bean.Price.Value / (bean.BagWeight / 1000m)
+            : (decimal?)null;
+
         return new BeanDto(
             bean.Id,
             bean.Name,
             bean.RoasterId,
-            bean.Roaster.Name,
+            bean.RoasterName,
             bean.OriginType,
             bean.OriginCountries
                 .OrderBy(country => country.Name)
@@ -48,11 +73,13 @@ public sealed class GetBeanByIdHandler(ApplicationDbContext dbContext)
             bean.Altitude,
             bean.BagWeight,
             bean.Price,
-            bean.PricePerKg,
+            pricePerKg,
             bean.FlavorNotes
-                .OrderBy(entity => entity.Name)
-                .Select(entity => new FlavorNoteDto(entity.Id, entity.Name))
+                .OrderBy(note => note.Name)
+                .Select(note => new FlavorNoteDto(note.Id, note.Name))
                 .ToList(),
+            bean.HasImage,
+            bean.HasImage ? $"/api/beans/{request.Id}/image" : null,
             bean.IsAvailable,
             Math.Max(0m, bean.BagWeight - totalDose));
     }

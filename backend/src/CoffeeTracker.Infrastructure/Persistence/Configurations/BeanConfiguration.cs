@@ -20,6 +20,11 @@ public class BeanConfiguration : IEntityTypeConfiguration<Bean>
         builder.Property(bean => bean.ProcessingMethod)
             .HasMaxLength(200);
 
+        builder.Property(bean => bean.ImageFileName)
+            .HasMaxLength(255);
+
+        builder.Property(bean => bean.ImageData);
+
         builder.Property(bean => bean.OriginType)
             .HasConversion<string>()
             .IsRequired();

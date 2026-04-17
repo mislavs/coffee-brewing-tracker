@@ -1,18 +1,22 @@
 using CoffeeTracker.Api.Contracts.Beans;
+using CoffeeTracker.Application.Common.Images;
 using CoffeeTracker.Application.Features.Beans.Commands;
 using CoffeeTracker.Application.Features.Beans.Commands.ParseBeanImage;
 using CoffeeTracker.Application.Features.Beans.Dtos;
 using CoffeeTracker.Application.Features.Beans.Queries;
 using CoffeeTracker.Infrastructure.AI;
+using FluentValidation;
+using FluentValidation.Results;
 using MediatR;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using System.Net.Http.Headers;
 
 namespace CoffeeTracker.Api.Endpoints;
 
 public static class BeanEndpoints
 {
-    private const int MaxImageUploadBytes = 10 * 1024 * 1024;
+    private const int MaxParseImageUploadBytes = 10 * 1024 * 1024;
 
     private static readonly HashSet<string> SupportedImageMimeTypes = new(StringComparer.OrdinalIgnoreCase)
     {
@@ -37,6 +41,18 @@ public static class BeanEndpoints
 
         group.MapPut("/{id:guid}", UpdateBean)
             .WithName("UpdateBean");
+
+        group.MapPut("/{id:guid}/image", UploadBeanImage)
+            .DisableAntiforgery()
+            .Accepts<IFormFile>("multipart/form-data")
+            .WithMetadata(new RequestSizeLimitAttribute(BeanImageLimits.MaxRequestBodySizeBytes))
+            .WithName("UploadBeanImage");
+
+        group.MapGet("/{id:guid}/image", GetBeanImage)
+            .WithName("GetBeanImage");
+
+        group.MapDelete("/{id:guid}/image", DeleteBeanImage)
+            .WithName("DeleteBeanImage");
 
         group.MapPatch("/{id:guid}/availability", SetBeanAvailability)
             .WithName("SetBeanAvailability");
@@ -133,6 +149,63 @@ public static class BeanEndpoints
         return TypedResults.Ok();
     }
 
+    private static async Task<NoContent> UploadBeanImage(
+        Guid id,
+        IFormFile? file,
+        ISender sender,
+        CancellationToken cancellationToken)
+    {
+        if (file is null)
+        {
+            throw BuildValidationException("file", "Bean image is required.");
+        }
+
+        if (file.Length <= 0)
+        {
+            throw BuildValidationException("file", "Bean image cannot be empty.");
+        }
+
+        if (file.Length > BeanImageLimits.MaxImageSizeBytes)
+        {
+            throw BuildValidationException("file", "Bean image must be 5 MB or smaller.");
+        }
+
+        if (!ImageMediaTypeParser.TryParse(file.ContentType, SupportedImageMimeTypes, out var mediaType))
+        {
+            throw BuildValidationException("file", "Bean image must be a PNG, JPEG, or WebP image.");
+        }
+
+        await using var stream = new MemoryStream();
+        await file.CopyToAsync(stream, cancellationToken);
+
+        await sender.Send(
+            new UploadBeanImageCommand(id, file.FileName, mediaType, stream.ToArray()),
+            cancellationToken);
+
+        return TypedResults.NoContent();
+    }
+
+    private static async Task<IResult> GetBeanImage(
+        Guid id,
+        ISender sender,
+        HttpContext context,
+        CancellationToken cancellationToken)
+    {
+        var image = await sender.Send(new GetBeanImageQuery(id), cancellationToken);
+
+        context.Response.Headers.CacheControl = "public,max-age=86400";
+        return Results.File(image.Data, image.ContentType, image.FileName);
+    }
+
+    private static async Task<NoContent> DeleteBeanImage(
+        Guid id,
+        ISender sender,
+        CancellationToken cancellationToken)
+    {
+        await sender.Send(new DeleteBeanImageCommand(id), cancellationToken);
+        return TypedResults.NoContent();
+    }
+
     private static async Task<Ok> SetBeanAvailability(
         Guid id,
         SetBeanAvailabilityRequest request,
@@ -178,11 +251,11 @@ public static class BeanEndpoints
                 statusCode: StatusCodes.Status400BadRequest);
         }
 
-        if (imageFile.Length > MaxImageUploadBytes)
+        if (imageFile.Length > MaxParseImageUploadBytes)
         {
             return TypedResults.Problem(
                 title: "Image file is too large",
-                detail: $"Maximum upload size is {MaxImageUploadBytes} bytes.",
+                detail: $"Maximum upload size is {MaxParseImageUploadBytes} bytes.",
                 statusCode: StatusCodes.Status400BadRequest);
         }
 
@@ -192,5 +265,11 @@ public static class BeanEndpoints
             cancellationToken);
 
         return TypedResults.Ok(ParseBeanImageResponse.FromResult(result));
+    }
+
+    private static ValidationException BuildValidationException(string propertyName, string errorMessage)
+    {
+        return new ValidationException(
+            [new ValidationFailure(propertyName, errorMessage)]);
     }
 }

@@ -23,6 +23,7 @@ import {
   formatPricePerKg,
   formatRoastProfile,
 } from '@/features/beans/formatters'
+import { resolveBeanImageUrl } from '@/features/beans/beanPresentation'
 import { useBean } from '@/features/beans/hooks/useBean'
 import { BrewLogCard } from '@/features/brew-log/components/BrewLogCard'
 import { useBrewLogs } from '@/features/brew-log/hooks/useBrewLogs'
@@ -50,6 +51,7 @@ function BeanDetailContent({ beanId }: { beanId: Guid }) {
     : 0
   const formattedRoastDate = formatDate(bean.roastDate)
   const roastAge = formatAgeInDays(bean.roastDate)
+  const imageUrl = resolveBeanImageUrl(bean.imageUrl)
 
   return (
     <div className="space-y-6">
@@ -69,6 +71,16 @@ function BeanDetailContent({ beanId }: { beanId: Guid }) {
           <CardTitle>{bean.name ?? 'Unnamed bean'}</CardTitle>
         </CardHeader>
         <CardContent className="text-sm">
+        <div className={imageUrl ? 'grid gap-8 lg:grid-cols-[minmax(0,18rem)_1fr]' : undefined}>
+          {imageUrl ? (
+            <div className="mx-auto w-full max-w-xs overflow-hidden rounded-xl border bg-muted/20 lg:mx-0">
+              <img
+                src={imageUrl}
+                alt={`${bean.name ?? 'Bean'} image`}
+                className="block h-auto w-full"
+              />
+            </div>
+          ) : null}
           <div className="grid gap-8 md:grid-cols-2">
             <div className="space-y-8">
               <section className="space-y-4">
@@ -177,6 +189,7 @@ function BeanDetailContent({ beanId }: { beanId: Guid }) {
               </section>
             </div>
           </div>
+        </div>
         </CardContent>
       </Card>
 

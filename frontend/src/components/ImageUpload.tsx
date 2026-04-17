@@ -7,6 +7,7 @@ type ImageUploadProps = {
   id: string
   label: string
   previewUrl?: string | null
+  previewAlt?: string
   onFileSelected: (file: File | null) => void
   onRemove: () => void
   accept?: string
@@ -18,6 +19,7 @@ export function ImageUpload({
   id,
   label,
   previewUrl,
+  previewAlt = 'Selected image preview',
   onFileSelected,
   onRemove,
   accept = 'image/png,image/jpeg,image/webp,image/svg+xml',
@@ -72,7 +74,7 @@ export function ImageUpload({
         {previewUrl ? (
           <img
             src={previewUrl}
-            alt="Selected logo preview"
+            alt={previewAlt}
             className="h-36 w-full rounded-md border object-contain"
           />
         ) : (

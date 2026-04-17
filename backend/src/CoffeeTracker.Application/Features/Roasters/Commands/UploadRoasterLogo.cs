@@ -1,3 +1,4 @@
+using CoffeeTracker.Application.Common.Images;
 using CoffeeTracker.Domain.Exceptions;
 using CoffeeTracker.Infrastructure.Persistence;
 using FluentValidation;
@@ -14,8 +15,6 @@ public sealed record UploadRoasterLogoCommand(
 
 public sealed class UploadRoasterLogoValidator : AbstractValidator<UploadRoasterLogoCommand>
 {
-    private const int MaxLogoSizeBytes = 512 * 1024;
-
     private static readonly HashSet<string> SupportedContentTypes = new(StringComparer.OrdinalIgnoreCase)
     {
         "image/png",
@@ -42,7 +41,7 @@ public sealed class UploadRoasterLogoValidator : AbstractValidator<UploadRoaster
             .NotNull()
             .Must(data => data.Length > 0)
             .WithMessage("Logo image cannot be empty.")
-            .Must(data => data.Length <= MaxLogoSizeBytes)
+            .Must(data => data.Length <= RoasterLogoLimits.MaxLogoSizeBytes)
             .WithMessage("Logo image must be 512 KB or smaller.");
     }
 }
@@ -50,44 +49,29 @@ public sealed class UploadRoasterLogoValidator : AbstractValidator<UploadRoaster
 public sealed class UploadRoasterLogoHandler(ApplicationDbContext dbContext)
     : IRequestHandler<UploadRoasterLogoCommand>
 {
+    private static readonly KeyValuePair<string, string>[] AdditionalExtensionMappings =
+    [
+        new("image/svg+xml", ".svg")
+    ];
+
     public async Task Handle(UploadRoasterLogoCommand request, CancellationToken cancellationToken)
     {
-        var roaster = await dbContext.Roasters
-            .FirstOrDefaultAsync(entity => entity.Id == request.Id, cancellationToken);
+        var extension = ImageContentTypeInference.GetExtensionForMediaType(
+            request.ContentType,
+            AdditionalExtensionMappings);
+        var fileName = ImageFileNormalizer.Normalize(request.FileName, extension, "roaster-logo");
 
-        if (roaster is null)
+        var rowsAffected = await dbContext.Roasters
+            .Where(entity => entity.Id == request.Id)
+            .ExecuteUpdateAsync(
+                setters => setters
+                    .SetProperty(entity => entity.LogoFileName, fileName)
+                    .SetProperty(entity => entity.LogoData, request.LogoData),
+                cancellationToken);
+
+        if (rowsAffected == 0)
         {
             throw new NotFoundException($"Roaster '{request.Id}' was not found.");
         }
-
-        var normalizedFileName = NormalizeLogoFileName(request.FileName, request.ContentType);
-        roaster.SetLogo(normalizedFileName, request.LogoData);
-        await dbContext.SaveChangesAsync(cancellationToken);
-    }
-
-    private static string NormalizeLogoFileName(string fileName, string contentType)
-    {
-        var name = Path.GetFileNameWithoutExtension(Path.GetFileName(fileName.Replace('\\', '/')));
-        if (string.IsNullOrWhiteSpace(name))
-        {
-            name = "roaster-logo";
-        }
-
-        var extension = contentType.ToLowerInvariant() switch
-        {
-            "image/png" => ".png",
-            "image/jpeg" => ".jpg",
-            "image/webp" => ".webp",
-            "image/svg+xml" => ".svg",
-            _ => ".img"
-        };
-
-        var maxNameLength = 255 - extension.Length;
-        if (name.Length > maxNameLength)
-        {
-            name = name[..maxNameLength];
-        }
-
-        return $"{name}{extension}";
     }
 }

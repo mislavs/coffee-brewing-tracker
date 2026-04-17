@@ -1,4 +1,5 @@
 using CoffeeTracker.Api.Contracts.Roasters;
+using CoffeeTracker.Application.Common.Images;
 using CoffeeTracker.Application.Features.Roasters.Commands;
 using CoffeeTracker.Application.Features.Roasters.Dtos;
 using CoffeeTracker.Application.Features.Roasters.Queries;
@@ -6,11 +7,20 @@ using FluentValidation;
 using FluentValidation.Results;
 using MediatR;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 
 namespace CoffeeTracker.Api.Endpoints;
 
 public static class RoasterEndpoints
 {
+    private static readonly HashSet<string> SupportedLogoMimeTypes = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "image/png",
+        "image/jpeg",
+        "image/webp",
+        "image/svg+xml"
+    };
+
     public static IEndpointRouteBuilder MapRoasterEndpoints(this IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/roasters")
@@ -30,6 +40,8 @@ public static class RoasterEndpoints
 
         group.MapPut("/{id:guid}/logo", UploadRoasterLogo)
             .DisableAntiforgery()
+            .Accepts<IFormFile>("multipart/form-data")
+            .WithMetadata(new RequestSizeLimitAttribute(RoasterLogoLimits.MaxRequestBodySizeBytes))
             .WithName("UploadRoasterLogo");
 
         group.MapGet("/{id:guid}/logo", GetRoasterLogo)
@@ -102,11 +114,26 @@ public static class RoasterEndpoints
             throw BuildValidationException("file", "Logo image is required.");
         }
 
+        if (file.Length <= 0)
+        {
+            throw BuildValidationException("file", "Logo image cannot be empty.");
+        }
+
+        if (file.Length > RoasterLogoLimits.MaxLogoSizeBytes)
+        {
+            throw BuildValidationException("file", "Logo image must be 512 KB or smaller.");
+        }
+
+        if (!ImageMediaTypeParser.TryParse(file.ContentType, SupportedLogoMimeTypes, out var mediaType))
+        {
+            throw BuildValidationException("file", "Logo must be a PNG, JPEG, WebP, or SVG image.");
+        }
+
         await using var stream = new MemoryStream();
         await file.CopyToAsync(stream, cancellationToken);
 
         await sender.Send(
-            new UploadRoasterLogoCommand(id, file.FileName, file.ContentType, stream.ToArray()),
+            new UploadRoasterLogoCommand(id, file.FileName, mediaType, stream.ToArray()),
             cancellationToken);
 
         return TypedResults.NoContent();

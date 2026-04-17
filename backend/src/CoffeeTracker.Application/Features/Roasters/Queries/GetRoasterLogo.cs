@@ -1,3 +1,4 @@
+using CoffeeTracker.Application.Common.Images;
 using CoffeeTracker.Application.Features.Roasters.Dtos;
 using CoffeeTracker.Domain.Exceptions;
 using CoffeeTracker.Infrastructure.Persistence;
@@ -21,6 +22,11 @@ public sealed class GetRoasterLogoValidator : AbstractValidator<GetRoasterLogoQu
 public sealed class GetRoasterLogoHandler(ApplicationDbContext dbContext)
     : IRequestHandler<GetRoasterLogoQuery, RoasterLogoDto>
 {
+    private static readonly KeyValuePair<string, string>[] AdditionalContentTypeMappings =
+    [
+        new(".svg", "image/svg+xml")
+    ];
+
     public async Task<RoasterLogoDto> Handle(GetRoasterLogoQuery request, CancellationToken cancellationToken)
     {
         var roaster = await dbContext.Roasters
@@ -41,21 +47,9 @@ public sealed class GetRoasterLogoHandler(ApplicationDbContext dbContext)
 
         return new RoasterLogoDto(
             roaster.LogoData,
-            InferContentType(roaster.LogoFileName),
+            ImageContentTypeInference.GetContentTypeForFile(
+                roaster.LogoFileName,
+                AdditionalContentTypeMappings),
             roaster.LogoFileName);
-    }
-
-    private static string InferContentType(string fileName)
-    {
-        var extension = Path.GetExtension(fileName);
-        return extension.ToLowerInvariant() switch
-        {
-            ".png" => "image/png",
-            ".jpg" => "image/jpeg",
-            ".jpeg" => "image/jpeg",
-            ".webp" => "image/webp",
-            ".svg" => "image/svg+xml",
-            _ => "application/octet-stream"
-        };
     }
 }

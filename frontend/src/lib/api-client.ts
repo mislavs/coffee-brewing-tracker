@@ -7,10 +7,12 @@ import {
 } from '@/lib/api/generated/accessories/accessories'
 import {
   getCreateBeanUrl,
+  getDeleteBeanImageUrl,
   getGetBeanByIdUrl,
   getGetBeansUrl,
   getParseBeanImageUrl,
   getSetBeanAvailabilityUrl,
+  getUploadBeanImageUrl,
   getUpdateBeanUrl,
 } from '@/lib/api/generated/beans/beans'
 import {
@@ -202,6 +204,21 @@ export const apiClient = {
             headers: jsonRequestHeaders,
             body: serializeJsonBody(request),
           }),
+        image: {
+          put: async (file: File) => {
+            const formData = new FormData()
+            formData.append('file', file)
+
+            await requestVoid(getUploadBeanImageUrl(id), {
+              method: 'PUT',
+              body: formData,
+            })
+          },
+          delete: () =>
+            requestVoid(getDeleteBeanImageUrl(id), {
+              method: 'DELETE',
+            }),
+        },
       }),
     },
     brewLogs: {

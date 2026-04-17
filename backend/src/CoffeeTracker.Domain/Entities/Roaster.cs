@@ -53,8 +53,8 @@ public class Roaster
 
     public void SetLogo(string fileName, byte[] data)
     {
-        LogoFileName = EntityNormalization.NormalizeRequired(fileName, nameof(fileName));
-        if (LogoFileName.Length > MaxLogoFileNameLength)
+        var normalizedFileName = EntityNormalization.NormalizeRequired(fileName, nameof(fileName));
+        if (normalizedFileName.Length > MaxLogoFileNameLength)
         {
             throw new ArgumentException(
                 $"Logo file name must be {MaxLogoFileNameLength} characters or fewer.",
@@ -67,6 +67,7 @@ public class Roaster
             throw new ArgumentException("Logo data cannot be empty.", nameof(data));
         }
 
+        LogoFileName = normalizedFileName;
         LogoData = data.ToArray();
     }
 
