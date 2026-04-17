@@ -100,7 +100,7 @@ function createInitialValuesFromBrewLog(
 
 type CreateLikeBrewLogFormProps = {
   title: string
-  description: string
+  description?: string
   initialValues: BrewLogFormValues
   showVoiceInput?: boolean
   initialVoiceDialogOpen?: boolean
@@ -212,7 +212,6 @@ function CreateBrewLogForm() {
   return (
     <CreateLikeBrewLogForm
       title="Log Brew"
-      description="Record a new brew entry."
       initialValues={createInitialValues()}
       showVoiceInput={shouldOpenVoiceInput}
       initialVoiceDialogOpen={shouldOpenVoiceInput}

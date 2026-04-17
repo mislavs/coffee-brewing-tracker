@@ -47,10 +47,7 @@ export function BeanAndEquipmentSection({
 
   return (
     <section className="space-y-4">
-      <SectionHeader
-        title="Bean and Equipment"
-        description="Choose the bean and equipment used for this brew."
-      />
+      <SectionHeader title="Bean and Equipment" />
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">
@@ -196,27 +193,31 @@ export function BrewParametersSection({ form }: FormSectionProps) {
 
   return (
     <section className="space-y-4">
-      <SectionHeader
-        title="Brew Parameters"
-        description="Capture your dose, water, and grind settings."
-      />
+      <SectionHeader title="Brew Parameters" />
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
         <div className="space-y-2">
           <label htmlFor="dose" className="text-sm font-medium">
             Dose (g)
           </label>
-          <Input id="dose" type="number" step="0.1" {...form.register('dose')} />
+          <Input
+            id="dose"
+            type="number"
+            inputMode="decimal"
+            step="0.1"
+            {...form.register('dose')}
+          />
           <FieldErrorText message={form.formState.errors.dose?.message} />
         </div>
 
         <div className="space-y-2">
           <label htmlFor="waterAmount" className="text-sm font-medium">
-            Water amount (ml)
+            Water (ml)
           </label>
           <Input
             id="waterAmount"
             type="number"
+            inputMode="decimal"
             step="0.1"
             {...form.register('waterAmount')}
           />
@@ -224,30 +225,37 @@ export function BrewParametersSection({ form }: FormSectionProps) {
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-medium">Live brew ratio</label>
-          <div className="border-input bg-muted/30 rounded-md border px-3 py-2 text-sm">
+          <label className="text-sm font-medium">Brew ratio</label>
+          <div className="border-input bg-muted/30 flex h-9 items-center rounded-md border px-3 text-sm tabular-nums">
             {liveRatio}
           </div>
         </div>
 
         <div className="space-y-2">
           <label htmlFor="waterTemperature" className="text-sm font-medium">
-            Water temperature (C)
+            Temp (°C)
           </label>
           <Input
             id="waterTemperature"
             type="number"
+            inputMode="decimal"
             step="0.1"
             {...form.register('waterTemperature')}
           />
           <FieldErrorText message={form.formState.errors.waterTemperature?.message} />
         </div>
 
-        <div className="space-y-2 sm:col-span-2">
+        <div className="space-y-2">
           <label htmlFor="grindSize" className="text-sm font-medium">
             Grind size
           </label>
-          <Input id="grindSize" type="number" step="0.1" {...form.register('grindSize')} />
+          <Input
+            id="grindSize"
+            type="number"
+            inputMode="decimal"
+            step="0.1"
+            {...form.register('grindSize')}
+          />
           <FieldErrorText message={form.formState.errors.grindSize?.message} />
         </div>
       </div>
@@ -258,10 +266,7 @@ export function BrewParametersSection({ form }: FormSectionProps) {
 export function ResultsSection({ form }: FormSectionProps) {
   return (
     <section className="space-y-4">
-      <SectionHeader
-        title="Results"
-        description="Record outcome details and notes."
-      />
+      <SectionHeader title="Results" />
 
       <div className="space-y-2">
         <label className="text-sm font-medium">Brew time</label>
@@ -316,28 +321,30 @@ export function ResultsSection({ form }: FormSectionProps) {
         <FieldErrorText message={form.formState.errors.rating?.message} />
       </div>
 
-      <div className="space-y-2">
-        <label htmlFor="tastingNotes" className="text-sm font-medium">
-          Notes
-        </label>
-        <Textarea
-          id="tastingNotes"
-          rows={4}
-          {...form.register('tastingNotes')}
-        />
-        <FieldErrorText message={form.formState.errors.tastingNotes?.message} />
-      </div>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="space-y-2">
+          <label htmlFor="tastingNotes" className="text-sm font-medium">
+            Notes
+          </label>
+          <Textarea
+            id="tastingNotes"
+            rows={4}
+            {...form.register('tastingNotes')}
+          />
+          <FieldErrorText message={form.formState.errors.tastingNotes?.message} />
+        </div>
 
-      <div className="space-y-2">
-        <label htmlFor="adjustmentIdeas" className="text-sm font-medium">
-          Adjustment ideas
-        </label>
-        <Textarea
-          id="adjustmentIdeas"
-          rows={4}
-          {...form.register('adjustmentIdeas')}
-        />
-        <FieldErrorText message={form.formState.errors.adjustmentIdeas?.message} />
+        <div className="space-y-2">
+          <label htmlFor="adjustmentIdeas" className="text-sm font-medium">
+            Adjustment ideas
+          </label>
+          <Textarea
+            id="adjustmentIdeas"
+            rows={4}
+            {...form.register('adjustmentIdeas')}
+          />
+          <FieldErrorText message={form.formState.errors.adjustmentIdeas?.message} />
+        </div>
       </div>
     </section>
   )

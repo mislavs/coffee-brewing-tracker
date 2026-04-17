@@ -38,7 +38,7 @@ import type { ParseVoiceBrewLogResponse } from '@/lib/api/schemas'
 
 type BrewLogFormCardProps = {
   title: string
-  description: string
+  description?: string
   submitLabel: string
   initialValues: BrewLogFormValues
   onSubmit: (values: BrewLogFormValues) => Promise<void>
@@ -139,7 +139,7 @@ export function BrewLogFormCard({
       <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="space-y-1.5">
           <CardTitle>{title}</CardTitle>
-          <CardDescription>{description}</CardDescription>
+          {description ? <CardDescription>{description}</CardDescription> : null}
         </div>
         {showVoiceInput ? (
           <VoiceInputButton
