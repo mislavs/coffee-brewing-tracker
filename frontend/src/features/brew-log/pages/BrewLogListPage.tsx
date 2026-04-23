@@ -1,4 +1,4 @@
-import { useCallback } from 'react'
+import { useCallback, useState } from 'react'
 import { ChevronLeft, ChevronRight, Coffee, Mic } from 'lucide-react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { EmptyState } from '@/components/EmptyState'
@@ -23,6 +23,7 @@ import { DatePicker } from '@/components/ui/date-picker'
 import { Input } from '@/components/ui/input'
 import { Switch } from '@/components/ui/switch'
 import { BrewLogCard } from '@/features/brew-log/components/BrewLogCard'
+import { QuickLogWizardDialog } from '@/features/brew-log/components/quick-log/QuickLogWizardDialog'
 import { useBrewLogs } from '@/features/brew-log/hooks/useBrewLogs'
 import { useFeatures } from '@/hooks/useFeatures'
 import { useDebouncedSearchParam } from '@/hooks/useDebouncedSearchParam'
@@ -66,6 +67,7 @@ function getPaginationItems(currentPage: number, totalPages: number) {
 }
 
 export function BrewLogListPage() {
+  const [quickLogOpen, setQuickLogOpen] = useState(false)
   const [searchParams, setSearchParams] = useSearchParams()
   const search = searchParams.get('search') ?? ''
   const dateFrom = searchParams.get('dateFrom') ?? ''
@@ -185,161 +187,182 @@ export function BrewLogListPage() {
   const { data: features } = useFeatures()
 
   return (
-    <Card>
-      <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <CardTitle>Brew Log</CardTitle>
-          <CardDescription>Browse and manage your brew history.</CardDescription>
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          {features?.voiceBrewLogParsing ? (
-            <Button variant="outline" asChild>
-              <Link to="/brew-log/new?dictate=true">
-                <Mic className="size-4" />
-                Dictate brew
-              </Link>
+    <>
+      <Card>
+        <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <CardTitle>Brew Log</CardTitle>
+            <CardDescription>Browse and manage your brew history.</CardDescription>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            {features?.voiceBrewLogParsing ? (
+              <Button variant="outline" asChild>
+                <Link to="/brew-log/new?dictate=true">
+                  <Mic className="size-4" />
+                  Dictate brew
+                </Link>
+              </Button>
+            ) : null}
+            <Button type="button" variant="secondary" onClick={() => setQuickLogOpen(true)}>
+              Quick Log
             </Button>
-          ) : null}
-          <Button asChild>
-            <Link to="/brew-log/new">Log Brew</Link>
-          </Button>
-        </div>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="grid gap-4 md:grid-cols-4">
-          <div className="space-y-2 md:col-span-1">
-            <label htmlFor="brew-log-search" className="text-sm font-medium">
-              Search by bean
-            </label>
-            <Input
-              id="brew-log-search"
-              placeholder="Filter by bean..."
-              value={searchDraft}
-              onChange={(event) => setSearchDraft(event.target.value)}
-            />
+            <Button asChild>
+              <Link to="/brew-log/new">Log Brew</Link>
+            </Button>
           </div>
-
-          <div className="space-y-2">
-            <label htmlFor="brew-log-date-from" className="text-sm font-medium">
-              Date from
-            </label>
-            <DatePicker
-              id="brew-log-date-from"
-              value={dateFrom || undefined}
-              onChange={(nextValue) => setDateFilter('dateFrom', nextValue)}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label htmlFor="brew-log-date-to" className="text-sm font-medium">
-              Date to
-            </label>
-            <DatePicker
-              id="brew-log-date-to"
-              value={dateTo || undefined}
-              onChange={(nextValue) => setDateFilter('dateTo', nextValue)}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label htmlFor="brew-log-include-unavailable" className="text-sm font-medium">
-              Availability
-            </label>
-            <div className="flex items-center gap-3 pt-2">
-              <Switch
-                id="brew-log-include-unavailable"
-                checked={includeUnavailable}
-                onCheckedChange={handleToggleUnavailable}
-              />
-              <label htmlFor="brew-log-include-unavailable" className="text-sm font-medium">
-                Show unavailable beans
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-4">
+            <div className="space-y-2 md:col-span-1">
+              <label htmlFor="brew-log-search" className="text-sm font-medium">
+                Search by bean
               </label>
+              <Input
+                id="brew-log-search"
+                placeholder="Filter by bean..."
+                value={searchDraft}
+                onChange={(event) => setSearchDraft(event.target.value)}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label htmlFor="brew-log-date-from" className="text-sm font-medium">
+                Date from
+              </label>
+              <DatePicker
+                id="brew-log-date-from"
+                value={dateFrom || undefined}
+                onChange={(nextValue) => setDateFilter('dateFrom', nextValue)}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label htmlFor="brew-log-date-to" className="text-sm font-medium">
+                Date to
+              </label>
+              <DatePicker
+                id="brew-log-date-to"
+                value={dateTo || undefined}
+                onChange={(nextValue) => setDateFilter('dateTo', nextValue)}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label htmlFor="brew-log-include-unavailable" className="text-sm font-medium">
+                Availability
+              </label>
+              <div className="flex items-center gap-3 pt-2">
+                <Switch
+                  id="brew-log-include-unavailable"
+                  checked={includeUnavailable}
+                  onCheckedChange={handleToggleUnavailable}
+                />
+                <label htmlFor="brew-log-include-unavailable" className="text-sm font-medium">
+                  Show unavailable beans
+                </label>
+              </div>
             </div>
           </div>
-        </div>
 
-        {isPending && brewLogs.length === 0 ? (
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-            {Array.from({ length: 6 }).map((_, index) => (
-              <BrewLogCardSkeleton
-                key={`brew-log-skeleton-${index}`}
-                className={getSkeletonVisibilityClassName(index)}
-              />
-            ))}
-          </div>
-        ) : brewLogs.length === 0 ? (
-          <EmptyState
-            icon={<Coffee className="size-6" />}
-            title="No brews yet"
-            description="Log your first brew to start tracking your coffee journey."
-            actionLabel="Log Brew"
-            actionHref="/brew-log/new"
-          />
-        ) : (
-          <div className="space-y-4">
+          {isPending && brewLogs.length === 0 ? (
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-              {brewLogs.map((brewLog) => (
-                <BrewLogCard
-                  key={brewLog.id ?? `${brewLog.beanName ?? 'brew'}-${brewLog.brewedAt ?? ''}`}
-                  brewLog={brewLog}
+              {Array.from({ length: 6 }).map((_, index) => (
+                <BrewLogCardSkeleton
+                  key={`brew-log-skeleton-${index}`}
+                  className={getSkeletonVisibilityClassName(index)}
                 />
               ))}
             </div>
+          ) : brewLogs.length === 0 ? (
+            <EmptyState
+              icon={<Coffee className="size-6" />}
+              title="No brews yet"
+              description="Log your first brew to start tracking your coffee journey."
+              actions={
+                <>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={() => setQuickLogOpen(true)}
+                  >
+                    Quick Log
+                  </Button>
+                  <Button asChild>
+                    <Link to="/brew-log/new">Log Brew</Link>
+                  </Button>
+                </>
+              }
+            />
+          ) : (
+            <div className="space-y-4">
+              <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                {brewLogs.map((brewLog) => (
+                  <BrewLogCard
+                    key={brewLog.id ?? `${brewLog.beanName ?? 'brew'}-${brewLog.brewedAt ?? ''}`}
+                    brewLog={brewLog}
+                  />
+                ))}
+              </div>
 
-            <div className="flex flex-col gap-4 border-t pt-4 sm:flex-row sm:items-center sm:justify-between">
-              <p className="text-sm text-muted-foreground">
-                Showing {showingFrom}-{showingTo} of {totalCount}
-              </p>
+              <div className="flex flex-col gap-4 border-t pt-4 sm:flex-row sm:items-center sm:justify-between">
+                <p className="text-sm text-muted-foreground">
+                  Showing {showingFrom}-{showingTo} of {totalCount}
+                </p>
 
-              <Pagination className="mx-0 w-full justify-start overflow-x-auto sm:w-auto sm:justify-end">
-                <PaginationContent className="min-w-max">
-                  <PaginationItem>
-                    <PaginationLink asChild size="default">
-                      <button
-                        type="button"
-                        onClick={() => setPage(currentPage - 1)}
-                        disabled={currentPage <= 1}
-                      >
-                        <ChevronLeft className="size-4" />
-                        <span className="hidden sm:inline">Previous</span>
-                      </button>
-                    </PaginationLink>
-                  </PaginationItem>
+                <Pagination className="mx-0 w-full justify-start overflow-x-auto sm:w-auto sm:justify-end">
+                  <PaginationContent className="min-w-max">
+                    <PaginationItem>
+                      <PaginationLink asChild size="default">
+                        <button
+                          type="button"
+                          onClick={() => setPage(currentPage - 1)}
+                          disabled={currentPage <= 1}
+                        >
+                          <ChevronLeft className="size-4" />
+                          <span className="hidden sm:inline">Previous</span>
+                        </button>
+                      </PaginationLink>
+                    </PaginationItem>
 
-                  {paginationItems.map((item) =>
-                    typeof item === 'number' ? (
-                      <PaginationItem key={item}>
-                        <PaginationLink asChild isActive={item === currentPage}>
-                          <button type="button" onClick={() => setPage(item)}>
-                            {item}
-                          </button>
-                        </PaginationLink>
-                      </PaginationItem>
-                    ) : (
-                      <PaginationItem key={item}>
-                        <PaginationEllipsis />
-                      </PaginationItem>
-                    ),
-                  )}
+                    {paginationItems.map((item) =>
+                      typeof item === 'number' ? (
+                        <PaginationItem key={item}>
+                          <PaginationLink asChild isActive={item === currentPage}>
+                            <button type="button" onClick={() => setPage(item)}>
+                              {item}
+                            </button>
+                          </PaginationLink>
+                        </PaginationItem>
+                      ) : (
+                        <PaginationItem key={item}>
+                          <PaginationEllipsis />
+                        </PaginationItem>
+                      ),
+                    )}
 
-                  <PaginationItem>
-                    <PaginationLink asChild size="default">
-                      <button
-                        type="button"
-                        onClick={() => setPage(currentPage + 1)}
-                        disabled={currentPage >= totalPages}
-                      >
-                        <span className="hidden sm:inline">Next</span>
-                        <ChevronRight className="size-4" />
-                      </button>
-                    </PaginationLink>
-                  </PaginationItem>
-                </PaginationContent>
-              </Pagination>
+                    <PaginationItem>
+                      <PaginationLink asChild size="default">
+                        <button
+                          type="button"
+                          onClick={() => setPage(currentPage + 1)}
+                          disabled={currentPage >= totalPages}
+                        >
+                          <span className="hidden sm:inline">Next</span>
+                          <ChevronRight className="size-4" />
+                        </button>
+                      </PaginationLink>
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
+              </div>
             </div>
-          </div>
-        )}
-      </CardContent>
-    </Card>
+          )}
+        </CardContent>
+      </Card>
+
+      {quickLogOpen ? (
+        <QuickLogWizardDialog open={quickLogOpen} onOpenChange={setQuickLogOpen} />
+      ) : null}
+    </>
   )
 }

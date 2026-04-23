@@ -8,6 +8,7 @@ type EmptyStateProps = {
   description: string
   actionLabel?: string
   actionHref?: string
+  actions?: ReactNode
 }
 
 export function EmptyState({
@@ -16,6 +17,7 @@ export function EmptyState({
   description,
   actionLabel,
   actionHref,
+  actions,
 }: EmptyStateProps) {
   return (
     <div className="animate-fade-up flex flex-col items-center justify-center gap-4 py-8 text-center sm:py-16">
@@ -26,7 +28,9 @@ export function EmptyState({
         <p className="text-base font-semibold">{title}</p>
         <p className="text-sm text-muted-foreground">{description}</p>
       </div>
-      {actionLabel && actionHref ? (
+      {actions ? (
+        <div className="mt-2 flex flex-wrap items-center justify-center gap-2">{actions}</div>
+      ) : actionLabel && actionHref ? (
         <Button asChild className="mt-2">
           <Link to={actionHref}>{actionLabel}</Link>
         </Button>

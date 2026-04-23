@@ -1,102 +1,25 @@
 import type { Guid } from '@/lib/api-types'
 import { useState } from 'react'
 import { Navigate, useNavigate, useSearchParams } from 'react-router-dom'
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
 import { useSetBeanAvailability } from '@/features/beans/hooks/useSetBeanAvailability'
 import {
   normalizeBrewLogFormValues,
   type BrewLogFormValues,
 } from '@/features/brew-log/brewLogFormSchema'
+import {
+  BrewLogLowStockPromptDialog,
+} from '@/features/brew-log/brewLogLowStock'
+import { getBrewLogLowStockPrompt } from '@/features/brew-log/brewLogLowStockUtils'
+import {
+  createInitialBrewLogValues,
+  createInitialBrewLogValuesFromBrewLog,
+} from '@/features/brew-log/brewLogFormDefaults'
 import { BrewLogFormCard } from '@/features/brew-log/components/BrewLogFormCardContainer'
 import { useBrewLog } from '@/features/brew-log/hooks/useBrewLog'
 import { useCreateBrewLog } from '@/features/brew-log/hooks/useCreateBrewLog'
 import { useUpdateBrewLog } from '@/features/brew-log/hooks/useUpdateBrewLog'
-import type { BrewLogDto } from '@/lib/api/schemas'
 import { tryParseGuid } from '@/lib/guid'
 import { useEntityFormId } from '@/lib/useEntityFormId'
-
-function toDateTimeLocalValue(value: Date | string | null | undefined) {
-  const parsed = value instanceof Date ? value : value ? new Date(value) : null
-  if (!parsed || Number.isNaN(parsed.getTime())) {
-    return ''
-  }
-
-  const offsetMs = parsed.getTimezoneOffset() * 60_000
-  return new Date(parsed.getTime() - offsetMs).toISOString().slice(0, 16)
-}
-
-function toBrewTimeParts(totalSeconds: number | null | undefined) {
-  if (totalSeconds === null || totalSeconds === undefined || totalSeconds < 0) {
-    return {
-      brewTimeMinutes: undefined,
-      brewTimeSeconds: undefined,
-    }
-  }
-
-  return {
-    brewTimeMinutes: Math.floor(totalSeconds / 60),
-    brewTimeSeconds: totalSeconds % 60,
-  }
-}
-
-function createInitialValues(): BrewLogFormValues {
-  return {
-    beanId: '',
-    brewerId: '',
-    grinderId: '',
-    recipeId: '',
-    dose: 0,
-    waterAmount: 0,
-    waterTemperature: undefined,
-    grindSize: undefined,
-    brewTimeMinutes: undefined,
-    brewTimeSeconds: undefined,
-    rating: undefined,
-    tastingNotes: undefined,
-    adjustmentIdeas: undefined,
-    accessoryIds: [],
-    brewedAt: toDateTimeLocalValue(new Date()),
-  }
-}
-
-function createInitialValuesFromBrewLog(
-  brewLog: BrewLogDto,
-  options?: {
-    clearResults?: boolean
-    brewedAt?: Date | string | null | undefined
-  },
-): BrewLogFormValues {
-  const clearResults = options?.clearResults ?? false
-
-  return {
-    ...toBrewTimeParts(clearResults ? undefined : brewLog.brewTimeSeconds),
-    beanId: brewLog.beanId ?? '',
-    brewerId: brewLog.brewerId ?? '',
-    grinderId: brewLog.grinderId ?? '',
-    recipeId: brewLog.recipeId ?? '',
-    dose: brewLog.dose ?? 0,
-    waterAmount: brewLog.waterAmount ?? 0,
-    waterTemperature: brewLog.waterTemperature ?? undefined,
-    grindSize: brewLog.grindSize ?? undefined,
-    rating: clearResults ? undefined : (brewLog.rating ?? undefined),
-    tastingNotes: clearResults ? undefined : (brewLog.notes ?? undefined),
-    adjustmentIdeas: clearResults ? undefined : (brewLog.adjustmentIdeas ?? undefined),
-    accessoryIds:
-      brewLog.accessories
-        ?.map((accessory) => accessory.id ?? '')
-        .filter((id) => id.length > 0) ?? [],
-    brewedAt: toDateTimeLocalValue(options?.brewedAt ?? brewLog.brewedAt),
-  }
-}
 
 type CreateLikeBrewLogFormProps = {
   title: string
@@ -140,17 +63,10 @@ function CreateLikeBrewLogForm({
         onSubmit={async (values) => {
           const request = normalizeBrewLogFormValues(values)
           const response = await mutateAsync(request)
-          const remainingQuantity = response?.remainingBeanQuantity
+          const lowStockPrompt = getBrewLogLowStockPrompt(request, response)
 
-          if (
-            typeof remainingQuantity === 'number' &&
-            remainingQuantity < 15 &&
-            request.beanId
-          ) {
-            setLowStockPrompt({
-              beanId: request.beanId as Guid,
-              remainingQuantity,
-            })
+          if (lowStockPrompt) {
+            setLowStockPrompt(lowStockPrompt)
             return
           }
 
@@ -158,49 +74,29 @@ function CreateLikeBrewLogForm({
         }}
       />
 
-      <AlertDialog
-        open={Boolean(lowStockPrompt)}
+      <BrewLogLowStockPromptDialog
+        prompt={lowStockPrompt}
+        isPending={isSettingAvailability}
         onOpenChange={(open) => {
           if (!open && !isSettingAvailability) {
             closeLowStockPrompt()
           }
         }}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Mark bean as unavailable?</AlertDialogTitle>
-            <AlertDialogDescription>
-              {`Only ${
-                lowStockPrompt?.remainingQuantity.toFixed(1) ?? '0.0'
-              }g remains for this bean. Do you want to mark it unavailable?`}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={isSettingAvailability}>
-              Keep available
-            </AlertDialogCancel>
-            <AlertDialogAction
-              disabled={isSettingAvailability}
-              onClick={(event) => {
-                event.preventDefault()
-                if (!lowStockPrompt || isSettingAvailability) {
-                  return
-                }
+        onKeepAvailable={closeLowStockPrompt}
+        onMarkUnavailable={() => {
+          if (!lowStockPrompt || isSettingAvailability) {
+            return
+          }
 
-                void (async () => {
-                  await setBeanAvailability({
-                    id: lowStockPrompt.beanId,
-                    isAvailable: false,
-                  })
-                  closeLowStockPrompt()
-                })()
-              }}
-            >
-              {isSettingAvailability ? 'Saving...' : 'Mark unavailable'}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+          void (async () => {
+            await setBeanAvailability({
+              id: lowStockPrompt.beanId,
+              isAvailable: false,
+            })
+            closeLowStockPrompt()
+          })()
+        }}
+      />
     </>
   )
 }
@@ -212,7 +108,7 @@ function CreateBrewLogForm() {
   return (
     <CreateLikeBrewLogForm
       title="Log Brew"
-      initialValues={createInitialValues()}
+      initialValues={createInitialBrewLogValues()}
       showVoiceInput={shouldOpenVoiceInput}
       initialVoiceDialogOpen={shouldOpenVoiceInput}
     />
@@ -226,7 +122,7 @@ function RepeatBrewLogForm({ sourceBrewLogId }: { sourceBrewLogId: Guid }) {
     <CreateLikeBrewLogForm
       title="Log Brew (Repeat)"
       description="Start a new brew using a previous brew as a template."
-      initialValues={createInitialValuesFromBrewLog(brewLog, {
+      initialValues={createInitialBrewLogValuesFromBrewLog(brewLog, {
         clearResults: true,
         brewedAt: new Date(),
       })}
@@ -247,7 +143,7 @@ function EditBrewLogForm({ brewLogId }: { brewLogId: Guid }) {
       cancelHref={`/brew-log/${brewLogId}`}
       showVoiceInput
       isSubmitting={isPending}
-      initialValues={createInitialValuesFromBrewLog(brewLog)}
+      initialValues={createInitialBrewLogValuesFromBrewLog(brewLog)}
       onSubmit={async (values) => {
         await mutateAsync({
           id: brewLogId,
