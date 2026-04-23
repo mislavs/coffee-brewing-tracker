@@ -12,6 +12,7 @@ export function RatingStep({ form, onSelect, disabled = false }: QuickLogRatingS
         <EmojiRatingPicker
           value={typeof rating === 'number' ? rating : undefined}
           onChange={onSelect}
+          className="justify-center"
         />
       </div>
       <FieldErrorText message={form.formState.errors.rating?.message} />

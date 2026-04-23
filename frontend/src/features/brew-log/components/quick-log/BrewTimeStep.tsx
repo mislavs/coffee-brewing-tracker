@@ -1,17 +1,15 @@
 import { Input } from '@/components/ui/input'
-import {
-  QuickLogField,
-  QuickLogFieldGrid,
-} from '@/features/brew-log/components/quick-log/QuickLogFormLayout'
+import { QuickLogField } from '@/features/brew-log/components/quick-log/QuickLogFormLayout'
 import type { QuickLogStepProps } from '@/features/brew-log/components/quick-log/quickLogTypes'
 
 export function BrewTimeStep({ form, disabled = false }: QuickLogStepProps) {
   return (
-    <QuickLogFieldGrid>
+    <div className="flex flex-wrap items-start justify-center gap-x-4 gap-y-3">
       <QuickLogField
         label="Minutes"
         htmlFor="quick-log-brew-time-minutes"
         error={form.formState.errors.brewTimeMinutes?.message}
+        className="w-24"
       >
         <Input
           id="quick-log-brew-time-minutes"
@@ -27,6 +25,7 @@ export function BrewTimeStep({ form, disabled = false }: QuickLogStepProps) {
         label="Seconds"
         htmlFor="quick-log-brew-time-seconds"
         error={form.formState.errors.brewTimeSeconds?.message}
+        className="w-24"
       >
         <Input
           id="quick-log-brew-time-seconds"
@@ -38,6 +37,6 @@ export function BrewTimeStep({ form, disabled = false }: QuickLogStepProps) {
           {...form.register('brewTimeSeconds')}
         />
       </QuickLogField>
-    </QuickLogFieldGrid>
+    </div>
   )
 }

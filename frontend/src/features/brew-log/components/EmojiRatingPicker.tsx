@@ -3,6 +3,7 @@ import { cn } from '@/lib/utils'
 type EmojiRatingPickerProps = {
   value: number | undefined
   onChange: (value: number | undefined) => void
+  className?: string
 }
 
 const ratingOptions = [
@@ -13,9 +14,17 @@ const ratingOptions = [
   { value: 5, emoji: '🤩' },
 ] as const
 
-export function EmojiRatingPicker({ value, onChange }: EmojiRatingPickerProps) {
+export function EmojiRatingPicker({
+  value,
+  onChange,
+  className,
+}: EmojiRatingPickerProps) {
   return (
-    <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="Brew rating">
+    <div
+      className={cn('flex flex-wrap gap-2', className)}
+      role="radiogroup"
+      aria-label="Brew rating"
+    >
       {ratingOptions.map((option) => {
         const isSelected = value === option.value
 

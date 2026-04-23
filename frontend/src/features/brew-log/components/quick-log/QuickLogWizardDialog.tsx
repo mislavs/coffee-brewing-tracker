@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
@@ -48,7 +47,6 @@ type QuickLogWizardDialogProps = {
 
 type StepDefinition = {
   title: string
-  description: string
   fields: Array<keyof BrewLogFormValues>
   skippable: boolean
   autoAdvance: boolean
@@ -182,7 +180,6 @@ export function QuickLogWizardDialog({
   const stepDefinitions: StepDefinition[] = [
     {
       title: 'Bean',
-      description: 'Choose the bean you brewed with.',
       fields: ['beanId'],
       skippable: false,
       autoAdvance: true,
@@ -196,7 +193,6 @@ export function QuickLogWizardDialog({
     },
     {
       title: 'Brewer',
-      description: 'Pick the brewer you used.',
       fields: ['brewerId'],
       skippable: false,
       autoAdvance: true,
@@ -210,7 +206,6 @@ export function QuickLogWizardDialog({
     },
     {
       title: 'Recipe',
-      description: 'Choose the recipe for this brewer.',
       fields: ['recipeId'],
       skippable: false,
       autoAdvance: true,
@@ -224,7 +219,6 @@ export function QuickLogWizardDialog({
     },
     {
       title: 'Grinder',
-      description: 'Pick the grinder you used.',
       fields: ['grinderId'],
       skippable: false,
       autoAdvance: true,
@@ -238,15 +232,13 @@ export function QuickLogWizardDialog({
     },
     {
       title: 'Accessories',
-      description: 'Select any accessories you used.',
       fields: ['accessoryIds'],
       skippable: true,
       autoAdvance: false,
       render: () => <AccessoriesStep form={form} disabled={isBusy} />,
     },
     {
-      title: 'Brew parameters',
-      description: 'Enter your dose, water, and any optional settings.',
+      title: 'Parameters',
       fields: ['dose', 'waterAmount', 'waterTemperature', 'grindSize'],
       skippable: false,
       autoAdvance: false,
@@ -254,7 +246,6 @@ export function QuickLogWizardDialog({
     },
     {
       title: 'Brew time',
-      description: 'Add the total brew time if you tracked it.',
       fields: ['brewTimeMinutes', 'brewTimeSeconds'],
       skippable: true,
       autoAdvance: false,
@@ -262,7 +253,6 @@ export function QuickLogWizardDialog({
     },
     {
       title: 'Rating',
-      description: 'Give the brew a quick rating, or skip it for now.',
       fields: ['rating'],
       skippable: true,
       autoAdvance: true,
@@ -276,7 +266,6 @@ export function QuickLogWizardDialog({
     },
     {
       title: 'Notes',
-      description: 'Capture tasting notes or ideas for next time.',
       fields: ['tastingNotes', 'adjustmentIdeas'],
       validationAliases: ['notes'],
       skippable: true,
@@ -323,21 +312,16 @@ export function QuickLogWizardDialog({
     <>
       <Dialog open={open} onOpenChange={handleDialogOpenChange}>
         <DialogContent
-          className="max-h-[90vh] overflow-y-auto sm:max-w-3xl"
+          className="top-[5vh] max-h-[90vh] translate-y-0 overflow-y-auto sm:max-w-3xl"
           showCloseButton={!isBusy}
+          aria-describedby={undefined}
         >
           <DialogHeader>
             <DialogTitle>Quick Log</DialogTitle>
-            <DialogDescription>
-              Step through a new brew with large option buttons and grouped inputs.
-            </DialogDescription>
           </DialogHeader>
 
           <WizardShell
-            title={currentStepDefinition.title}
-            description={currentStepDefinition.description}
             currentStep={currentStep}
-            totalSteps={stepDefinitions.length}
             stepTitles={stepTitles}
             maxReachedStep={maxReachedStep}
             onStepSelect={goToStep}

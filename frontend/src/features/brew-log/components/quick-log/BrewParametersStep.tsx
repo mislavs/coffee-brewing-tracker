@@ -3,7 +3,6 @@ import { Input } from '@/components/ui/input'
 import {
   QuickLogDisplayField,
   QuickLogField,
-  QuickLogFieldGrid,
 } from '@/features/brew-log/components/quick-log/QuickLogFormLayout'
 import type { QuickLogStepProps } from '@/features/brew-log/components/quick-log/quickLogTypes'
 
@@ -22,7 +21,7 @@ export function BrewParametersStep({ form, disabled = false }: QuickLogStepProps
       : '—'
 
   return (
-    <QuickLogFieldGrid>
+    <div className="grid grid-cols-2 items-start gap-x-4 gap-y-3 sm:grid-cols-5">
       <QuickLogField
         label="Dose (g)"
         htmlFor="quick-log-dose"
@@ -54,7 +53,7 @@ export function BrewParametersStep({ form, disabled = false }: QuickLogStepProps
       </QuickLogField>
 
       <QuickLogDisplayField label="Brew ratio">
-        <div className="border-input bg-muted/30 flex h-9 items-center rounded-md border px-3 text-sm tabular-nums">
+        <div className="border-input bg-muted/30 flex h-9 items-center justify-center rounded-md border px-3 text-sm tabular-nums">
           {liveRatio}
         </div>
       </QuickLogDisplayField>
@@ -78,7 +77,6 @@ export function BrewParametersStep({ form, disabled = false }: QuickLogStepProps
         label="Grind size"
         htmlFor="quick-log-grind-size"
         error={form.formState.errors.grindSize?.message}
-        className="sm:col-span-2"
       >
         <Input
           id="quick-log-grind-size"
@@ -89,6 +87,6 @@ export function BrewParametersStep({ form, disabled = false }: QuickLogStepProps
           {...form.register('grindSize')}
         />
       </QuickLogField>
-    </QuickLogFieldGrid>
+    </div>
   )
 }

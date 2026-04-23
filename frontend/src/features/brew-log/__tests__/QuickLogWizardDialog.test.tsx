@@ -59,19 +59,19 @@ function renderDialog() {
 
 async function goToBrewParameters(user: ReturnType<typeof userEvent.setup>) {
   await user.click(screen.getByRole('radio', { name: 'Bean One' }))
-  await screen.findByRole('heading', { name: 'Brewer' })
+  await screen.findByRole('button', { name: 'Brewer', current: 'step' })
 
   await user.click(screen.getByRole('radio', { name: 'Brewer A' }))
-  await screen.findByRole('heading', { name: 'Recipe' })
+  await screen.findByRole('button', { name: 'Recipe', current: 'step' })
 
   await user.click(screen.getByRole('radio', { name: 'Recipe A' }))
-  await screen.findByRole('heading', { name: 'Grinder' })
+  await screen.findByRole('button', { name: 'Grinder', current: 'step' })
 
   await user.click(screen.getByRole('radio', { name: 'Grinder One' }))
-  await screen.findByRole('heading', { name: 'Accessories' })
+  await screen.findByRole('button', { name: 'Accessories', current: 'step' })
 
   await user.click(screen.getByRole('button', { name: 'Skip' }))
-  await screen.findByRole('heading', { name: 'Brew parameters' })
+  await screen.findByRole('button', { name: 'Parameters', current: 'step' })
 }
 
 async function completeRequiredFlow(user: ReturnType<typeof userEvent.setup>) {
@@ -84,13 +84,13 @@ async function completeRequiredFlow(user: ReturnType<typeof userEvent.setup>) {
   fireEvent.change(waterInput, { target: { value: '300' } })
   await user.click(screen.getByRole('button', { name: 'Next' }))
 
-  await screen.findByRole('heading', { name: 'Brew time' })
+  await screen.findByRole('button', { name: 'Brew time', current: 'step' })
   await user.click(screen.getByRole('button', { name: 'Skip' }))
 
-  await screen.findByRole('heading', { name: 'Rating' })
+  await screen.findByRole('button', { name: 'Rating', current: 'step' })
   await user.click(screen.getByRole('button', { name: 'Skip' }))
 
-  await screen.findByRole('heading', { name: 'Notes' })
+  await screen.findByRole('button', { name: 'Notes', current: 'step' })
 }
 
 describe('QuickLogWizardDialog', () => {
@@ -142,7 +142,7 @@ describe('QuickLogWizardDialog', () => {
   it('shows bean options on the first step', () => {
     renderDialog()
 
-    expect(screen.getByRole('heading', { name: 'Bean' })).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Bean', current: 'step' })).toBeTruthy()
     expect(screen.getByRole('radio', { name: 'Bean One' })).toBeTruthy()
   })
 
@@ -152,7 +152,9 @@ describe('QuickLogWizardDialog', () => {
 
     await user.click(screen.getByRole('radio', { name: 'Bean One' }))
 
-    expect(await screen.findByRole('heading', { name: 'Brewer' })).toBeTruthy()
+    expect(
+      await screen.findByRole('button', { name: 'Brewer', current: 'step' }),
+    ).toBeTruthy()
   })
 
   it('keeps the user on the brew parameters step when required values are missing', async () => {
@@ -162,7 +164,9 @@ describe('QuickLogWizardDialog', () => {
     await goToBrewParameters(user)
     await user.click(screen.getByRole('button', { name: 'Next' }))
 
-    expect(screen.getByRole('heading', { name: 'Brew parameters' })).toBeTruthy()
+    expect(
+      screen.getByRole('button', { name: 'Parameters', current: 'step' }),
+    ).toBeTruthy()
     expect(screen.getByText('Dose must be greater than 0.')).toBeTruthy()
     expect(screen.getByText('Water amount must be greater than 0.')).toBeTruthy()
   })
@@ -176,12 +180,14 @@ describe('QuickLogWizardDialog', () => {
     await user.click(await screen.findByRole('radio', { name: 'Recipe A' }))
     await user.click(await screen.findByRole('radio', { name: 'Grinder One' }))
 
-    await screen.findByRole('heading', { name: 'Accessories' })
+    await screen.findByRole('button', { name: 'Accessories', current: 'step' })
     await user.click(screen.getByRole('button', { name: 'Brewer' }))
-    await screen.findByRole('heading', { name: 'Brewer' })
+    await screen.findByRole('button', { name: 'Brewer', current: 'step' })
     await user.click(screen.getByRole('radio', { name: 'Brewer B' }))
 
-    expect(await screen.findByRole('heading', { name: 'Recipe' })).toBeTruthy()
+    expect(
+      await screen.findByRole('button', { name: 'Recipe', current: 'step' }),
+    ).toBeTruthy()
     expect(screen.queryByRole('radio', { name: 'Recipe A' })).toBeNull()
     expect(screen.getByRole('radio', { name: 'Recipe B' })).toBeTruthy()
     expect((screen.getByRole('button', { name: 'Grinder' }) as HTMLButtonElement).disabled).toBe(
@@ -201,7 +207,9 @@ describe('QuickLogWizardDialog', () => {
     await completeRequiredFlow(user)
     await user.click(screen.getByRole('button', { name: 'Log brew' }))
 
-    expect(await screen.findByRole('heading', { name: 'Brew parameters' })).toBeTruthy()
+    expect(
+      await screen.findByRole('button', { name: 'Parameters', current: 'step' }),
+    ).toBeTruthy()
     expect(screen.getByText('Dose is invalid.')).toBeTruthy()
   })
 
