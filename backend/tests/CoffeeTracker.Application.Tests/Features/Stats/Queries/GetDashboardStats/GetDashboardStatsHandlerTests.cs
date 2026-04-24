@@ -61,8 +61,8 @@ public class GetDashboardStatsHandlerTests(IntegrationTestFactory factory) : Int
         // Assert
         result.CoffeeAvailableGrams.Should().Be(500m);
         result.TotalCoffeeConsumedGrams.Should().Be(450m);
-        result.EstimatedDaysRemaining.Should().Be(100);
-        result.AverageDailyConsumptionGrams.Should().Be(5m);
+        result.EstimatedDaysRemaining.Should().Be(66);
+        result.AverageDailyConsumptionGrams.Should().Be(7.5m);
     }
 
     [Fact]
@@ -112,7 +112,7 @@ public class GetDashboardStatsHandlerTests(IntegrationTestFactory factory) : Int
         // Assert
         result.CoffeeAvailableGrams.Should().Be(0m);
         result.EstimatedDaysRemaining.Should().Be(0);
-        result.AverageDailyConsumptionGrams.Should().Be(5m);
+        result.AverageDailyConsumptionGrams.Should().Be(7.5m);
     }
 
     private async Task<(Roaster Roaster, Brewer Brewer, Grinder Grinder)> CreateBrewDependenciesAsync()

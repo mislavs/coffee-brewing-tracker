@@ -14,7 +14,7 @@ public sealed class GetDashboardStatsHandler(ApplicationDbContext dbContext)
         GetDashboardStatsQuery request,
         CancellationToken cancellationToken)
     {
-        var recentBrewWindowStart = DateTime.UtcNow.AddDays(-90);
+        var recentBrewWindowStart = DateTime.UtcNow.AddDays(-60);
 
         var totalBrews = await dbContext.BrewLogEntries
             .AsNoTracking()
@@ -55,7 +55,7 @@ public sealed class GetDashboardStatsHandler(ApplicationDbContext dbContext)
 
         if (recentBrewCount >= 5 && recentConsumptionGrams > 0m)
         {
-            averageDailyConsumptionGrams = recentConsumptionGrams / 90m;
+            averageDailyConsumptionGrams = recentConsumptionGrams / 60m;
             estimatedDaysRemaining = coffeeAvailableGrams == 0m
                 ? 0
                 : (int)Math.Floor(coffeeAvailableGrams / averageDailyConsumptionGrams.Value);
