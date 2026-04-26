@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react'
-import { ChevronLeft, ChevronRight, Coffee, Mic } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Coffee, Filter, Mic } from 'lucide-react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { EmptyState } from '@/components/EmptyState'
 import { Button } from '@/components/ui/button'
@@ -73,6 +73,9 @@ export function BrewLogListPage() {
   const dateFrom = searchParams.get('dateFrom') ?? ''
   const dateTo = searchParams.get('dateTo') ?? ''
   const includeUnavailable = searchParams.get('includeUnavailable') === 'true'
+  const [isFiltersOpen, setIsFiltersOpen] = useState(
+    Boolean(search) || Boolean(dateFrom) || Boolean(dateTo) || includeUnavailable,
+  )
   const page = parsePageParam(searchParams.get('page'))
   const setFilterSearchParams = useCallback(
     (
@@ -195,6 +198,18 @@ export function BrewLogListPage() {
             <CardDescription>Browse and manage your brew history.</CardDescription>
           </div>
           <div className="flex flex-wrap items-center gap-2">
+            <Button
+              type="button"
+              variant={isFiltersOpen ? 'secondary' : 'ghost'}
+              size="icon"
+              aria-expanded={isFiltersOpen}
+              aria-controls="brew-log-filters"
+              aria-label={isFiltersOpen ? 'Hide filters' : 'Show filters'}
+              title={isFiltersOpen ? 'Hide filters' : 'Show filters'}
+              onClick={() => setIsFiltersOpen((current) => !current)}
+            >
+              <Filter className="size-4" />
+            </Button>
             {features?.voiceBrewLogParsing ? (
               <Button variant="outline" asChild>
                 <Link to="/brew-log/new?dictate=true">
@@ -212,57 +227,59 @@ export function BrewLogListPage() {
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-4">
-            <div className="space-y-2 md:col-span-1">
-              <label htmlFor="brew-log-search" className="text-sm font-medium">
-                Search by bean
-              </label>
-              <Input
-                id="brew-log-search"
-                placeholder="Filter by bean..."
-                value={searchDraft}
-                onChange={(event) => setSearchDraft(event.target.value)}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <label htmlFor="brew-log-date-from" className="text-sm font-medium">
-                Date from
-              </label>
-              <DatePicker
-                id="brew-log-date-from"
-                value={dateFrom || undefined}
-                onChange={(nextValue) => setDateFilter('dateFrom', nextValue)}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <label htmlFor="brew-log-date-to" className="text-sm font-medium">
-                Date to
-              </label>
-              <DatePicker
-                id="brew-log-date-to"
-                value={dateTo || undefined}
-                onChange={(nextValue) => setDateFilter('dateTo', nextValue)}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <label htmlFor="brew-log-include-unavailable" className="text-sm font-medium">
-                Availability
-              </label>
-              <div className="flex items-center gap-3 pt-2">
-                <Switch
-                  id="brew-log-include-unavailable"
-                  checked={includeUnavailable}
-                  onCheckedChange={handleToggleUnavailable}
-                />
-                <label htmlFor="brew-log-include-unavailable" className="text-sm font-medium">
-                  Show unavailable beans
+          {isFiltersOpen ? (
+            <div id="brew-log-filters" className="grid gap-4 md:grid-cols-4">
+              <div className="space-y-2 md:col-span-1">
+                <label htmlFor="brew-log-search" className="text-sm font-medium">
+                  Search by bean
                 </label>
+                <Input
+                  id="brew-log-search"
+                  placeholder="Filter by bean..."
+                  value={searchDraft}
+                  onChange={(event) => setSearchDraft(event.target.value)}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label htmlFor="brew-log-date-from" className="text-sm font-medium">
+                  Date from
+                </label>
+                <DatePicker
+                  id="brew-log-date-from"
+                  value={dateFrom || undefined}
+                  onChange={(nextValue) => setDateFilter('dateFrom', nextValue)}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label htmlFor="brew-log-date-to" className="text-sm font-medium">
+                  Date to
+                </label>
+                <DatePicker
+                  id="brew-log-date-to"
+                  value={dateTo || undefined}
+                  onChange={(nextValue) => setDateFilter('dateTo', nextValue)}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label htmlFor="brew-log-include-unavailable" className="text-sm font-medium">
+                  Availability
+                </label>
+                <div className="flex items-center gap-3 pt-2">
+                  <Switch
+                    id="brew-log-include-unavailable"
+                    checked={includeUnavailable}
+                    onCheckedChange={handleToggleUnavailable}
+                  />
+                  <label htmlFor="brew-log-include-unavailable" className="text-sm font-medium">
+                    Show unavailable beans
+                  </label>
+                </div>
               </div>
             </div>
-          </div>
+          ) : null}
 
           {isPending && brewLogs.length === 0 ? (
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">

@@ -1,4 +1,5 @@
-import { BookOpen } from 'lucide-react'
+import { useState } from 'react'
+import { BookOpen, Filter } from 'lucide-react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { EmptyState } from '@/components/EmptyState'
 import { Button } from '@/components/ui/button'
@@ -27,6 +28,7 @@ const allBrewersValue = '__all_brewers__'
 export function RecipeListPage() {
   const [searchParams, setSearchParams] = useSearchParams()
   const brewerId = searchParams.get('brewerId') ?? ''
+  const [isFiltersOpen, setIsFiltersOpen] = useState(Boolean(brewerId))
   const { data: brewers = [] } = useBrewers()
   const { data: recipes = [], isPending } = useRecipes(brewerId)
 
@@ -37,48 +39,64 @@ export function RecipeListPage() {
           <CardTitle>Recipes</CardTitle>
           <CardDescription>Browse and manage your coffee recipes.</CardDescription>
         </div>
-        <Button asChild>
-          <Link to="/recipes/new">Add Recipe</Link>
-        </Button>
+        <div className="flex flex-wrap items-center gap-2">
+          <Button
+            type="button"
+            variant={isFiltersOpen ? 'secondary' : 'ghost'}
+            size="icon"
+            aria-expanded={isFiltersOpen}
+            aria-controls="recipe-filters"
+            aria-label={isFiltersOpen ? 'Hide filters' : 'Show filters'}
+            title={isFiltersOpen ? 'Hide filters' : 'Show filters'}
+            onClick={() => setIsFiltersOpen((current) => !current)}
+          >
+            <Filter className="size-4" />
+          </Button>
+          <Button asChild>
+            <Link to="/recipes/new">Add Recipe</Link>
+          </Button>
+        </div>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="max-w-md space-y-2">
-          <label htmlFor="recipe-brewer-filter" className="text-sm font-medium">
-            Filter by brewer
-          </label>
-          <Select
-            value={brewerId || allBrewersValue}
-            onValueChange={(nextValue) => {
-              setSearchParams(
-                (previous) => {
-                  const next = new URLSearchParams(previous)
-                  if (nextValue === allBrewersValue) {
-                    next.delete('brewerId')
-                  } else {
-                    next.set('brewerId', nextValue)
-                  }
+        {isFiltersOpen ? (
+          <div id="recipe-filters" className="max-w-md space-y-2">
+            <label htmlFor="recipe-brewer-filter" className="text-sm font-medium">
+              Filter by brewer
+            </label>
+            <Select
+              value={brewerId || allBrewersValue}
+              onValueChange={(nextValue) => {
+                setSearchParams(
+                  (previous) => {
+                    const next = new URLSearchParams(previous)
+                    if (nextValue === allBrewersValue) {
+                      next.delete('brewerId')
+                    } else {
+                      next.set('brewerId', nextValue)
+                    }
 
-                  return next
-                },
-                { replace: true },
-              )
-            }}
-          >
-            <SelectTrigger id="recipe-brewer-filter" className="w-full">
-              <SelectValue placeholder="All brewers" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value={allBrewersValue}>All brewers</SelectItem>
-              {brewers.map((brewer) =>
-                brewer.id ? (
-                  <SelectItem key={brewer.id} value={brewer.id}>
-                    {brewer.name ?? 'Unnamed brewer'}
-                  </SelectItem>
-                ) : null,
-              )}
-            </SelectContent>
-          </Select>
-        </div>
+                    return next
+                  },
+                  { replace: true },
+                )
+              }}
+            >
+              <SelectTrigger id="recipe-brewer-filter" className="w-full">
+                <SelectValue placeholder="All brewers" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={allBrewersValue}>All brewers</SelectItem>
+                {brewers.map((brewer) =>
+                  brewer.id ? (
+                    <SelectItem key={brewer.id} value={brewer.id}>
+                      {brewer.name ?? 'Unnamed brewer'}
+                    </SelectItem>
+                  ) : null,
+                )}
+              </SelectContent>
+            </Select>
+          </div>
+        ) : null}
 
         {isPending && recipes.length === 0 ? (
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">

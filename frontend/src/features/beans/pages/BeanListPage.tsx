@@ -1,4 +1,5 @@
-import { Leaf } from 'lucide-react'
+import { useState } from 'react'
+import { Filter, Leaf } from 'lucide-react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { EmptyState } from '@/components/EmptyState'
 import { Button } from '@/components/ui/button'
@@ -32,6 +33,9 @@ export function BeanListPage() {
   const search = searchParams.get('search') ?? ''
   const showUnavailable = searchParams.get('showUnavailable') === 'true'
   const countryId = searchParams.get('country') ?? ''
+  const [isFiltersOpen, setIsFiltersOpen] = useState(
+    Boolean(search) || Boolean(countryId) || showUnavailable,
+  )
   const [searchDraft, setSearchDraft] = useDebouncedSearchParam({
     paramName: 'search',
     value: search,
@@ -73,67 +77,85 @@ export function BeanListPage() {
             Browse and manage your coffee bean library.
           </CardDescription>
         </div>
-        <Button asChild>
-          <Link to="/beans/new">Add Bean</Link>
-        </Button>
+        <div className="flex flex-wrap items-center gap-2">
+          <Button
+            type="button"
+            variant={isFiltersOpen ? 'secondary' : 'ghost'}
+            size="icon"
+            aria-expanded={isFiltersOpen}
+            aria-controls="bean-filters"
+            aria-label={isFiltersOpen ? 'Hide filters' : 'Show filters'}
+            title={isFiltersOpen ? 'Hide filters' : 'Show filters'}
+            onClick={() => setIsFiltersOpen((current) => !current)}
+          >
+            <Filter className="size-4" />
+          </Button>
+          <Button asChild>
+            <Link to="/beans/new">Add Bean</Link>
+          </Button>
+        </div>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="grid gap-4 md:grid-cols-2">
-          <div className="space-y-2">
-            <label htmlFor="bean-search" className="text-sm font-medium">
-              Search by name
-            </label>
-            <Input
-              id="bean-search"
-              placeholder="Filter beans..."
-              value={searchDraft}
-              onChange={(event) => setSearchDraft(event.target.value)}
-            />
+        {isFiltersOpen ? (
+          <div id="bean-filters" className="space-y-4">
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-2">
+                <label htmlFor="bean-search" className="text-sm font-medium">
+                  Search by name
+                </label>
+                <Input
+                  id="bean-search"
+                  placeholder="Filter beans..."
+                  value={searchDraft}
+                  onChange={(event) => setSearchDraft(event.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <label htmlFor="bean-country-filter" className="text-sm font-medium">
+                  Filter by country
+                </label>
+                <Select
+                  value={countryId || allCountriesValue}
+                  onValueChange={(nextValue) => {
+                    setSearchParams((previous) => {
+                      const next = new URLSearchParams(previous)
+                      if (nextValue === allCountriesValue) {
+                        next.delete('country')
+                      } else {
+                        next.set('country', nextValue)
+                      }
+                      return next
+                    }, { replace: true })
+                  }}
+                >
+                  <SelectTrigger id="bean-country-filter" className="w-full">
+                    <SelectValue placeholder="All countries" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={allCountriesValue}>All countries</SelectItem>
+                    {countryStats.map((country) =>
+                      country.countryId ? (
+                        <SelectItem key={country.countryId} value={country.countryId}>
+                          {country.countryName ?? 'Unnamed country'}
+                        </SelectItem>
+                      ) : null,
+                    )}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <Switch
+                id="show-unavailable"
+                checked={showUnavailable}
+                onCheckedChange={handleToggleUnavailable}
+              />
+              <label htmlFor="show-unavailable" className="text-sm font-medium">
+                Show unavailable
+              </label>
+            </div>
           </div>
-          <div className="space-y-2">
-            <label htmlFor="bean-country-filter" className="text-sm font-medium">
-              Filter by country
-            </label>
-            <Select
-              value={countryId || allCountriesValue}
-              onValueChange={(nextValue) => {
-                setSearchParams((previous) => {
-                  const next = new URLSearchParams(previous)
-                  if (nextValue === allCountriesValue) {
-                    next.delete('country')
-                  } else {
-                    next.set('country', nextValue)
-                  }
-                  return next
-                }, { replace: true })
-              }}
-            >
-              <SelectTrigger id="bean-country-filter" className="w-full">
-                <SelectValue placeholder="All countries" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value={allCountriesValue}>All countries</SelectItem>
-                {countryStats.map((country) =>
-                  country.countryId ? (
-                    <SelectItem key={country.countryId} value={country.countryId}>
-                      {country.countryName ?? 'Unnamed country'}
-                    </SelectItem>
-                  ) : null,
-                )}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-        <div className="flex items-center gap-3">
-          <Switch
-            id="show-unavailable"
-            checked={showUnavailable}
-            onCheckedChange={handleToggleUnavailable}
-          />
-          <label htmlFor="show-unavailable" className="text-sm font-medium">
-            Show unavailable
-          </label>
-        </div>
+        ) : null}
 
         {isPending && beans.length === 0 ? (
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
