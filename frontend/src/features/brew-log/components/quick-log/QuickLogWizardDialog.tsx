@@ -312,7 +312,7 @@ export function QuickLogWizardDialog({
     <>
       <Dialog open={open} onOpenChange={handleDialogOpenChange}>
         <DialogContent
-          className="top-[5vh] max-h-[90vh] translate-y-0 overflow-y-auto sm:max-w-3xl"
+          className="top-[5vh] max-h-[90vh] max-w-[calc(100%-3rem)] translate-y-0 overflow-y-auto sm:max-w-[calc(100%-3rem)] lg:max-w-3xl"
           showCloseButton={!isBusy}
           aria-describedby={undefined}
         >
