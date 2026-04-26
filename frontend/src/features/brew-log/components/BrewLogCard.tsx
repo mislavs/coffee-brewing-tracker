@@ -15,7 +15,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
-import { formatBrewTime, getRatingDisplay } from '@/features/brew-log/formatters'
+import { getRatingDisplay } from '@/features/brew-log/formatters'
 
 type BrewLogCardProps = {
   brewLog: BrewLogSummaryDto
@@ -40,6 +40,7 @@ export function BrewLogCard({ brewLog }: BrewLogCardProps) {
   const beanDisplayName = roasterName ? `${beanName} (${roasterName})` : beanName
   const brewerName = brewLog.brewerName || '—'
   const recipeName = brewLog.recipeName?.trim() || '—'
+  const brewerAndRecipe = `${brewerName} / ${recipeName}`
   const doseAndWater = `${formatWeight(brewLog.dose)} / ${formatWeight(brewLog.waterAmount)}`
   const grinderAndSetting =
     brewLog.grindSize != null
@@ -87,31 +88,21 @@ export function BrewLogCard({ brewLog }: BrewLogCardProps) {
         </div>
       </CardHeader>
       <CardContent className="px-4 pt-0">
-        <div className="rounded-lg border bg-muted/15 px-3 py-2">
-          <dl className="grid grid-cols-[max-content_minmax(0,1fr)] gap-x-3 gap-y-1.5 text-sm">
-            <dt className="text-muted-foreground">Brewer</dt>
-            <dd className="min-w-0 break-words font-medium text-foreground">{brewerName}</dd>
+        <dl className="grid grid-cols-[max-content_minmax(0,1fr)] gap-x-3 gap-y-1.5 text-sm">
+          <dt className="text-muted-foreground">Brewer / Recipe</dt>
+          <dd className="min-w-0 break-words font-medium text-foreground">{brewerAndRecipe}</dd>
 
-            <dt className="text-muted-foreground">Recipe</dt>
-            <dd className="min-w-0 break-words font-medium text-foreground">{recipeName}</dd>
+          <dt className="text-muted-foreground">Bean / Water</dt>
+          <dd className="min-w-0 break-words font-medium text-foreground">{doseAndWater}</dd>
 
-            <dt className="text-muted-foreground">Bean / Water</dt>
-            <dd className="min-w-0 break-words font-medium text-foreground">{doseAndWater}</dd>
+          <dt className="text-muted-foreground">Grinder</dt>
+          <dd className="min-w-0 break-words font-medium text-foreground">{grinderAndSetting}</dd>
 
-            <dt className="text-muted-foreground">Grinder</dt>
-            <dd className="min-w-0 break-words font-medium text-foreground">{grinderAndSetting}</dd>
-
-            <dt className="text-muted-foreground">Time</dt>
-            <dd className="min-w-0 break-words font-medium text-foreground">
-              {formatBrewTime(brewLog.brewTimeSeconds)}
-            </dd>
-
-            <dt className="text-muted-foreground">Rating</dt>
-            <dd className="min-w-0 break-words font-medium text-foreground">
-              {getRatingDisplay(brewLog.rating)}
-            </dd>
-          </dl>
-        </div>
+          <dt className="text-muted-foreground">Rating</dt>
+          <dd className="min-w-0 break-words font-medium text-foreground">
+            {getRatingDisplay(brewLog.rating)}
+          </dd>
+        </dl>
       </CardContent>
     </Card>
   )

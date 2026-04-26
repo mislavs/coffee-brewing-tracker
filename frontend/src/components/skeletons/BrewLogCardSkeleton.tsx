@@ -11,11 +11,9 @@ type BrewLogCardSkeletonProps = {
 }
 
 const detailRowWidths: Array<{ labelWidth: string; valueWidth: string }> = [
-  { labelWidth: 'w-14', valueWidth: 'w-24' },
-  { labelWidth: 'w-16', valueWidth: 'w-20' },
+  { labelWidth: 'w-28', valueWidth: 'w-32' },
   { labelWidth: 'w-20', valueWidth: 'w-28' },
   { labelWidth: 'w-14', valueWidth: 'w-24' },
-  { labelWidth: 'w-12', valueWidth: 'w-16' },
   { labelWidth: 'w-14', valueWidth: 'w-20' },
 ]
 
@@ -27,7 +25,7 @@ export function BrewLogCardSkeleton({ className }: BrewLogCardSkeletonProps) {
         <Skeleton className="h-3 w-28" />
       </CardHeader>
       <CardContent className="px-4 pt-0">
-        <div className="space-y-1.5 rounded-md border bg-muted/20 px-2.5 py-1.5">
+        <div className="space-y-1.5">
           {detailRowWidths.map((widths, index) => (
             <div key={index} className="flex gap-3">
               <Skeleton className={cn('h-3', widths.labelWidth)} />
