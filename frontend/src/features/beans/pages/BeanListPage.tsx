@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button'
 import {
   Card,
   CardContent,
-  CardHeader,
 } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { CardSkeleton } from '@/components/skeletons/CardSkeleton'
@@ -68,11 +67,11 @@ export function BeanListPage() {
 
   return (
     <Card>
-      <CardHeader className="flex flex-row flex-wrap items-center justify-end gap-2">
-        <div className="flex flex-wrap items-center gap-2">
+      <CardContent className="space-y-4">
+        <div className="flex flex-wrap items-center justify-between gap-2">
           <Button
             type="button"
-            variant={isFiltersOpen ? 'secondary' : 'ghost'}
+            variant={isFiltersOpen ? 'default' : 'ghost'}
             size="icon"
             aria-expanded={isFiltersOpen}
             aria-controls="bean-filters"
@@ -82,12 +81,12 @@ export function BeanListPage() {
           >
             <Filter className="size-4" />
           </Button>
-          <Button asChild>
-            <Link to="/beans/new">Add Bean</Link>
-          </Button>
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            <Button asChild>
+              <Link to="/beans/new">Add Bean</Link>
+            </Button>
+          </div>
         </div>
-      </CardHeader>
-      <CardContent className="space-y-4">
         {isFiltersOpen ? (
           <div id="bean-filters" className="space-y-4">
             <div className="grid gap-4 md:grid-cols-2">

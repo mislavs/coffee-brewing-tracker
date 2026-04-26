@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button'
 import {
   Card,
   CardContent,
-  CardHeader,
 } from '@/components/ui/card'
 import { CardSkeleton } from '@/components/skeletons/CardSkeleton'
 import { getSkeletonVisibilityClassName } from '@/components/skeletons/utils'
@@ -17,12 +16,12 @@ export function RoasterListPage() {
 
   return (
     <Card>
-      <CardHeader className="flex flex-row flex-wrap items-center justify-end gap-2">
-        <Button asChild>
-          <Link to="/roasters/new">Add Roaster</Link>
-        </Button>
-      </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-4">
+        <div className="flex flex-wrap items-center justify-end gap-2">
+          <Button asChild>
+            <Link to="/roasters/new">Add Roaster</Link>
+          </Button>
+        </div>
         {isPending && roasters.length === 0 ? (
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {Array.from({ length: 6 }).map((_, index) => (

@@ -8,7 +8,6 @@ import { getSkeletonVisibilityClassName } from '@/components/skeletons/utils'
 import {
   Card,
   CardContent,
-  CardHeader,
 } from '@/components/ui/card'
 import {
   Select,
@@ -32,11 +31,11 @@ export function RecipeListPage() {
 
   return (
     <Card>
-      <CardHeader className="flex flex-row flex-wrap items-center justify-end gap-2">
-        <div className="flex flex-wrap items-center gap-2">
+      <CardContent className="space-y-4">
+        <div className="flex flex-wrap items-center justify-between gap-2">
           <Button
             type="button"
-            variant={isFiltersOpen ? 'secondary' : 'ghost'}
+            variant={isFiltersOpen ? 'default' : 'ghost'}
             size="icon"
             aria-expanded={isFiltersOpen}
             aria-controls="recipe-filters"
@@ -46,12 +45,12 @@ export function RecipeListPage() {
           >
             <Filter className="size-4" />
           </Button>
-          <Button asChild>
-            <Link to="/recipes/new">Add Recipe</Link>
-          </Button>
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            <Button asChild>
+              <Link to="/recipes/new">Add Recipe</Link>
+            </Button>
+          </div>
         </div>
-      </CardHeader>
-      <CardContent className="space-y-4">
         {isFiltersOpen ? (
           <div id="recipe-filters" className="max-w-md space-y-2">
             <label htmlFor="recipe-brewer-filter" className="text-sm font-medium">

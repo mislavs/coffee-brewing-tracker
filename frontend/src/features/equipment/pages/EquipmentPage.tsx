@@ -65,12 +65,12 @@ function EquipmentEntityCardList({
 
   return (
     <Card>
-      <CardHeader className="flex flex-row flex-wrap items-center justify-end gap-2">
-        <Button asChild>
-          <Link to={addHref}>{addLabel}</Link>
-        </Button>
-      </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-4">
+        <div className="flex flex-wrap items-center justify-end gap-2">
+          <Button asChild>
+            <Link to={addHref}>{addLabel}</Link>
+          </Button>
+        </div>
         {isPending && items.length === 0 ? (
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {Array.from({ length: 4 }).map((_, index) => (
@@ -160,12 +160,12 @@ function AccessoryList() {
 
   return (
     <Card>
-      <CardHeader className="flex flex-row flex-wrap items-center justify-end gap-2">
-        <Button asChild>
-          <Link to="/equipment/accessories/new">Add Accessory</Link>
-        </Button>
-      </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-4">
+        <div className="flex flex-wrap items-center justify-end gap-2">
+          <Button asChild>
+            <Link to="/equipment/accessories/new">Add Accessory</Link>
+          </Button>
+        </div>
         {isPending && accessories.length === 0 ? (
           <>
             <div className="space-y-3 md:hidden">

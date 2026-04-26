@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button'
 import {
   Card,
   CardContent,
-  CardHeader,
 } from '@/components/ui/card'
 import {
   Pagination,
@@ -190,11 +189,11 @@ export function BrewLogListPage() {
   return (
     <>
       <Card>
-        <CardHeader className="flex flex-row flex-wrap items-center justify-end gap-2">
-          <div className="flex flex-wrap items-center gap-2">
+        <CardContent className="space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-2">
             <Button
               type="button"
-              variant={isFiltersOpen ? 'secondary' : 'ghost'}
+              variant={isFiltersOpen ? 'default' : 'ghost'}
               size="icon"
               aria-expanded={isFiltersOpen}
               aria-controls="brew-log-filters"
@@ -204,23 +203,23 @@ export function BrewLogListPage() {
             >
               <Filter className="size-4" />
             </Button>
-            {features?.voiceBrewLogParsing ? (
-              <Button variant="outline" asChild>
-                <Link to="/brew-log/new?dictate=true">
-                  <Mic className="size-4" />
-                  Dictate brew
-                </Link>
+            <div className="flex flex-wrap items-center justify-end gap-2">
+              {features?.voiceBrewLogParsing ? (
+                <Button variant="outline" asChild>
+                  <Link to="/brew-log/new?dictate=true">
+                    <Mic className="size-4" />
+                    Dictate brew
+                  </Link>
+                </Button>
+              ) : null}
+              <Button type="button" variant="secondary" onClick={() => setQuickLogOpen(true)}>
+                Quick Log
               </Button>
-            ) : null}
-            <Button type="button" variant="secondary" onClick={() => setQuickLogOpen(true)}>
-              Quick Log
-            </Button>
-            <Button asChild>
-              <Link to="/brew-log/new">Log Brew</Link>
-            </Button>
+              <Button asChild>
+                <Link to="/brew-log/new">Log Brew</Link>
+              </Button>
+            </div>
           </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
           {isFiltersOpen ? (
             <div id="brew-log-filters" className="grid gap-4 md:grid-cols-4">
               <div className="space-y-2 md:col-span-1">
