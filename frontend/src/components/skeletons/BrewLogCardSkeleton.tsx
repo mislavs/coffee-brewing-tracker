@@ -21,13 +21,13 @@ const detailRowWidths: Array<{ labelWidth: string; valueWidth: string }> = [
 
 export function BrewLogCardSkeleton({ className }: BrewLogCardSkeletonProps) {
   return (
-    <Card className={cn('h-full py-4', className)}>
-      <CardHeader className="space-y-1 px-3 pt-2.5 pb-0.5">
-        <Skeleton className="h-5 w-24 rounded-full" />
+    <Card className={cn('h-full gap-3 py-3', className)}>
+      <CardHeader className="space-y-1 px-4 pt-1.5 pb-0">
         <Skeleton className="h-4 w-4/5" />
+        <Skeleton className="h-3 w-28" />
       </CardHeader>
       <CardContent className="px-4 pt-0">
-        <div className="space-y-2 rounded-md border bg-muted/20 px-2.5 py-1">
+        <div className="space-y-1.5 rounded-md border bg-muted/20 px-2.5 py-1.5">
           {detailRowWidths.map((widths, index) => (
             <div key={index} className="flex gap-3">
               <Skeleton className={cn('h-3', widths.labelWidth)} />
