@@ -6,9 +6,7 @@ import { Button } from '@/components/ui/button'
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
-  CardTitle,
 } from '@/components/ui/card'
 import {
   Pagination,
@@ -192,11 +190,7 @@ export function BrewLogListPage() {
   return (
     <>
       <Card>
-        <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <CardTitle>Brew Log</CardTitle>
-            <CardDescription>Browse and manage your brew history.</CardDescription>
-          </div>
+        <CardHeader className="flex flex-row flex-wrap items-center justify-end gap-2">
           <div className="flex flex-wrap items-center gap-2">
             <Button
               type="button"

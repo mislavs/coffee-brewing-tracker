@@ -8,9 +8,7 @@ import { getSkeletonVisibilityClassName } from '@/components/skeletons/utils'
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
-  CardTitle,
 } from '@/components/ui/card'
 import {
   Select,
@@ -34,11 +32,7 @@ export function RecipeListPage() {
 
   return (
     <Card>
-      <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <CardTitle>Recipes</CardTitle>
-          <CardDescription>Browse and manage your coffee recipes.</CardDescription>
-        </div>
+      <CardHeader className="flex flex-row flex-wrap items-center justify-end gap-2">
         <div className="flex flex-wrap items-center gap-2">
           <Button
             type="button"

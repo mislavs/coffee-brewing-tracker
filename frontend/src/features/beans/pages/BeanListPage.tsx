@@ -6,9 +6,7 @@ import { Button } from '@/components/ui/button'
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
-  CardTitle,
 } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { CardSkeleton } from '@/components/skeletons/CardSkeleton'
@@ -70,13 +68,7 @@ export function BeanListPage() {
 
   return (
     <Card>
-      <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <CardTitle>Beans</CardTitle>
-          <CardDescription>
-            Browse and manage your coffee bean library.
-          </CardDescription>
-        </div>
+      <CardHeader className="flex flex-row flex-wrap items-center justify-end gap-2">
         <div className="flex flex-wrap items-center gap-2">
           <Button
             type="button"

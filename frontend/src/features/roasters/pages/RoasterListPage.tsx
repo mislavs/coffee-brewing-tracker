@@ -5,9 +5,7 @@ import { Button } from '@/components/ui/button'
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
-  CardTitle,
 } from '@/components/ui/card'
 import { CardSkeleton } from '@/components/skeletons/CardSkeleton'
 import { getSkeletonVisibilityClassName } from '@/components/skeletons/utils'
@@ -19,13 +17,7 @@ export function RoasterListPage() {
 
   return (
     <Card>
-      <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <CardTitle>Roasters</CardTitle>
-          <CardDescription>
-            Browse and manage your coffee roasters.
-          </CardDescription>
-        </div>
+      <CardHeader className="flex flex-row flex-wrap items-center justify-end gap-2">
         <Button asChild>
           <Link to="/roasters/new">Add Roaster</Link>
         </Button>

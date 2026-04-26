@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button'
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
@@ -41,7 +40,6 @@ type EquipmentEntity = {
 
 type EquipmentEntityCardListProps = {
   title: string
-  description: string
   addLabel: string
   addHref: string
   detailHrefPrefix: string
@@ -54,7 +52,6 @@ type EquipmentEntityCardListProps = {
 
 function EquipmentEntityCardList({
   title,
-  description,
   addLabel,
   addHref,
   detailHrefPrefix,
@@ -68,11 +65,7 @@ function EquipmentEntityCardList({
 
   return (
     <Card>
-      <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <CardTitle>{title}</CardTitle>
-          <CardDescription>{description}</CardDescription>
-        </div>
+      <CardHeader className="flex flex-row flex-wrap items-center justify-end gap-2">
         <Button asChild>
           <Link to={addHref}>{addLabel}</Link>
         </Button>
@@ -125,7 +118,6 @@ function BrewerList() {
   return (
     <EquipmentEntityCardList
       title="Brewers"
-      description="Browse and manage your brewers."
       addLabel="Add Brewer"
       addHref="/equipment/brewers/new"
       detailHrefPrefix="/equipment/brewers"
@@ -144,7 +136,6 @@ function GrinderList() {
   return (
     <EquipmentEntityCardList
       title="Grinders"
-      description="Browse and manage your grinders."
       addLabel="Add Grinder"
       addHref="/equipment/grinders/new"
       detailHrefPrefix="/equipment/grinders"
@@ -169,11 +160,7 @@ function AccessoryList() {
 
   return (
     <Card>
-      <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <CardTitle>Accessories</CardTitle>
-          <CardDescription>Browse and manage your accessories.</CardDescription>
-        </div>
+      <CardHeader className="flex flex-row flex-wrap items-center justify-end gap-2">
         <Button asChild>
           <Link to="/equipment/accessories/new">Add Accessory</Link>
         </Button>
