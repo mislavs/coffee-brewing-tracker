@@ -20,12 +20,69 @@ export function WizardShell({
   footer,
 }: WizardShellProps) {
   const totalSteps = stepTitles.length
+  const mobileStepIndexes = [currentStep - 1, currentStep, currentStep + 1]
+    .filter((stepIndex) => stepIndex >= 0 && stepIndex < totalSteps)
+  const firstMobileStepIndex = mobileStepIndexes[0] ?? 0
+  const lastMobileStepIndex =
+    mobileStepIndexes[mobileStepIndexes.length - 1] ?? totalSteps - 1
+  const hasHiddenBefore = firstMobileStepIndex > 0
+  const hasHiddenAfter = lastMobileStepIndex < totalSteps - 1
 
   return (
     <div className="space-y-6">
+      <nav aria-label="Quick log progress" className="sm:hidden">
+        <ol className="grid grid-cols-[auto_repeat(3,minmax(0,1fr))_auto] items-center gap-1">
+          <li
+            aria-hidden
+            className="w-3 text-center text-sm font-semibold text-muted-foreground"
+          >
+            {hasHiddenBefore ? '<' : null}
+          </li>
+          {mobileStepIndexes.map((stepIndex) => {
+            const isCurrent = stepIndex === currentStep
+            const isReached = stepIndex <= maxReachedStep
+            const isLocked = !isReached
+            const stepTitle = stepTitles[stepIndex] ?? ''
+
+            return (
+              <li key={stepTitle} className="min-w-0">
+                <button
+                  type="button"
+                  disabled={isLocked || isCurrent}
+                  aria-current={isCurrent ? 'step' : undefined}
+                  onClick={() => onStepSelect(stepIndex)}
+                  className={cn(
+                    'w-full min-w-0 rounded-full px-2 py-1.5 text-center text-xs transition-colors',
+                    'outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50',
+                    isCurrent &&
+                      'cursor-default bg-primary text-primary-foreground shadow-sm',
+                    !isCurrent &&
+                      isReached &&
+                      'text-muted-foreground hover:bg-muted hover:text-foreground',
+                    isLocked &&
+                      'cursor-not-allowed text-muted-foreground/60',
+                  )}
+                >
+                  <span className="block truncate">{stepTitle}</span>
+                </button>
+              </li>
+            )
+          })}
+          {Array.from({ length: 3 - mobileStepIndexes.length }).map((_, index) => (
+            <li key={`mobile-step-placeholder-${index}`} aria-hidden />
+          ))}
+          <li
+            aria-hidden
+            className="w-3 text-center text-sm font-semibold text-muted-foreground"
+          >
+            {hasHiddenAfter ? '>' : null}
+          </li>
+        </ol>
+      </nav>
+
       <nav
         aria-label="Quick log progress"
-        className="-mx-1 overflow-x-auto px-1 pb-2 sm:overflow-visible sm:pb-0"
+        className="hidden -mx-1 px-1 sm:block sm:overflow-visible sm:pb-0"
       >
         <ol className="flex min-w-[34rem] items-start sm:min-w-0">
           {stepTitles.map((stepTitle, index) => {

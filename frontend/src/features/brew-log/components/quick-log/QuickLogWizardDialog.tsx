@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
 import { useSetBeanAvailability } from '@/features/beans/hooks/useSetBeanAvailability'
@@ -413,9 +412,7 @@ export function QuickLogWizardDialog({
           showCloseButton={!isBusy}
           aria-describedby={undefined}
         >
-          <DialogHeader>
-            <DialogTitle>Quick Log</DialogTitle>
-          </DialogHeader>
+          <DialogTitle className="sr-only">Quick Log</DialogTitle>
 
           <WizardShell
             currentStep={currentStep}
