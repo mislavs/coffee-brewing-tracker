@@ -147,6 +147,11 @@ public class BrewLogEntry
         BrewedAt = brewedAt;
     }
 
+    public void SetRating(BrewRating? rating)
+    {
+        Rating = rating;
+    }
+
     public void SetAccessories(IEnumerable<Accessory>? accessories)
     {
         _accessories.Clear();

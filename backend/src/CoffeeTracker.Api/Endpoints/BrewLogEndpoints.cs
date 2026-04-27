@@ -42,6 +42,9 @@ public static class BrewLogEndpoints
         group.MapPut("/{id:guid}", UpdateBrewLog)
             .WithName("UpdateBrewLog");
 
+        group.MapPatch("/{id:guid}/rating", SetBrewLogRating)
+            .WithName("SetBrewLogRating");
+
         group.MapDelete("/{id:guid}", DeleteBrewLog)
             .WithName("DeleteBrewLog");
 
@@ -146,6 +149,19 @@ public static class BrewLogEndpoints
                 request.Notes,
                 request.AdjustmentIdeas,
                 request.BrewedAt),
+            cancellationToken);
+
+        return TypedResults.Ok();
+    }
+
+    private static async Task<Ok> SetBrewLogRating(
+        Guid id,
+        SetBrewLogRatingRequest request,
+        ISender sender,
+        CancellationToken cancellationToken)
+    {
+        await sender.Send(
+            new SetBrewLogRatingCommand(id, request.Rating),
             cancellationToken);
 
         return TypedResults.Ok();

@@ -742,6 +742,40 @@
         }
       }
     },
+    "/api/brew-logs/{id}/rating": {
+      "patch": {
+        "tags": [
+          "BrewLogs"
+        ],
+        "operationId": "SetBrewLogRating",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetBrewLogRatingRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/brew-logs/parse-voice": {
       "post": {
         "tags": [
@@ -2776,6 +2810,17 @@
         "properties": {
           "isAvailable": {
             "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "SetBrewLogRatingRequest": {
+        "type": "object",
+        "properties": {
+          "rating": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
           }
         },
         "additionalProperties": false

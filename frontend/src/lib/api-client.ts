@@ -21,6 +21,7 @@ import {
   getGetBrewLogByIdUrl,
   getGetBrewLogsUrl,
   getParseVoiceBrewLogUrl,
+  getSetBrewLogRatingUrl,
   getUpdateBrewLogUrl,
 } from '@/lib/api/generated/brew-logs/brew-logs'
 import {
@@ -97,6 +98,7 @@ import type {
   RoasterDto,
   RoasterSummaryDto,
   SetBeanAvailabilityRequest,
+  SetBrewLogRatingRequest,
   UpdateAccessoryRequest,
   UpdateBeanRequest,
   UpdateBrewLogRequest,
@@ -267,6 +269,12 @@ export const apiClient = {
         put: (request: UpdateBrewLogRequest) =>
           requestVoid(getUpdateBrewLogUrl(id), {
             method: 'PUT',
+            headers: jsonRequestHeaders,
+            body: serializeJsonBody(request),
+          }),
+        setRating: (request: SetBrewLogRatingRequest) =>
+          requestVoid(getSetBrewLogRatingUrl(id), {
+            method: 'PATCH',
             headers: jsonRequestHeaders,
             body: serializeJsonBody(request),
           }),

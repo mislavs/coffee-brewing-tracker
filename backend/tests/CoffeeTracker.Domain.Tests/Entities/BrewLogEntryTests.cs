@@ -1,4 +1,5 @@
 using CoffeeTracker.Domain.Entities;
+using CoffeeTracker.Domain.Enums;
 using FluentAssertions;
 
 namespace CoffeeTracker.Domain.Tests.Entities;
@@ -97,5 +98,57 @@ public class BrewLogEntryTests
 
         // Assert
         brewLogEntry.AdjustmentIdeas.Should().BeNull();
+    }
+
+    [Fact]
+    public void SetRating_WhenRatingIsProvided_UpdatesRating()
+    {
+        // Arrange
+        var brewLogEntry = BrewLogEntry.Create(
+            Guid.NewGuid(),
+            Guid.NewGuid(),
+            Guid.NewGuid(),
+            null,
+            18m,
+            300m,
+            93m,
+            12m,
+            180,
+            null,
+            "Sweet and balanced",
+            "Try finer grind",
+            DateTime.UtcNow);
+
+        // Act
+        brewLogEntry.SetRating(BrewRating.Excellent);
+
+        // Assert
+        brewLogEntry.Rating.Should().Be(BrewRating.Excellent);
+    }
+
+    [Fact]
+    public void SetRating_WhenRatingIsNull_ClearsRating()
+    {
+        // Arrange
+        var brewLogEntry = BrewLogEntry.Create(
+            Guid.NewGuid(),
+            Guid.NewGuid(),
+            Guid.NewGuid(),
+            null,
+            18m,
+            300m,
+            93m,
+            12m,
+            180,
+            BrewRating.Good,
+            "Sweet and balanced",
+            "Try finer grind",
+            DateTime.UtcNow);
+
+        // Act
+        brewLogEntry.SetRating(null);
+
+        // Assert
+        brewLogEntry.Rating.Should().BeNull();
     }
 }
