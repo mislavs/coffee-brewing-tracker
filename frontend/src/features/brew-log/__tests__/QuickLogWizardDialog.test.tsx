@@ -5,10 +5,12 @@ import { QuickLogWizardDialog } from '@/features/brew-log/components/quick-log/Q
 import { useBeans } from '@/features/beans/hooks/useBeans'
 import { useSetBeanAvailability } from '@/features/beans/hooks/useSetBeanAvailability'
 import { useCreateBrewLog } from '@/features/brew-log/hooks/useCreateBrewLog'
+import { useLatestBrewLogForBean } from '@/features/brew-log/hooks/useLatestBrewLogForBean'
 import { useAccessories } from '@/features/equipment/hooks/useAccessories'
 import { useBrewers } from '@/features/equipment/hooks/useBrewers'
 import { useGrinders } from '@/features/equipment/hooks/useGrinders'
 import { useRecipes } from '@/features/recipes/hooks/useRecipes'
+import type { BrewLogDto } from '@/lib/api/schemas'
 
 vi.mock('@/features/beans/hooks/useBeans', () => ({
   useBeans: vi.fn(),
@@ -34,6 +36,10 @@ vi.mock('@/features/brew-log/hooks/useCreateBrewLog', () => ({
   useCreateBrewLog: vi.fn(),
 }))
 
+vi.mock('@/features/brew-log/hooks/useLatestBrewLogForBean', () => ({
+  useLatestBrewLogForBean: vi.fn(),
+}))
+
 vi.mock('@/features/beans/hooks/useSetBeanAvailability', () => ({
   useSetBeanAvailability: vi.fn(),
 }))
@@ -44,7 +50,9 @@ const brewerBId = '33333333-3333-3333-3333-333333333333'
 const recipeAId = '44444444-4444-4444-4444-444444444444'
 const recipeBId = '55555555-5555-5555-5555-555555555555'
 const grinderId = '66666666-6666-6666-6666-666666666666'
+const grinderBId = '88888888-8888-8888-8888-888888888888'
 const accessoryId = '77777777-7777-7777-7777-777777777777'
+const accessoryBId = '99999999-9999-9999-9999-999999999999'
 
 const mutateAsyncMock = vi.fn()
 const setBeanAvailabilityMock = vi.fn()
@@ -133,6 +141,9 @@ describe('QuickLogWizardDialog', () => {
       mutateAsync: mutateAsyncMock,
       isPending: false,
     } as unknown as ReturnType<typeof useCreateBrewLog>)
+    vi.mocked(useLatestBrewLogForBean).mockReturnValue(
+      createQueryResult(null) as ReturnType<typeof useLatestBrewLogForBean>,
+    )
     vi.mocked(useSetBeanAvailability).mockReturnValue({
       mutateAsync: setBeanAvailabilityMock,
       isPending: false,
@@ -244,6 +255,93 @@ describe('QuickLogWizardDialog', () => {
     })
     expect(typeof request.brewedAt).toBe('string')
     expect(Number.isNaN(Date.parse(request.brewedAt))).toBe(false)
+  })
+
+  it('uses the selected bean latest brew as quick-log defaults without copying results', async () => {
+    const user = userEvent.setup()
+    const latestBrew: BrewLogDto = {
+      id: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+      beanId,
+      brewerId: brewerBId,
+      recipeId: recipeBId,
+      grinderId: grinderBId,
+      accessories: [{ id: accessoryBId, name: 'Accessory Two' }],
+      dose: 20,
+      waterAmount: 320,
+      waterTemperature: 94,
+      grindSize: 6.5,
+      brewTimeSeconds: 165,
+      rating: 5,
+      notes: 'Do not copy this note.',
+      adjustmentIdeas: 'Do not copy this adjustment.',
+      brewedAt: '2026-04-26T08:00:00Z',
+    }
+    vi.mocked(useLatestBrewLogForBean).mockReturnValue(
+      createQueryResult(latestBrew) as ReturnType<typeof useLatestBrewLogForBean>,
+    )
+    vi.mocked(useGrinders).mockReturnValue(
+      createQueryResult([
+        { id: grinderId, name: 'Grinder One' },
+        { id: grinderBId, name: 'Grinder Two' },
+      ]) as ReturnType<typeof useGrinders>,
+    )
+    vi.mocked(useAccessories).mockReturnValue(
+      createQueryResult([
+        { id: accessoryId, name: 'Accessory One' },
+        { id: accessoryBId, name: 'Accessory Two' },
+      ]) as ReturnType<typeof useAccessories>,
+    )
+    renderDialog()
+
+    await user.click(screen.getByRole('radio', { name: 'Bean One' }))
+
+    await screen.findByRole('button', { name: 'Brewer', current: 'step' })
+    const brewerOptions = screen.getAllByRole('radio')
+    expect(brewerOptions[0].textContent).toBe('Brewer B')
+    expect(brewerOptions[0].getAttribute('aria-checked')).toBe('true')
+
+    await user.click(screen.getByRole('button', { name: 'Next' }))
+    await screen.findByRole('button', { name: 'Recipe', current: 'step' })
+    const recipeOptions = screen.getAllByRole('radio')
+    expect(recipeOptions[0].textContent).toBe('Recipe B')
+    expect(recipeOptions[0].getAttribute('aria-checked')).toBe('true')
+
+    await user.click(screen.getByRole('button', { name: 'Next' }))
+    await screen.findByRole('button', { name: 'Grinder', current: 'step' })
+    const grinderOptions = screen.getAllByRole('radio')
+    expect(grinderOptions[0].textContent).toBe('Grinder Two')
+    expect(grinderOptions[0].getAttribute('aria-checked')).toBe('true')
+
+    await user.click(screen.getByRole('button', { name: 'Next' }))
+    await screen.findByRole('button', { name: 'Accessories', current: 'step' })
+    const accessoryOptions = screen.getAllByRole('button').filter((button) =>
+      button.textContent?.startsWith('Accessory'),
+    )
+    expect(accessoryOptions[0].textContent).toBe('Accessory Two')
+    expect(accessoryOptions[0].getAttribute('aria-pressed')).toBe('true')
+
+    await user.click(screen.getByRole('button', { name: 'Next' }))
+    await screen.findByRole('button', { name: 'Parameters', current: 'step' })
+    expect((screen.getByLabelText('Dose (g)') as HTMLInputElement).value).toBe('20')
+    expect((screen.getByLabelText('Water (ml)') as HTMLInputElement).value).toBe('320')
+    expect((screen.getByLabelText('Temp (°C)') as HTMLInputElement).value).toBe('94')
+    expect((screen.getByLabelText('Grind size') as HTMLInputElement).value).toBe('6.5')
+
+    await user.click(screen.getByRole('button', { name: 'Next' }))
+    await screen.findByRole('button', { name: 'Brew time', current: 'step' })
+    expect((screen.getByLabelText('Minutes') as HTMLInputElement).value).toBe('')
+    expect((screen.getByLabelText('Seconds') as HTMLInputElement).value).toBe('')
+
+    await user.click(screen.getByRole('button', { name: 'Skip' }))
+    await screen.findByRole('button', { name: 'Rating', current: 'step' })
+    expect(screen.queryByRole('radio', { checked: true })).toBeNull()
+
+    await user.click(screen.getByRole('button', { name: 'Skip' }))
+    await screen.findByRole('button', { name: 'Notes', current: 'step' })
+    expect((screen.getByRole('textbox', { name: 'Notes' }) as HTMLTextAreaElement).value).toBe(
+      '',
+    )
+    expect((screen.getByLabelText('Adjustment ideas') as HTMLTextAreaElement).value).toBe('')
   })
 
   it('opens the low-stock prompt when the remaining bean quantity is low', async () => {

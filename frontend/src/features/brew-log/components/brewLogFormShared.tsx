@@ -24,4 +24,38 @@ export function toIdNameOptions<T extends OptionSource>(
   )
 }
 
+export function sortOptionsByPreferredId(
+  options: IdNameOption[],
+  preferredId: string | undefined,
+) {
+  return sortOptionsByPreferredIds(options, preferredId ? [preferredId] : [])
+}
+
+export function sortOptionsByPreferredIds(
+  options: IdNameOption[],
+  preferredIds: string[] | undefined,
+) {
+  if (!preferredIds?.length) {
+    return options
+  }
+
+  const preferredOrder = new Map(preferredIds.map((id, index) => [id, index]))
+  const preferredOptions = options
+    .filter((option) => preferredOrder.has(option.id))
+    .sort(
+      (left, right) =>
+        (preferredOrder.get(left.id) ?? 0) - (preferredOrder.get(right.id) ?? 0),
+    )
+
+  if (preferredOptions.length === 0) {
+    return options
+  }
+
+  const preferredIdSet = new Set(preferredIds)
+  return [
+    ...preferredOptions,
+    ...options.filter((option) => !preferredIdSet.has(option.id)),
+  ]
+}
+
 export { getFieldErrorMessage } from '@/lib/formUtils'

@@ -1,18 +1,33 @@
 import { useMemo } from 'react'
 import { useWatch } from 'react-hook-form'
-import { toIdNameOptions } from '@/features/brew-log/components/brewLogFormShared'
+import {
+  sortOptionsByPreferredId,
+  toIdNameOptions,
+} from '@/features/brew-log/components/brewLogFormShared'
 import { EntitySingleSelectStep } from '@/features/brew-log/components/quick-log/EntitySingleSelectStep'
 import type { QuickLogSingleSelectStepProps } from '@/features/brew-log/components/quick-log/quickLogTypes'
 import { useGrinders } from '@/features/equipment/hooks/useGrinders'
+
+type GrinderStepProps = QuickLogSingleSelectStepProps & {
+  preferredId?: string
+}
 
 export function GrinderStep({
   form,
   onSelect,
   disabled = false,
-}: QuickLogSingleSelectStepProps) {
+  preferredId,
+}: GrinderStepProps) {
   const selectedGrinderId = useWatch({ control: form.control, name: 'grinderId' }) ?? ''
   const { data: grinders = [] } = useGrinders()
-  const options = useMemo(() => toIdNameOptions(grinders, 'Unnamed grinder'), [grinders])
+  const options = useMemo(
+    () =>
+      sortOptionsByPreferredId(
+        toIdNameOptions(grinders, 'Unnamed grinder'),
+        preferredId,
+      ),
+    [grinders, preferredId],
+  )
 
   return (
     <EntitySingleSelectStep

@@ -3,19 +3,32 @@ import { useWatch } from 'react-hook-form'
 import { FieldErrorText } from '@/features/brew-log/components/BrewLogFormUi'
 import {
   getFieldErrorMessage,
+  sortOptionsByPreferredIds,
   toIdNameOptions,
 } from '@/features/brew-log/components/brewLogFormShared'
 import { OptionGrid } from '@/features/brew-log/components/quick-log/OptionGrid'
 import type { QuickLogStepProps } from '@/features/brew-log/components/quick-log/quickLogTypes'
 import { useAccessories } from '@/features/equipment/hooks/useAccessories'
 
-export function AccessoriesStep({ form, disabled = false }: QuickLogStepProps) {
+type AccessoriesStepProps = QuickLogStepProps & {
+  preferredIds?: string[]
+}
+
+export function AccessoriesStep({
+  form,
+  disabled = false,
+  preferredIds,
+}: AccessoriesStepProps) {
   const selectedAccessoryIds =
     useWatch({ control: form.control, name: 'accessoryIds' }) ?? []
   const { data: accessories = [] } = useAccessories()
   const options = useMemo(
-    () => toIdNameOptions(accessories, 'Unnamed accessory'),
-    [accessories],
+    () =>
+      sortOptionsByPreferredIds(
+        toIdNameOptions(accessories, 'Unnamed accessory'),
+        preferredIds,
+      ),
+    [accessories, preferredIds],
   )
 
   return (

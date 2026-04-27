@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm, useWatch } from 'react-hook-form'
 import type { Guid } from '@/lib/api-types'
@@ -34,6 +34,7 @@ import { RecipeStep } from '@/features/brew-log/components/quick-log/RecipeStep'
 import { WizardShell } from '@/features/brew-log/components/quick-log/WizardShell'
 import { useResetRecipeOnBrewerChange } from '@/features/brew-log/components/useResetRecipeOnBrewerChange'
 import { useCreateBrewLog } from '@/features/brew-log/hooks/useCreateBrewLog'
+import { useLatestBrewLogForBean } from '@/features/brew-log/hooks/useLatestBrewLogForBean'
 import { applyBrewLogFormServerErrors } from '@/features/brew-log/mapApiValidationErrors'
 import {
   extractValidationPayload,
@@ -70,6 +71,22 @@ function buildValidationFieldToStepIndex(stepDefinitions: StepDefinition[]) {
   return validationFieldToStepIndex
 }
 
+function hasFormValue(value: unknown) {
+  if (Array.isArray(value)) {
+    return value.length > 0
+  }
+
+  if (typeof value === 'number') {
+    return Number.isFinite(value)
+  }
+
+  if (typeof value === 'string') {
+    return value.trim().length > 0
+  }
+
+  return value !== null && value !== undefined
+}
+
 export function QuickLogWizardDialog({
   open,
   onOpenChange,
@@ -84,13 +101,75 @@ export function QuickLogWizardDialog({
     resolver: zodResolver(brewLogFormSchema),
     defaultValues: createInitialBrewLogValues(),
   })
+  const watchedBeanId = useWatch({ control: form.control, name: 'beanId' }) ?? ''
   const watchedBrewerId = useWatch({ control: form.control, name: 'brewerId' }) ?? ''
+  const watchedFormValues = useWatch({ control: form.control })
+  const lastAppliedBeanIdRef = useRef('')
+  const skipNextRecipeResetRef = useRef(false)
+  const { data: latestBrewForBean = null } = useLatestBrewLogForBean(watchedBeanId)
   const { mutateAsync, isPending } = useCreateBrewLog()
   const { mutateAsync: setBeanAvailability, isPending: isSettingAvailability } =
     useSetBeanAvailability()
   const isBusy = isPending || isSettingAvailability
 
-  useResetRecipeOnBrewerChange(form, watchedBrewerId, '')
+  useResetRecipeOnBrewerChange(form, watchedBrewerId, '', {
+    skipNextResetRef: skipNextRecipeResetRef,
+  })
+
+  useEffect(() => {
+    if (skipNextRecipeResetRef.current) {
+      skipNextRecipeResetRef.current = false
+    }
+  }, [watchedBrewerId])
+
+  useEffect(() => {
+    if (
+      !watchedBeanId ||
+      !latestBrewForBean ||
+      lastAppliedBeanIdRef.current === watchedBeanId
+    ) {
+      return
+    }
+
+    skipNextRecipeResetRef.current =
+      Boolean(latestBrewForBean.brewerId) && latestBrewForBean.brewerId !== watchedBrewerId
+    form.setValue('brewerId', latestBrewForBean.brewerId ?? '', {
+      shouldDirty: true,
+      shouldValidate: true,
+    })
+    form.setValue('recipeId', latestBrewForBean.recipeId ?? '', {
+      shouldDirty: true,
+      shouldValidate: true,
+    })
+    form.setValue('grinderId', latestBrewForBean.grinderId ?? '', {
+      shouldDirty: true,
+      shouldValidate: true,
+    })
+    form.setValue(
+      'accessoryIds',
+      latestBrewForBean.accessories
+        ?.map((accessory) => accessory.id ?? '')
+        .filter((id) => id.length > 0) ?? [],
+      { shouldDirty: true, shouldValidate: true },
+    )
+    form.setValue('dose', latestBrewForBean.dose ?? 0, {
+      shouldDirty: true,
+      shouldValidate: true,
+    })
+    form.setValue('waterAmount', latestBrewForBean.waterAmount ?? 0, {
+      shouldDirty: true,
+      shouldValidate: true,
+    })
+    form.setValue('waterTemperature', latestBrewForBean.waterTemperature ?? undefined, {
+      shouldDirty: true,
+      shouldValidate: true,
+    })
+    form.setValue('grindSize', latestBrewForBean.grindSize ?? undefined, {
+      shouldDirty: true,
+      shouldValidate: true,
+    })
+    lastAppliedBeanIdRef.current = watchedBeanId
+  }, [form, latestBrewForBean, watchedBeanId, watchedBrewerId])
 
   const clearRootServerError = () => {
     form.clearErrors('root.serverError' as never)
@@ -201,6 +280,7 @@ export function QuickLogWizardDialog({
           form={form}
           disabled={isBusy}
           onSelect={handleBrewerSelect}
+          preferredId={latestBrewForBean?.brewerId ?? undefined}
         />
       ),
     },
@@ -214,6 +294,7 @@ export function QuickLogWizardDialog({
           form={form}
           disabled={isBusy}
           onSelect={(recipeId) => handleAutoAdvanceField('recipeId', recipeId)}
+          preferredId={latestBrewForBean?.recipeId ?? undefined}
         />
       ),
     },
@@ -227,6 +308,7 @@ export function QuickLogWizardDialog({
           form={form}
           disabled={isBusy}
           onSelect={(grinderId) => handleAutoAdvanceField('grinderId', grinderId)}
+          preferredId={latestBrewForBean?.grinderId ?? undefined}
         />
       ),
     },
@@ -235,7 +317,17 @@ export function QuickLogWizardDialog({
       fields: ['accessoryIds'],
       skippable: true,
       autoAdvance: false,
-      render: () => <AccessoriesStep form={form} disabled={isBusy} />,
+      render: () => (
+        <AccessoriesStep
+          form={form}
+          disabled={isBusy}
+          preferredIds={
+            latestBrewForBean?.accessories
+              ?.map((accessory) => accessory.id ?? '')
+              .filter((id) => id.length > 0) ?? []
+          }
+        />
+      ),
     },
     {
       title: 'Parameters',
@@ -277,6 +369,11 @@ export function QuickLogWizardDialog({
   const currentStepDefinition = stepDefinitions[currentStep]
   const isLastStep = currentStep === stepDefinitions.length - 1
   const validationFieldToStepIndex = buildValidationFieldToStepIndex(stepDefinitions)
+  const currentStepHasValue = currentStepDefinition.fields.every((fieldName) =>
+    hasFormValue(watchedFormValues[fieldName]),
+  )
+  const shouldShowNext =
+    !isLastStep && (!currentStepDefinition.autoAdvance || currentStepHasValue)
 
   const handleNext = async () => {
     clearRootServerError()
@@ -350,7 +447,7 @@ export function QuickLogWizardDialog({
                     </Button>
                   ) : null}
 
-                  {!isLastStep && !currentStepDefinition.autoAdvance ? (
+                  {shouldShowNext ? (
                     <Button type="button" disabled={isBusy} onClick={() => void handleNext()}>
                       Next
                     </Button>

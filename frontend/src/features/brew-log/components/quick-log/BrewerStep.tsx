@@ -1,18 +1,33 @@
 import { useMemo } from 'react'
 import { useWatch } from 'react-hook-form'
-import { toIdNameOptions } from '@/features/brew-log/components/brewLogFormShared'
+import {
+  sortOptionsByPreferredId,
+  toIdNameOptions,
+} from '@/features/brew-log/components/brewLogFormShared'
 import { EntitySingleSelectStep } from '@/features/brew-log/components/quick-log/EntitySingleSelectStep'
 import type { QuickLogSingleSelectStepProps } from '@/features/brew-log/components/quick-log/quickLogTypes'
 import { useBrewers } from '@/features/equipment/hooks/useBrewers'
+
+type BrewerStepProps = QuickLogSingleSelectStepProps & {
+  preferredId?: string
+}
 
 export function BrewerStep({
   form,
   onSelect,
   disabled = false,
-}: QuickLogSingleSelectStepProps) {
+  preferredId,
+}: BrewerStepProps) {
   const selectedBrewerId = useWatch({ control: form.control, name: 'brewerId' }) ?? ''
   const { data: brewers = [] } = useBrewers()
-  const options = useMemo(() => toIdNameOptions(brewers, 'Unnamed brewer'), [brewers])
+  const options = useMemo(
+    () =>
+      sortOptionsByPreferredId(
+        toIdNameOptions(brewers, 'Unnamed brewer'),
+        preferredId,
+      ),
+    [brewers, preferredId],
+  )
 
   return (
     <EntitySingleSelectStep
