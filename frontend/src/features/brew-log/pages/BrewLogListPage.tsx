@@ -16,7 +16,6 @@ import {
 } from '@/components/ui/pagination'
 import { BrewLogCardSkeleton } from '@/components/skeletons/BrewLogCardSkeleton'
 import { getSkeletonVisibilityClassName } from '@/components/skeletons/utils'
-import { DatePicker } from '@/components/ui/date-picker'
 import {
   Select,
   SelectContent,
@@ -74,12 +73,8 @@ export function BrewLogListPage() {
   const [quickLogOpen, setQuickLogOpen] = useState(false)
   const [searchParams, setSearchParams] = useSearchParams()
   const beanId = searchParams.get('beanId') ?? ''
-  const dateFrom = searchParams.get('dateFrom') ?? ''
-  const dateTo = searchParams.get('dateTo') ?? ''
   const includeUnavailable = searchParams.get('includeUnavailable') === 'true'
-  const [isFiltersOpen, setIsFiltersOpen] = useState(
-    Boolean(beanId) || Boolean(dateFrom) || Boolean(dateTo) || includeUnavailable,
-  )
+  const [isFiltersOpen, setIsFiltersOpen] = useState(Boolean(beanId) || includeUnavailable)
   const page = parsePageParam(searchParams.get('page'))
   const setFilterSearchParams = useCallback(
     (
@@ -114,6 +109,8 @@ export function BrewLogListPage() {
           }
 
           next.delete('page')
+          next.delete('dateFrom')
+          next.delete('dateTo')
           return next
         },
         navigateOptions,
@@ -133,22 +130,6 @@ export function BrewLogListPage() {
           next.delete('beanId')
         } else {
           next.set('beanId', nextValue)
-        }
-
-        return next
-      },
-      { replace: true },
-    )
-  }
-
-  const setDateFilter = (name: 'dateFrom' | 'dateTo', nextIsoDate: string | undefined) => {
-    setFilterSearchParams(
-      (previous) => {
-        const next = new URLSearchParams(previous)
-        if (nextIsoDate) {
-          next.set(name, nextIsoDate)
-        } else {
-          next.delete(name)
         }
 
         return next
@@ -193,8 +174,8 @@ export function BrewLogListPage() {
 
   const { data: brewLogsPage, isPending } = useBrewLogs(
     undefined,
-    dateFrom,
-    dateTo,
+    undefined,
+    undefined,
     includeUnavailable,
     beanId || undefined,
     page,
@@ -245,8 +226,8 @@ export function BrewLogListPage() {
             </div>
           </div>
           {isFiltersOpen ? (
-            <div id="brew-log-filters" className="grid gap-4 md:grid-cols-4">
-              <div className="space-y-2 md:col-span-1">
+            <div id="brew-log-filters" className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-2">
                 <label htmlFor="brew-log-bean-filter" className="text-sm font-medium">
                   Filter by bean
                 </label>
@@ -275,28 +256,6 @@ export function BrewLogListPage() {
                     )}
                   </SelectContent>
                 </Select>
-              </div>
-
-              <div className="space-y-2">
-                <label htmlFor="brew-log-date-from" className="text-sm font-medium">
-                  Date from
-                </label>
-                <DatePicker
-                  id="brew-log-date-from"
-                  value={dateFrom || undefined}
-                  onChange={(nextValue) => setDateFilter('dateFrom', nextValue)}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label htmlFor="brew-log-date-to" className="text-sm font-medium">
-                  Date to
-                </label>
-                <DatePicker
-                  id="brew-log-date-to"
-                  value={dateTo || undefined}
-                  onChange={(nextValue) => setDateFilter('dateTo', nextValue)}
-                />
               </div>
 
               <div className="space-y-2">
