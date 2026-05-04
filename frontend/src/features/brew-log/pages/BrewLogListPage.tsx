@@ -17,15 +17,22 @@ import {
 import { BrewLogCardSkeleton } from '@/components/skeletons/BrewLogCardSkeleton'
 import { getSkeletonVisibilityClassName } from '@/components/skeletons/utils'
 import { DatePicker } from '@/components/ui/date-picker'
-import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
+import { useBeans } from '@/features/beans/hooks/useBeans'
 import { BrewLogCard } from '@/features/brew-log/components/BrewLogCard'
 import { QuickLogWizardDialog } from '@/features/brew-log/components/quick-log/QuickLogWizardDialog'
 import { useBrewLogs } from '@/features/brew-log/hooks/useBrewLogs'
 import { useFeatures } from '@/hooks/useFeatures'
-import { useDebouncedSearchParam } from '@/hooks/useDebouncedSearchParam'
 
 const BREW_LOG_PAGE_SIZE = 12
+const allBeansValue = '__all_beans__'
 
 function parsePageParam(value: string | null) {
   const parsed = Number.parseInt(value ?? '1', 10)
@@ -66,12 +73,12 @@ function getPaginationItems(currentPage: number, totalPages: number) {
 export function BrewLogListPage() {
   const [quickLogOpen, setQuickLogOpen] = useState(false)
   const [searchParams, setSearchParams] = useSearchParams()
-  const search = searchParams.get('search') ?? ''
+  const beanId = searchParams.get('beanId') ?? ''
   const dateFrom = searchParams.get('dateFrom') ?? ''
   const dateTo = searchParams.get('dateTo') ?? ''
   const includeUnavailable = searchParams.get('includeUnavailable') === 'true'
   const [isFiltersOpen, setIsFiltersOpen] = useState(
-    Boolean(search) || Boolean(dateFrom) || Boolean(dateTo) || includeUnavailable,
+    Boolean(beanId) || Boolean(dateFrom) || Boolean(dateTo) || includeUnavailable,
   )
   const page = parsePageParam(searchParams.get('page'))
   const setFilterSearchParams = useCallback(
@@ -114,11 +121,25 @@ export function BrewLogListPage() {
     },
     [setSearchParams],
   )
-  const [searchDraft, setSearchDraft] = useDebouncedSearchParam({
-    paramName: 'search',
-    value: search,
-    setSearchParams: setFilterSearchParams,
-  })
+  const { data: beans = [] } = useBeans(undefined, includeUnavailable)
+  const selectedBean = beans.find((bean) => bean.id === beanId)
+
+  const handleBeanFilterChange = (nextValue: string) => {
+    setFilterSearchParams(
+      (previous) => {
+        const next = new URLSearchParams(previous)
+        next.delete('search')
+        if (nextValue === allBeansValue) {
+          next.delete('beanId')
+        } else {
+          next.set('beanId', nextValue)
+        }
+
+        return next
+      },
+      { replace: true },
+    )
+  }
 
   const setDateFilter = (name: 'dateFrom' | 'dateTo', nextIsoDate: string | undefined) => {
     setFilterSearchParams(
@@ -144,6 +165,9 @@ export function BrewLogListPage() {
           next.set('includeUnavailable', 'true')
         } else {
           next.delete('includeUnavailable')
+          if (selectedBean?.isAvailable === false) {
+            next.delete('beanId')
+          }
         }
 
         return next
@@ -168,11 +192,11 @@ export function BrewLogListPage() {
   }
 
   const { data: brewLogsPage, isPending } = useBrewLogs(
-    search,
+    undefined,
     dateFrom,
     dateTo,
     includeUnavailable,
-    undefined,
+    beanId || undefined,
     page,
     BREW_LOG_PAGE_SIZE,
   )
@@ -223,15 +247,34 @@ export function BrewLogListPage() {
           {isFiltersOpen ? (
             <div id="brew-log-filters" className="grid gap-4 md:grid-cols-4">
               <div className="space-y-2 md:col-span-1">
-                <label htmlFor="brew-log-search" className="text-sm font-medium">
-                  Search by bean
+                <label htmlFor="brew-log-bean-filter" className="text-sm font-medium">
+                  Filter by bean
                 </label>
-                <Input
-                  id="brew-log-search"
-                  placeholder="Filter by bean..."
-                  value={searchDraft}
-                  onChange={(event) => setSearchDraft(event.target.value)}
-                />
+                <Select
+                  value={beanId || allBeansValue}
+                  onValueChange={handleBeanFilterChange}
+                >
+                  <SelectTrigger id="brew-log-bean-filter" className="w-full">
+                    <SelectValue placeholder="All beans" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={allBeansValue}>All beans</SelectItem>
+                    {beans.map((bean) =>
+                      bean.id ? (
+                        <SelectItem key={bean.id} value={bean.id}>
+                          <span className="flex w-full items-center justify-between gap-2">
+                            <span>{bean.name ?? 'Unnamed bean'}</span>
+                            {bean.isAvailable === false ? (
+                              <span className="text-xs text-muted-foreground">
+                                Unavailable
+                              </span>
+                            ) : null}
+                          </span>
+                        </SelectItem>
+                      ) : null,
+                    )}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="space-y-2">
