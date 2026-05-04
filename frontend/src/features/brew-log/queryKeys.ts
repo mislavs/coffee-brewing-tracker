@@ -3,6 +3,7 @@ export const brewLogQueryKeys = {
   all: (params?: {
     search?: string
     beanId?: string
+    recipeId?: string
     dateFrom?: string
     dateTo?: string
     includeUnavailableBeans?: boolean

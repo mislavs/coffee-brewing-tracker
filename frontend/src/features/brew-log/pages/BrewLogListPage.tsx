@@ -28,10 +28,12 @@ import { useBeans } from '@/features/beans/hooks/useBeans'
 import { BrewLogCard } from '@/features/brew-log/components/BrewLogCard'
 import { QuickLogWizardDialog } from '@/features/brew-log/components/quick-log/QuickLogWizardDialog'
 import { useBrewLogs } from '@/features/brew-log/hooks/useBrewLogs'
+import { useRecipes } from '@/features/recipes/hooks/useRecipes'
 import { useFeatures } from '@/hooks/useFeatures'
 
 const BREW_LOG_PAGE_SIZE = 12
 const allBeansValue = '__all_beans__'
+const allRecipesValue = '__all_recipes__'
 
 function parsePageParam(value: string | null) {
   const parsed = Number.parseInt(value ?? '1', 10)
@@ -73,8 +75,11 @@ export function BrewLogListPage() {
   const [quickLogOpen, setQuickLogOpen] = useState(false)
   const [searchParams, setSearchParams] = useSearchParams()
   const beanId = searchParams.get('beanId') ?? ''
+  const recipeId = searchParams.get('recipeId') ?? ''
   const includeUnavailable = searchParams.get('includeUnavailable') === 'true'
-  const [isFiltersOpen, setIsFiltersOpen] = useState(Boolean(beanId) || includeUnavailable)
+  const [isFiltersOpen, setIsFiltersOpen] = useState(
+    Boolean(beanId) || Boolean(recipeId) || includeUnavailable,
+  )
   const page = parsePageParam(searchParams.get('page'))
   const setFilterSearchParams = useCallback(
     (
@@ -119,6 +124,7 @@ export function BrewLogListPage() {
     [setSearchParams],
   )
   const { data: beans = [] } = useBeans(undefined, includeUnavailable)
+  const { data: recipes = [] } = useRecipes()
   const selectedBean = beans.find((bean) => bean.id === beanId)
 
   const handleBeanFilterChange = (nextValue: string) => {
@@ -130,6 +136,22 @@ export function BrewLogListPage() {
           next.delete('beanId')
         } else {
           next.set('beanId', nextValue)
+        }
+
+        return next
+      },
+      { replace: true },
+    )
+  }
+
+  const handleRecipeFilterChange = (nextValue: string) => {
+    setFilterSearchParams(
+      (previous) => {
+        const next = new URLSearchParams(previous)
+        if (nextValue === allRecipesValue) {
+          next.delete('recipeId')
+        } else {
+          next.set('recipeId', nextValue)
         }
 
         return next
@@ -180,6 +202,7 @@ export function BrewLogListPage() {
     beanId || undefined,
     page,
     BREW_LOG_PAGE_SIZE,
+    recipeId || undefined,
   )
   const brewLogs = brewLogsPage?.items ?? []
   const totalCount = brewLogsPage?.totalCount ?? 0
@@ -226,7 +249,7 @@ export function BrewLogListPage() {
             </div>
           </div>
           {isFiltersOpen ? (
-            <div id="brew-log-filters" className="grid gap-4 md:grid-cols-2">
+            <div id="brew-log-filters" className="grid gap-4 md:grid-cols-3">
               <div className="space-y-2">
                 <label htmlFor="brew-log-bean-filter" className="text-sm font-medium">
                   Filter by bean
@@ -250,6 +273,35 @@ export function BrewLogListPage() {
                                 Unavailable
                               </span>
                             ) : null}
+                          </span>
+                        </SelectItem>
+                      ) : null,
+                    )}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <label htmlFor="brew-log-recipe-filter" className="text-sm font-medium">
+                  Filter by recipe
+                </label>
+                <Select
+                  value={recipeId || allRecipesValue}
+                  onValueChange={handleRecipeFilterChange}
+                >
+                  <SelectTrigger id="brew-log-recipe-filter" className="w-full">
+                    <SelectValue placeholder="All recipes" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={allRecipesValue}>All recipes</SelectItem>
+                    {recipes.map((recipe) =>
+                      recipe.id ? (
+                        <SelectItem key={recipe.id} value={recipe.id}>
+                          <span className="flex w-full items-center justify-between gap-2">
+                            <span>{recipe.name ?? 'Unnamed recipe'}</span>
+                            <span className="text-xs text-muted-foreground">
+                              {recipe.brewerName ?? 'Unknown brewer'}
+                            </span>
                           </span>
                         </SelectItem>
                       ) : null,

@@ -233,6 +233,7 @@ export const apiClient = {
               ? {
                   search: queryParameters.search,
                   beanId: queryParameters.beanId,
+                  recipeId: queryParameters.recipeId,
                   dateFrom: toIsoDateQueryValue(queryParameters.dateFrom),
                   dateTo: toIsoDateQueryValue(queryParameters.dateTo),
                   includeUnavailableBeans: queryParameters.includeUnavailableBeans,

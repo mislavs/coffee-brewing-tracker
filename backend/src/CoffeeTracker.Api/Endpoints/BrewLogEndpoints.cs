@@ -62,6 +62,7 @@ public static class BrewLogEndpoints
     private static async Task<Ok<PaginatedList<BrewLogSummaryDto>>> GetBrewLogs(
         string? search,
         Guid? beanId,
+        Guid? recipeId,
         DateTime? dateFrom,
         DateTime? dateTo,
         bool? includeUnavailableBeans,
@@ -74,6 +75,7 @@ public static class BrewLogEndpoints
             new GetBrewLogsListQuery(
                 search,
                 beanId,
+                recipeId,
                 dateFrom,
                 dateTo,
                 includeUnavailableBeans ?? false,

@@ -21,7 +21,7 @@ public class GetBrewLogsListHandlerTests(IntegrationTestFactory factory) : Integ
         };
         await InsertMany(brewLogs);
 
-        var query = new GetBrewLogsListQuery(null, null, null, null);
+        var query = new GetBrewLogsListQuery(null, null, null, null, null);
 
         // Act
         var result = await Send(query);
@@ -75,7 +75,7 @@ public class GetBrewLogsListHandlerTests(IntegrationTestFactory factory) : Integ
             null,
             DateTime.UtcNow));
 
-        var query = new GetBrewLogsListQuery(null, null, null, null);
+        var query = new GetBrewLogsListQuery(null, null, null, null, null);
 
         // Act
         var result = await Send(query);
@@ -128,7 +128,7 @@ public class GetBrewLogsListHandlerTests(IntegrationTestFactory factory) : Integ
             BrewLogEntry.Create(ethiopiaBean.Id, brewer.Id, grinder.Id, null, 18m, 300m, null, 10m, null, BrewRating.Good, null, null, DateTime.UtcNow)
         ]);
 
-        var query = new GetBrewLogsListQuery("KENYA", null, null, null);
+        var query = new GetBrewLogsListQuery("KENYA", null, null, null, null);
 
         // Act
         var result = await Send(query);
@@ -153,6 +153,7 @@ public class GetBrewLogsListHandlerTests(IntegrationTestFactory factory) : Integ
         var query = new GetBrewLogsListQuery(
             null,
             null,
+            null,
             new DateTime(2026, 2, 5, 0, 0, 0, DateTimeKind.Utc),
             new DateTime(2026, 2, 15, 23, 59, 59, DateTimeKind.Utc));
 
@@ -162,6 +163,33 @@ public class GetBrewLogsListHandlerTests(IntegrationTestFactory factory) : Integ
         // Assert
         result.Items.Should().ContainSingle();
         result.Items.Single().BrewedAt.Should().Be(new DateTime(2026, 2, 10, 10, 0, 0, DateTimeKind.Utc));
+    }
+
+    [Fact]
+    public async Task Handle_WhenRecipeIdProvided_FiltersByRecipe()
+    {
+        // Arrange
+        var (bean, brewer, grinder) = await SeedRequiredEntities("recipe");
+        var matchingRecipe = Recipe.Create("Matching recipe", brewer.Id, null);
+        var otherRecipe = Recipe.Create("Other recipe", brewer.Id, null);
+        await InsertMany([matchingRecipe, otherRecipe]);
+
+        await InsertMany(
+        [
+            BrewLogEntry.Create(bean.Id, brewer.Id, grinder.Id, matchingRecipe.Id, 18m, 300m, null, 10m, null, BrewRating.Good, null, null, DateTime.UtcNow),
+            BrewLogEntry.Create(bean.Id, brewer.Id, grinder.Id, otherRecipe.Id, 18m, 300m, null, 10m, null, BrewRating.Good, null, null, DateTime.UtcNow.AddDays(-1)),
+            BrewLogEntry.Create(bean.Id, brewer.Id, grinder.Id, null, 18m, 300m, null, 10m, null, BrewRating.Good, null, null, DateTime.UtcNow.AddDays(-2))
+        ]);
+
+        var query = new GetBrewLogsListQuery(null, null, matchingRecipe.Id, null, null);
+
+        // Act
+        var result = await Send(query);
+
+        // Assert
+        result.Items.Should().ContainSingle();
+        result.Items.Single().RecipeName.Should().Be("Matching recipe");
+        result.TotalCount.Should().Be(1);
     }
 
     [Fact]
@@ -209,8 +237,8 @@ public class GetBrewLogsListHandlerTests(IntegrationTestFactory factory) : Integ
         ]);
 
         // Act
-        var defaultResult = await Send(new GetBrewLogsListQuery(null, null, null, null));
-        var includeUnavailableResult = await Send(new GetBrewLogsListQuery(null, null, null, null, true));
+        var defaultResult = await Send(new GetBrewLogsListQuery(null, null, null, null, null));
+        var includeUnavailableResult = await Send(new GetBrewLogsListQuery(null, null, null, null, null, true));
 
         // Assert
         defaultResult.Items.Should().ContainSingle();
@@ -235,7 +263,7 @@ public class GetBrewLogsListHandlerTests(IntegrationTestFactory factory) : Integ
             BrewLogEntry.Create(bean.Id, brewer.Id, grinder.Id, null, 18m, 300m, null, 10m, null, BrewRating.Good, null, null, brewedAt.AddDays(-2))
         ]);
 
-        var query = new GetBrewLogsListQuery(null, null, null, null, false, 2, 1);
+        var query = new GetBrewLogsListQuery(null, null, null, null, null, false, 2, 1);
 
         // Act
         var result = await Send(query);

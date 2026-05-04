@@ -7,6 +7,7 @@ import { brewLogQueryKeys } from '@/features/brew-log/queryKeys'
 type BrewLogListFilters = {
   search?: string
   beanId?: Guid
+  recipeId?: Guid
   dateFrom?: string
   dateTo?: string
   includeUnavailableBeans?: boolean
@@ -22,9 +23,11 @@ export function useBrewLogs(
   beanId?: Guid,
   page = 1,
   pageSize = 12,
+  recipeId?: Guid,
 ) {
   const normalizedSearch = search?.trim() ?? ''
   const normalizedBeanId = beanId?.trim() ?? ''
+  const normalizedRecipeId = recipeId?.trim() ?? ''
   const normalizedDateFrom = dateFrom?.trim() ?? ''
   const normalizedDateTo = dateTo?.trim() ?? ''
   const normalizedPage = Math.max(page, 1)
@@ -39,6 +42,9 @@ export function useBrewLogs(
   }
   if (normalizedBeanId) {
     params.beanId = normalizedBeanId
+  }
+  if (normalizedRecipeId) {
+    params.recipeId = normalizedRecipeId
   }
   if (normalizedDateFrom) {
     params.dateFrom = normalizedDateFrom
@@ -58,6 +64,7 @@ export function useBrewLogs(
         queryParameters: {
           search: normalizedSearch || undefined,
           beanId: normalizedBeanId || undefined,
+          recipeId: normalizedRecipeId || undefined,
           dateFrom: normalizedDateFrom ? new Date(normalizedDateFrom) : undefined,
           dateTo: normalizedDateTo ? new Date(normalizedDateTo) : undefined,
           includeUnavailableBeans: includeUnavailableBeans || undefined,

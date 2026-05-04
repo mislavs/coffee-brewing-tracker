@@ -9,6 +9,7 @@ namespace CoffeeTracker.Application.Features.BrewLog.Queries;
 public sealed record GetBrewLogsListQuery(
     string? Search,
     Guid? BeanId,
+    Guid? RecipeId,
     DateTime? DateFrom,
     DateTime? DateTo,
     bool IncludeUnavailableBeans = false,
@@ -41,6 +42,11 @@ public sealed class GetBrewLogsListHandler(ApplicationDbContext dbContext)
         if (request.BeanId.HasValue)
         {
             query = query.Where(entity => entity.BeanId == request.BeanId.Value);
+        }
+
+        if (request.RecipeId.HasValue)
+        {
+            query = query.Where(entity => entity.RecipeId == request.RecipeId.Value);
         }
 
         if (request.DateFrom.HasValue)
