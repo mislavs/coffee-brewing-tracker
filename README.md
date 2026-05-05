@@ -21,29 +21,33 @@ A full-stack application for tracking coffee beans, brewing sessions, equipment,
 
 ## Container Images
 
-The repo includes production Dockerfiles for:
+The repo includes one production Dockerfile at the repository root:
 
-- `frontend/Dockerfile`
-- `backend/Dockerfile`
+- `Dockerfile`
 
-The frontend container reads its backend base URL from the `API_URL` environment variable at container startup. Set that value in your `docker-compose.yml` so the same frontend image can be reused across environments without rebuilding.
+The image builds the React SPA, copies the generated `dist` output into the ASP.NET API image, and serves both the frontend and `/api/*` from Kestrel. PostgreSQL should run as a separate managed database or container.
 
 Example:
 
 ```yaml
 services:
-  frontend:
-    image: ghcr.io/<owner>/coffee-brewing-tracker-frontend:<tag>
+  app:
+    image: ghcr.io/<owner>/coffee-brewing-tracker:<tag>
+    ports:
+      - "80:8080"
     environment:
-      API_URL: http://api:8080
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__DefaultConnection: "Host=postgres;Database=coffee;Username=postgres;Password=<password>"
 ```
+
+In production, the API applies pending database migrations on startup. This is intended for a single running app container. If the app is later scaled to multiple replicas, move migrations to a one-shot job or service before scaling out.
 
 ## GitHub Actions
 
 The repository uses two workflow files under `.github/workflows/`:
 
 - `ci.yml` runs automatically on pull requests and pushes to `master`.
-- `publish-images.yml` is manual only and publishes the `frontend` and `api` images to GHCR.
+- `publish-images.yml` is manual only and publishes the unified app image to GHCR.
 
 To publish images:
 
@@ -57,7 +61,6 @@ Each published image always gets a `sha-<shortsha>` tag. When `version` is provi
 
 Published package names:
 
-- `ghcr.io/<owner>/coffee-brewing-tracker-frontend`
-- `ghcr.io/<owner>/coffee-brewing-tracker-api`
+- `ghcr.io/<owner>/coffee-brewing-tracker`
 
 GitHub repository settings should allow workflow write access so `GITHUB_TOKEN` can push packages to GHCR. In practice, that means Actions must be enabled and workflow permissions should allow read/write access for package publishing.
