@@ -34,6 +34,7 @@ import { WizardShell } from '@/features/brew-log/components/quick-log/WizardShel
 import { useResetRecipeOnBrewerChange } from '@/features/brew-log/components/useResetRecipeOnBrewerChange'
 import { useCreateBrewLog } from '@/features/brew-log/hooks/useCreateBrewLog'
 import { useLatestBrewLogForBean } from '@/features/brew-log/hooks/useLatestBrewLogForBean'
+import { useAccessories } from '@/features/equipment/hooks/useAccessories'
 import { applyBrewLogFormServerErrors } from '@/features/brew-log/mapApiValidationErrors'
 import {
   extractValidationPayload,
@@ -106,6 +107,9 @@ export function QuickLogWizardDialog({
   const lastAppliedBeanIdRef = useRef('')
   const skipNextRecipeResetRef = useRef(false)
   const { data: latestBrewForBean = null } = useLatestBrewLogForBean(watchedBeanId)
+  const accessoriesQuery = useAccessories()
+  const hasDefinedAccessories = (accessoriesQuery.data?.length ?? 0) > 0
+  const hideAccessoriesStep = !accessoriesQuery.isPending && !hasDefinedAccessories
   const { mutateAsync, isPending } = useCreateBrewLog()
   const { mutateAsync: setBeanAvailability, isPending: isSettingAvailability } =
     useSetBeanAvailability()
@@ -144,13 +148,15 @@ export function QuickLogWizardDialog({
       shouldDirty: true,
       shouldValidate: true,
     })
-    form.setValue(
-      'accessoryIds',
-      latestBrewForBean.accessories
-        ?.map((accessory) => accessory.id ?? '')
-        .filter((id) => id.length > 0) ?? [],
-      { shouldDirty: true, shouldValidate: true },
-    )
+    if (hasDefinedAccessories) {
+      form.setValue(
+        'accessoryIds',
+        latestBrewForBean.accessories
+          ?.map((accessory) => accessory.id ?? '')
+          .filter((id) => id.length > 0) ?? [],
+        { shouldDirty: true, shouldValidate: true },
+      )
+    }
     form.setValue('dose', latestBrewForBean.dose ?? 0, {
       shouldDirty: true,
       shouldValidate: true,
@@ -168,7 +174,7 @@ export function QuickLogWizardDialog({
       shouldValidate: true,
     })
     lastAppliedBeanIdRef.current = watchedBeanId
-  }, [form, latestBrewForBean, watchedBeanId, watchedBrewerId])
+  }, [form, hasDefinedAccessories, latestBrewForBean, watchedBeanId, watchedBrewerId])
 
   const clearRootServerError = () => {
     form.clearErrors('root.serverError' as never)
@@ -255,6 +261,24 @@ export function QuickLogWizardDialog({
     }
   }
 
+  const accessoriesStepDefinition: StepDefinition = {
+    title: 'Accessories',
+    fields: ['accessoryIds'],
+    skippable: true,
+    autoAdvance: false,
+    render: () => (
+      <AccessoriesStep
+        form={form}
+        disabled={isBusy}
+        preferredIds={
+          latestBrewForBean?.accessories
+            ?.map((accessory) => accessory.id ?? '')
+            .filter((id) => id.length > 0) ?? []
+        }
+      />
+    ),
+  }
+
   const stepDefinitions: StepDefinition[] = [
     {
       title: 'Bean',
@@ -311,23 +335,7 @@ export function QuickLogWizardDialog({
         />
       ),
     },
-    {
-      title: 'Accessories',
-      fields: ['accessoryIds'],
-      skippable: true,
-      autoAdvance: false,
-      render: () => (
-        <AccessoriesStep
-          form={form}
-          disabled={isBusy}
-          preferredIds={
-            latestBrewForBean?.accessories
-              ?.map((accessory) => accessory.id ?? '')
-              .filter((id) => id.length > 0) ?? []
-          }
-        />
-      ),
-    },
+    ...(hideAccessoriesStep ? [] : [accessoriesStepDefinition]),
     {
       title: 'Parameters',
       fields: ['dose', 'waterAmount', 'waterTemperature', 'grindSize'],

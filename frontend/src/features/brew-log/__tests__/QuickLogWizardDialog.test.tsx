@@ -65,21 +65,43 @@ function renderDialog() {
   return render(<QuickLogWizardDialog open onOpenChange={vi.fn()} />)
 }
 
+async function findCurrentStepButton(name: string) {
+  const buttons = await screen.findAllByRole('button', { name, current: 'step' })
+  expect(buttons.length).toBeGreaterThan(0)
+  return buttons[0]
+}
+
+function expectCurrentStepButton(name: string) {
+  expect(screen.getAllByRole('button', { name, current: 'step' }).length).toBeGreaterThan(0)
+}
+
+function getReachedStepButton(name: string) {
+  const button = screen
+    .getAllByRole('button', { name })
+    .find((button) => !(button as HTMLButtonElement).disabled)
+
+  if (!button) {
+    throw new Error(`Could not find reached step button named "${name}".`)
+  }
+
+  return button
+}
+
 async function goToBrewParameters(user: ReturnType<typeof userEvent.setup>) {
   await user.click(screen.getByRole('radio', { name: 'Bean One' }))
-  await screen.findByRole('button', { name: 'Brewer', current: 'step' })
+  await findCurrentStepButton('Brewer')
 
   await user.click(screen.getByRole('radio', { name: 'Brewer A' }))
-  await screen.findByRole('button', { name: 'Recipe', current: 'step' })
+  await findCurrentStepButton('Recipe')
 
   await user.click(screen.getByRole('radio', { name: 'Recipe A' }))
-  await screen.findByRole('button', { name: 'Grinder', current: 'step' })
+  await findCurrentStepButton('Grinder')
 
   await user.click(screen.getByRole('radio', { name: 'Grinder One' }))
-  await screen.findByRole('button', { name: 'Accessories', current: 'step' })
+  await findCurrentStepButton('Accessories')
 
   await user.click(screen.getByRole('button', { name: 'Skip' }))
-  await screen.findByRole('button', { name: 'Parameters', current: 'step' })
+  await findCurrentStepButton('Parameters')
 }
 
 async function completeRequiredFlow(user: ReturnType<typeof userEvent.setup>) {
@@ -92,13 +114,13 @@ async function completeRequiredFlow(user: ReturnType<typeof userEvent.setup>) {
   fireEvent.change(waterInput, { target: { value: '300' } })
   await user.click(screen.getByRole('button', { name: 'Next' }))
 
-  await screen.findByRole('button', { name: 'Brew time', current: 'step' })
+  await findCurrentStepButton('Brew time')
   await user.click(screen.getByRole('button', { name: 'Skip' }))
 
-  await screen.findByRole('button', { name: 'Rating', current: 'step' })
+  await findCurrentStepButton('Rating')
   await user.click(screen.getByRole('button', { name: 'Skip' }))
 
-  await screen.findByRole('button', { name: 'Notes', current: 'step' })
+  await findCurrentStepButton('Notes')
 }
 
 describe('QuickLogWizardDialog', () => {
@@ -153,7 +175,7 @@ describe('QuickLogWizardDialog', () => {
   it('shows bean options on the first step', () => {
     renderDialog()
 
-    expect(screen.getByRole('button', { name: 'Bean', current: 'step' })).toBeTruthy()
+    expectCurrentStepButton('Bean')
     expect(screen.getByRole('radio', { name: 'Bean One' })).toBeTruthy()
   })
 
@@ -163,9 +185,30 @@ describe('QuickLogWizardDialog', () => {
 
     await user.click(screen.getByRole('radio', { name: 'Bean One' }))
 
-    expect(
-      await screen.findByRole('button', { name: 'Brewer', current: 'step' }),
-    ).toBeTruthy()
+    expect(await findCurrentStepButton('Brewer')).toBeTruthy()
+  })
+
+  it('skips the accessories step when no accessories are defined', async () => {
+    const user = userEvent.setup()
+    vi.mocked(useAccessories).mockReturnValue(
+      createQueryResult([]) as ReturnType<typeof useAccessories>,
+    )
+    renderDialog()
+
+    expect(screen.queryByRole('button', { name: 'Accessories' })).toBeNull()
+
+    await user.click(screen.getByRole('radio', { name: 'Bean One' }))
+    await findCurrentStepButton('Brewer')
+
+    await user.click(screen.getByRole('radio', { name: 'Brewer A' }))
+    await findCurrentStepButton('Recipe')
+
+    await user.click(screen.getByRole('radio', { name: 'Recipe A' }))
+    await findCurrentStepButton('Grinder')
+
+    await user.click(screen.getByRole('radio', { name: 'Grinder One' }))
+
+    expect(await findCurrentStepButton('Parameters')).toBeTruthy()
   })
 
   it('keeps the user on the brew parameters step when required values are missing', async () => {
@@ -175,9 +218,7 @@ describe('QuickLogWizardDialog', () => {
     await goToBrewParameters(user)
     await user.click(screen.getByRole('button', { name: 'Next' }))
 
-    expect(
-      screen.getByRole('button', { name: 'Parameters', current: 'step' }),
-    ).toBeTruthy()
+    expectCurrentStepButton('Parameters')
     expect(screen.getByText('Dose must be greater than 0.')).toBeTruthy()
     expect(screen.getByText('Water amount must be greater than 0.')).toBeTruthy()
   })
@@ -191,19 +232,19 @@ describe('QuickLogWizardDialog', () => {
     await user.click(await screen.findByRole('radio', { name: 'Recipe A' }))
     await user.click(await screen.findByRole('radio', { name: 'Grinder One' }))
 
-    await screen.findByRole('button', { name: 'Accessories', current: 'step' })
-    await user.click(screen.getByRole('button', { name: 'Brewer' }))
-    await screen.findByRole('button', { name: 'Brewer', current: 'step' })
+    await findCurrentStepButton('Accessories')
+    await user.click(getReachedStepButton('Brewer'))
+    await findCurrentStepButton('Brewer')
     await user.click(screen.getByRole('radio', { name: 'Brewer B' }))
 
-    expect(
-      await screen.findByRole('button', { name: 'Recipe', current: 'step' }),
-    ).toBeTruthy()
+    expect(await findCurrentStepButton('Recipe')).toBeTruthy()
     expect(screen.queryByRole('radio', { name: 'Recipe A' })).toBeNull()
     expect(screen.getByRole('radio', { name: 'Recipe B' })).toBeTruthy()
-    expect((screen.getByRole('button', { name: 'Grinder' }) as HTMLButtonElement).disabled).toBe(
-      true,
-    )
+    expect(
+      screen
+        .getAllByRole('button', { name: 'Grinder' })
+        .every((button) => (button as HTMLButtonElement).disabled),
+    ).toBe(true)
   })
 
   it('jumps back to the matching step when submit returns server validation errors', async () => {
@@ -218,9 +259,7 @@ describe('QuickLogWizardDialog', () => {
     await completeRequiredFlow(user)
     await user.click(screen.getByRole('button', { name: 'Log brew' }))
 
-    expect(
-      await screen.findByRole('button', { name: 'Parameters', current: 'step' }),
-    ).toBeTruthy()
+    expect(await findCurrentStepButton('Parameters')).toBeTruthy()
     expect(screen.getByText('Dose is invalid.')).toBeTruthy()
   })
 
@@ -295,25 +334,25 @@ describe('QuickLogWizardDialog', () => {
 
     await user.click(screen.getByRole('radio', { name: 'Bean One' }))
 
-    await screen.findByRole('button', { name: 'Brewer', current: 'step' })
+    await findCurrentStepButton('Brewer')
     const brewerOptions = screen.getAllByRole('radio')
     expect(brewerOptions[0].textContent).toBe('Brewer B')
     expect(brewerOptions[0].getAttribute('aria-checked')).toBe('true')
 
     await user.click(screen.getByRole('button', { name: 'Next' }))
-    await screen.findByRole('button', { name: 'Recipe', current: 'step' })
+    await findCurrentStepButton('Recipe')
     const recipeOptions = screen.getAllByRole('radio')
     expect(recipeOptions[0].textContent).toBe('Recipe B')
     expect(recipeOptions[0].getAttribute('aria-checked')).toBe('true')
 
     await user.click(screen.getByRole('button', { name: 'Next' }))
-    await screen.findByRole('button', { name: 'Grinder', current: 'step' })
+    await findCurrentStepButton('Grinder')
     const grinderOptions = screen.getAllByRole('radio')
     expect(grinderOptions[0].textContent).toBe('Grinder Two')
     expect(grinderOptions[0].getAttribute('aria-checked')).toBe('true')
 
     await user.click(screen.getByRole('button', { name: 'Next' }))
-    await screen.findByRole('button', { name: 'Accessories', current: 'step' })
+    await findCurrentStepButton('Accessories')
     const accessoryOptions = screen.getAllByRole('button').filter((button) =>
       button.textContent?.startsWith('Accessory'),
     )
@@ -321,23 +360,23 @@ describe('QuickLogWizardDialog', () => {
     expect(accessoryOptions[0].getAttribute('aria-pressed')).toBe('true')
 
     await user.click(screen.getByRole('button', { name: 'Next' }))
-    await screen.findByRole('button', { name: 'Parameters', current: 'step' })
+    await findCurrentStepButton('Parameters')
     expect((screen.getByLabelText('Dose (g)') as HTMLInputElement).value).toBe('20')
     expect((screen.getByLabelText('Water (ml)') as HTMLInputElement).value).toBe('320')
     expect((screen.getByLabelText('Temp (°C)') as HTMLInputElement).value).toBe('94')
     expect((screen.getByLabelText('Grind size') as HTMLInputElement).value).toBe('6.5')
 
     await user.click(screen.getByRole('button', { name: 'Next' }))
-    await screen.findByRole('button', { name: 'Brew time', current: 'step' })
+    await findCurrentStepButton('Brew time')
     expect((screen.getByLabelText('Minutes') as HTMLInputElement).value).toBe('')
     expect((screen.getByLabelText('Seconds') as HTMLInputElement).value).toBe('')
 
     await user.click(screen.getByRole('button', { name: 'Skip' }))
-    await screen.findByRole('button', { name: 'Rating', current: 'step' })
+    await findCurrentStepButton('Rating')
     expect(screen.queryByRole('radio', { checked: true })).toBeNull()
 
     await user.click(screen.getByRole('button', { name: 'Skip' }))
-    await screen.findByRole('button', { name: 'Notes', current: 'step' })
+    await findCurrentStepButton('Notes')
     expect((screen.getByRole('textbox', { name: 'Notes' }) as HTMLTextAreaElement).value).toBe(
       '',
     )
