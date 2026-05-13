@@ -9,6 +9,7 @@ const beanFieldNames: Record<string, keyof BeanFormValues> = {
   originCountryIds: 'originCountryIds',
   variety: 'variety',
   processingMethod: 'processingMethod',
+  region: 'region',
   roastProfile: 'roastProfile',
   roastDate: 'roastDate',
   altitude: 'altitude',

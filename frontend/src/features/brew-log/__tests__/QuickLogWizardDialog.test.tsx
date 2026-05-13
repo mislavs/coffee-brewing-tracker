@@ -191,7 +191,7 @@ describe('QuickLogWizardDialog', () => {
   it('skips the accessories step when no accessories are defined', async () => {
     const user = userEvent.setup()
     vi.mocked(useAccessories).mockReturnValue(
-      createQueryResult([]) as ReturnType<typeof useAccessories>,
+      createQueryResult([]) as unknown as ReturnType<typeof useAccessories>,
     )
     renderDialog()
 

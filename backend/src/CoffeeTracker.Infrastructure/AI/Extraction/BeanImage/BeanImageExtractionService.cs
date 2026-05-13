@@ -61,7 +61,11 @@ public sealed class BeanImageExtractionService(
             result.BagWeight,
             result.Price,
             result.FlavorNotes ?? [],
-            result.UnmatchedReferences ?? []);
+            result.UnmatchedReferences ?? [],
+            NormalizeOptionalText(result.Region));
+
+    private static string? NormalizeOptionalText(string? value) =>
+        string.IsNullOrWhiteSpace(value) ? null : value.Trim();
 
     private static string BuildExtractionInstructions()
     {
@@ -80,8 +84,9 @@ public sealed class BeanImageExtractionService(
             Output requirements:
             - Include ALL keys every time.
             - Use these keys exactly:
-              beanName, roasterName, originCountries, variety, processingMethod,
+              beanName, roasterName, originCountries, region, variety, processingMethod,
               roastProfile, roastDate, altitude, bagWeight, price, flavorNotes, unmatchedReferences
+            - region should be a producing region or local area visible on the label, such as "Huila", "Nyeri", or "Yirgacheffe"; do not use a country name as region
             - roastProfile should be one of: "Filter", "Espresso", "Omni", or null
             - altitude should be an integer number (meters) or null
             - bagWeight and price should be numeric values when visible, otherwise null

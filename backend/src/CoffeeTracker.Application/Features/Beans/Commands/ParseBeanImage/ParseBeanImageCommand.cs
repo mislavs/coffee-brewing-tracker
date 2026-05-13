@@ -85,7 +85,8 @@ public sealed class ParseBeanImageHandler(
             BagWeight: extractionResult.BagWeight,
             Price: extractionResult.Price,
             FlavorNotes: flavorNotes,
-            UnmatchedReferences: unmatchedReferences);
+            UnmatchedReferences: unmatchedReferences,
+            Region: extractionResult.Region);
     }
 
     private async Task<Guid?> ResolveRoasterIdAsync(

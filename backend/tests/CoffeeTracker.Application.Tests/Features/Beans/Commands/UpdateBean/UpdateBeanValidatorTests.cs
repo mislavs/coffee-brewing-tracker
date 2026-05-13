@@ -99,6 +99,19 @@ public class UpdateBeanValidatorTests
         result.ShouldHaveValidationErrorFor(entry => entry.RoastProfile);
     }
 
+    [Fact]
+    public void Validate_WhenRegionIsTooLong_ShouldHaveValidationError()
+    {
+        // Arrange
+        var command = CreateValidCommand() with { Region = new string('x', 201) };
+
+        // Act
+        var result = _sut.TestValidate(command);
+
+        // Assert
+        result.ShouldHaveValidationErrorFor(entry => entry.Region);
+    }
+
     private static UpdateBeanCommand CreateValidCommand()
     {
         return new UpdateBeanCommand(

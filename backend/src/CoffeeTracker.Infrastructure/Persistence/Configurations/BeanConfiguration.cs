@@ -20,6 +20,9 @@ public class BeanConfiguration : IEntityTypeConfiguration<Bean>
         builder.Property(bean => bean.ProcessingMethod)
             .HasMaxLength(200);
 
+        builder.Property(bean => bean.Region)
+            .HasMaxLength(200);
+
         builder.Property(bean => bean.ImageFileName)
             .HasMaxLength(255);
 

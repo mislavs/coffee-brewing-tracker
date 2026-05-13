@@ -21,7 +21,8 @@ public sealed record CreateBeanCommand(
     int? Altitude,
     decimal BagWeight,
     decimal? Price,
-    IReadOnlyList<string>? FlavorNoteNames) : IRequest<Guid>, IBeanCommand;
+    IReadOnlyList<string>? FlavorNoteNames,
+    string? Region = null) : IRequest<Guid>, IBeanCommand;
 
 public sealed class CreateBeanValidator : AbstractValidator<CreateBeanCommand>
 {
@@ -67,7 +68,8 @@ public sealed class CreateBeanHandler(ApplicationDbContext dbContext)
             request.RoastDate,
             request.Altitude,
             request.BagWeight,
-            request.Price);
+            request.Price,
+            request.Region);
 
         bean.SetFlavorNotes(flavorNotes);
 

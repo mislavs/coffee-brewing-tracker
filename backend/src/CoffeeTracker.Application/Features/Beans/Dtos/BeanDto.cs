@@ -12,6 +12,7 @@ public sealed record BeanDto(
     IReadOnlyList<BeanOriginCountryDto> OriginCountries,
     string? Variety,
     string? ProcessingMethod,
+    string? Region,
     RoastProfile RoastProfile,
     DateOnly? RoastDate,
     int? Altitude,

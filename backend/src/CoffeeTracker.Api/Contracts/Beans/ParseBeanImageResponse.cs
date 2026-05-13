@@ -17,7 +17,8 @@ public sealed record ParseBeanImageResponse(
     decimal? BagWeight,
     decimal? Price,
     List<string> FlavorNotes,
-    List<string> UnmatchedReferences)
+    List<string> UnmatchedReferences,
+    string? Region = null)
 {
     public static ParseBeanImageResponse FromResult(ParseBeanImageResult result)
     {
@@ -35,6 +36,7 @@ public sealed record ParseBeanImageResponse(
             result.BagWeight,
             result.Price,
             result.FlavorNotes,
-            result.UnmatchedReferences);
+            result.UnmatchedReferences,
+            result.Region);
     }
 }

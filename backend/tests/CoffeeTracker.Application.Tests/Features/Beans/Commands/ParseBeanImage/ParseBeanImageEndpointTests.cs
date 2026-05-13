@@ -1,3 +1,4 @@
+using CoffeeTracker.Api.Contracts.Beans;
 using CoffeeTracker.Application.Features.Beans.Commands.ParseBeanImage;
 using CoffeeTracker.Application.Features.Beans.Dtos;
 using CoffeeTracker.Infrastructure.AI;
@@ -95,6 +96,10 @@ public class ParseBeanImageEndpointTests(IntegrationTestFactory factory)
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
+        var result = await response.Content.ReadFromJsonAsync<ParseBeanImageResponse>(
+            cancellationToken: TestContext.Current.CancellationToken);
+        result.Should().NotBeNull();
+        result!.Region.Should().Be("Nyeri");
     }
 
     private HttpClient CreateClientWithImageFeatureAvailability(bool isImageBeanParsingAvailable)
@@ -134,6 +139,6 @@ public class ParseBeanImageEndpointTests(IntegrationTestFactory factory)
         public Task<ParseBeanImageResult> Handle(
             ParseBeanImageCommand request,
             CancellationToken cancellationToken) =>
-            Task.FromResult(ParseBeanImageResult.Empty);
+            Task.FromResult(ParseBeanImageResult.Empty with { Region = "Nyeri" });
     }
 }

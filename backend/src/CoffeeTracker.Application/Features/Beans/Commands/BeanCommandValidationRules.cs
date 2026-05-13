@@ -14,6 +14,7 @@ public interface IBeanCommand
     IReadOnlyList<Guid>? OriginCountryIds { get; }
     string? Variety { get; }
     string? ProcessingMethod { get; }
+    string? Region { get; }
     RoastProfile RoastProfile { get; }
     DateOnly? RoastDate { get; }
     int? Altitude { get; }
@@ -44,6 +45,9 @@ public sealed class BeanCommandValidationRules<T> : AbstractValidator<T>
             .MaximumLength(200);
 
         RuleFor(c => c.ProcessingMethod)
+            .MaximumLength(200);
+
+        RuleFor(c => c.Region)
             .MaximumLength(200);
 
         RuleFor(c => c.BagWeight)

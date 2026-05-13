@@ -267,6 +267,7 @@ export function BeanFormCard({
     }
     setIfPresent('variety', result.variety)
     setIfPresent('processingMethod', result.processingMethod)
+    setIfPresent('region', result.region)
 
     const roastProfile = toRoastProfileValue(result.roastProfile)
     setIfPresent('roastProfile', roastProfile)
@@ -462,6 +463,14 @@ export function BeanFormCard({
                 )}
               />
               <FieldErrorText message={originCountryIdsError} />
+            </div>
+
+            <div className="space-y-2">
+              <label htmlFor="region" className="text-sm font-medium">
+                Region
+              </label>
+              <Input id="region" {...form.register('region')} />
+              <FieldErrorText message={form.formState.errors.region?.message} />
             </div>
 
             <div className="space-y-2">

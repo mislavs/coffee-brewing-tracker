@@ -110,7 +110,8 @@ public static class BeanEndpoints
                 request.Altitude,
                 request.BagWeight,
                 request.Price,
-                request.FlavorNoteNames),
+                request.FlavorNoteNames,
+                request.Region),
             cancellationToken);
 
         var location = linkGenerator.GetPathByName(
@@ -143,7 +144,8 @@ public static class BeanEndpoints
                 request.BagWeight,
                 request.Price,
                 request.IsAvailable,
-                request.FlavorNoteNames),
+                request.FlavorNoteNames,
+                request.Region),
             cancellationToken);
 
         return TypedResults.Ok();

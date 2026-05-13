@@ -1524,6 +1524,10 @@
             "type": "string",
             "nullable": true
           },
+          "region": {
+            "type": "string",
+            "nullable": true
+          },
           "roastProfile": {
             "$ref": "#/components/schemas/RoastProfile"
           },
@@ -2034,6 +2038,10 @@
               "type": "string"
             },
             "nullable": true
+          },
+          "region": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -2444,6 +2452,10 @@
             "items": {
               "type": "string"
             },
+            "nullable": true
+          },
+          "region": {
+            "type": "string",
             "nullable": true
           }
         },
@@ -2911,6 +2923,10 @@
             "items": {
               "type": "string"
             },
+            "nullable": true
+          },
+          "region": {
+            "type": "string",
             "nullable": true
           }
         },

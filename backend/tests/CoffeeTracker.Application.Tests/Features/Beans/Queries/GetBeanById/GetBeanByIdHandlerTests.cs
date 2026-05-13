@@ -32,7 +32,8 @@ public class GetBeanByIdHandlerTests(IntegrationTestFactory factory) : Integrati
             new DateOnly(2026, 2, 1),
             1800,
             250m,
-            40m);
+            40m,
+            region: "Nyeri");
         bean.SetImage("kenya-ab.png", [1, 2, 3]);
         bean.SetFlavorNotes([citrus, chocolate]);
         await Insert(bean);
@@ -47,6 +48,7 @@ public class GetBeanByIdHandlerTests(IntegrationTestFactory factory) : Integrati
         result.Name.Should().Be("Kenya AB");
         result.RoasterId.Should().Be(roaster.Id);
         result.RoasterName.Should().Be("Kawa");
+        result.Region.Should().Be("Nyeri");
         result.OriginCountries.Should().ContainSingle();
         result.OriginCountries.Single().Id.Should().Be(kenya.Id);
         result.OriginCountries.Single().Name.Should().Be("Kenya");

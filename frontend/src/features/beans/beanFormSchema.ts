@@ -47,6 +47,7 @@ export const beanFormSchema = z.object({
   originCountryIds: z.array(z.string().trim().min(1)).default([]),
   variety: optionalTrimmedStringSchema,
   processingMethod: optionalTrimmedStringSchema,
+  region: optionalTrimmedStringSchema,
   roastProfile: z.coerce
     .number()
     .int()

@@ -30,6 +30,7 @@ public class ParseBeanImageHandlerTests(IntegrationTestFactory factory) : Integr
                 OriginCountries: [" Kenya ", "UnknownLand", "KENYA", " "],
                 Variety: "SL28",
                 ProcessingMethod: "Washed",
+                Region: "Nyeri",
                 RoastProfile: "Filter",
                 RoastDate: "2026-03-01",
                 Altitude: 1800,
@@ -51,6 +52,7 @@ public class ParseBeanImageHandlerTests(IntegrationTestFactory factory) : Integr
         result.RoastDate.Should().Be(new DateOnly(2026, 3, 1));
         result.OriginType.Should().Be(OriginType.SingleOrigin);
         result.OriginCountries.Should().Equal(["Kenya"]);
+        result.Region.Should().Be("Nyeri");
         result.FlavorNotes.Should().Equal(["Chocolate", "Floral"]);
         result.UnmatchedReferences.Should().Equal(["RawRef", "UnknownLand"]);
     }

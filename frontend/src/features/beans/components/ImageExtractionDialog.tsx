@@ -56,6 +56,10 @@ function buildExtractedFields(result: ParseBeanImageResponse): ExtractedField[] 
     })
   }
 
+  if (result.region) {
+    fields.push({ label: 'Region', value: result.region })
+  }
+
   if (result.variety) {
     fields.push({ label: 'Variety', value: result.variety })
   }

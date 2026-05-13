@@ -37,7 +37,8 @@ public class UpdateBeanHandlerTests(IntegrationTestFactory factory) : Integratio
             new DateOnly(2026, 1, 1),
             1700,
             250m,
-            35m);
+            35m,
+            region: "Old Region");
         bean.SetFlavorNotes([citrus, chocolate]);
         await Insert(bean);
 
@@ -55,7 +56,8 @@ public class UpdateBeanHandlerTests(IntegrationTestFactory factory) : Integratio
             300m,
             45m,
             true,
-            ["Floral"]);
+            ["Floral"],
+            " Huila ");
 
         // Act
         await Send(command);
@@ -73,11 +75,66 @@ public class UpdateBeanHandlerTests(IntegrationTestFactory factory) : Integratio
         updatedBean!.Name.Should().Be("Updated Bean");
         updatedBean.RoasterId.Should().Be(roasterB.Id);
         updatedBean.OriginType.Should().Be(OriginType.Blend);
+        updatedBean.Region.Should().Be("Huila");
         updatedBean.OriginCountries.Select(country => country.Name)
             .Should()
             .Contain(["Brazil", "Ethiopia"]);
         updatedBean.RoastProfile.Should().Be(RoastProfile.Espresso);
         updatedBean.FlavorNotes.Should().ContainSingle(entity => entity.Name == "Floral");
+    }
+
+    [Fact]
+    public async Task Handle_WhenRegionIsBlank_ClearsRegion()
+    {
+        // Arrange
+        var roaster = Roaster.Create("Roaster A", "City A", null);
+        var kenya = Country.Create("Kenya", string.Empty, string.Empty);
+        await Insert(roaster);
+        await Insert(kenya);
+
+        var bean = Bean.Create(
+            "Old Bean",
+            roaster.Id,
+            OriginType.SingleOrigin,
+            [kenya],
+            "Old Variety",
+            "Washed",
+            RoastProfile.Filter,
+            null,
+            null,
+            250m,
+            35m,
+            region: "Nyeri");
+        await Insert(bean);
+
+        var command = new UpdateBeanCommand(
+            bean.Id,
+            "Updated Bean",
+            roaster.Id,
+            OriginType.SingleOrigin,
+            [kenya.Id],
+            "Old Variety",
+            "Washed",
+            RoastProfile.Filter,
+            null,
+            null,
+            250m,
+            35m,
+            true,
+            null,
+            "   ");
+
+        // Act
+        await Send(command);
+
+        // Assert
+        var updatedRegion = await DbContext.Beans
+            .AsNoTracking()
+            .Where(entity => entity.Id == bean.Id)
+            .Select(entity => entity.Region)
+            .SingleAsync(TestContext.Current.CancellationToken);
+
+        updatedRegion.Should().BeNull();
     }
 
     [Fact]

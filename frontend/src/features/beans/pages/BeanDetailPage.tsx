@@ -123,6 +123,9 @@ function BeanDetailContent({ beanId }: { beanId: Guid }) {
                       <p className="text-muted-foreground">No origin countries set.</p>
                     )}
                   </DetailField>
+                  <DetailField label="Region" stacked>
+                    {bean.region || '—'}
+                  </DetailField>
                   <DetailField label="Variety" stacked>
                     {bean.variety || '—'}
                   </DetailField>

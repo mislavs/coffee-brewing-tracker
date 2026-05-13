@@ -16,7 +16,8 @@ public sealed record ParseBeanImageResult(
     decimal? BagWeight,
     decimal? Price,
     List<string> FlavorNotes,
-    List<string> UnmatchedReferences)
+    List<string> UnmatchedReferences,
+    string? Region = null)
 {
     public static ParseBeanImageResult Empty =>
         new(

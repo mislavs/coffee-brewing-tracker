@@ -15,4 +15,5 @@ public sealed record UpdateBeanRequest(
     decimal BagWeight,
     decimal? Price,
     bool IsAvailable,
-    IReadOnlyList<string>? FlavorNoteNames);
+    IReadOnlyList<string>? FlavorNoteNames,
+    string? Region = null);

@@ -14,4 +14,5 @@ public sealed record CreateBeanRequest(
     int? Altitude,
     decimal BagWeight,
     decimal? Price,
-    IReadOnlyList<string>? FlavorNoteNames);
+    IReadOnlyList<string>? FlavorNoteNames,
+    string? Region = null);

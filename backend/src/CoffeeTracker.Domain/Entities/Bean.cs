@@ -21,6 +21,7 @@ public class Bean
         IEnumerable<Country>? originCountries,
         string? variety,
         string? processingMethod,
+        string? region,
         RoastProfile roastProfile,
         DateOnly? roastDate,
         int? altitude,
@@ -34,6 +35,7 @@ public class Bean
         SetOriginCountries(originCountries);
         Variety = EntityNormalization.NormalizeOptional(variety);
         ProcessingMethod = EntityNormalization.NormalizeOptional(processingMethod);
+        Region = EntityNormalization.NormalizeOptional(region);
         RoastProfile = roastProfile;
         RoastDate = roastDate;
         Altitude = altitude;
@@ -54,6 +56,8 @@ public class Bean
     public string? Variety { get; private set; }
 
     public string? ProcessingMethod { get; private set; }
+
+    public string? Region { get; private set; }
 
     public RoastProfile RoastProfile { get; private set; }
 
@@ -90,7 +94,8 @@ public class Bean
         DateOnly? roastDate,
         int? altitude,
         decimal bagWeight,
-        decimal? price)
+        decimal? price,
+        string? region = null)
     {
         return new Bean(
             Guid.NewGuid(),
@@ -100,6 +105,7 @@ public class Bean
             originCountries,
             variety,
             processingMethod,
+            region,
             roastProfile,
             roastDate,
             altitude,
@@ -119,7 +125,8 @@ public class Bean
         int? altitude,
         decimal bagWeight,
         decimal? price,
-        bool isAvailable)
+        bool isAvailable,
+        string? region = null)
     {
         Name = EntityNormalization.NormalizeRequired(name, nameof(name));
         RoasterId = EntityNormalization.EnsureRequired(roasterId, nameof(roasterId));
@@ -127,6 +134,7 @@ public class Bean
         SetOriginCountries(originCountries);
         Variety = EntityNormalization.NormalizeOptional(variety);
         ProcessingMethod = EntityNormalization.NormalizeOptional(processingMethod);
+        Region = EntityNormalization.NormalizeOptional(region);
         RoastProfile = roastProfile;
         RoastDate = roastDate;
         Altitude = altitude;

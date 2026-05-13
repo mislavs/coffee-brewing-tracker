@@ -45,6 +45,7 @@ public class BeanImageExtractionServiceTests
         // Assert
         capturedInstructions.Should().NotBeNullOrWhiteSpace();
         capturedInstructions.Should().Contain("coffee bean information");
+        capturedInstructions.Should().Contain("region");
         capturedImageBytes.Should().Equal(bytes);
         capturedMimeType.Should().Be("image/png");
         capturedUserText.Should().BeNull();
@@ -96,7 +97,8 @@ public class BeanImageExtractionServiceTests
                         BagWeight: 250m,
                         Price: 13.5m,
                         FlavorNotes: null!,
-                        UnmatchedReferences: null!)));
+                        UnmatchedReferences: null!,
+                        Region: " Nyeri ")));
 
         var sut = new BeanImageExtractionService(_dataExtractor, _logger);
         await using var stream = new MemoryStream([1, 2, 3]);
@@ -106,6 +108,7 @@ public class BeanImageExtractionServiceTests
 
         // Assert
         result.BeanName.Should().Be("Kenya Lot");
+        result.Region.Should().Be("Nyeri");
         result.OriginCountries.Should().NotBeNull().And.BeEmpty();
         result.FlavorNotes.Should().NotBeNull().And.BeEmpty();
         result.UnmatchedReferences.Should().NotBeNull().And.BeEmpty();

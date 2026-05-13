@@ -12,7 +12,8 @@ public sealed record BeanImageExtractionResult(
     decimal? BagWeight,
     decimal? Price,
     List<string> FlavorNotes,
-    List<string> UnmatchedReferences)
+    List<string> UnmatchedReferences,
+    string? Region = null)
 {
     public static BeanImageExtractionResult Empty =>
         new(

@@ -17,6 +17,7 @@ function buildInput(overrides: Record<string, unknown> = {}) {
     originCountryIds: [countryId],
     variety: 'Bourbon',
     processingMethod: 'Washed',
+    region: 'Huila',
     roastProfile: '2',
     roastDate: '2025-03-05',
     altitude: '1200',
@@ -90,6 +91,20 @@ describe('beanFormSchema', () => {
     expect(beanFormSchema.safeParse(buildInput({ roastDate: '03/05/2025' })).success).toBe(
       false,
     )
+  })
+
+  it('normalizes optional region values', () => {
+    const emptyResult = beanFormSchema.safeParse(buildInput({ region: '   ' }))
+    expect(emptyResult.success).toBe(true)
+    if (emptyResult.success) {
+      expect(emptyResult.data.region).toBeUndefined()
+    }
+
+    const stringResult = beanFormSchema.safeParse(buildInput({ region: ' Huila ' }))
+    expect(stringResult.success).toBe(true)
+    if (stringResult.success) {
+      expect(stringResult.data.region).toBe('Huila')
+    }
   })
 
   it('requires positive bagWeight after preprocessing', () => {
