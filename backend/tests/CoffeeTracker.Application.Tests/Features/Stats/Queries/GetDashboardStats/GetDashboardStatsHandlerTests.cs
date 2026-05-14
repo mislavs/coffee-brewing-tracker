@@ -45,14 +45,15 @@ public class GetDashboardStatsHandlerTests(IntegrationTestFactory factory) : Int
         var (roaster, brewer, grinder) = await CreateBrewDependenciesAsync();
         var bean = CreateBean("Forecast bean", roaster.Id, 950m);
         await Insert(bean);
+        var referenceTime = DateTime.UtcNow.AddHours(1);
 
         await InsertMany(
         [
-            CreateBrewLogEntry(bean.Id, brewer.Id, grinder.Id, 90m, DateTime.UtcNow.AddDays(-10)),
-            CreateBrewLogEntry(bean.Id, brewer.Id, grinder.Id, 90m, DateTime.UtcNow.AddDays(-20)),
-            CreateBrewLogEntry(bean.Id, brewer.Id, grinder.Id, 90m, DateTime.UtcNow.AddDays(-30)),
-            CreateBrewLogEntry(bean.Id, brewer.Id, grinder.Id, 90m, DateTime.UtcNow.AddDays(-40)),
-            CreateBrewLogEntry(bean.Id, brewer.Id, grinder.Id, 90m, DateTime.UtcNow.AddDays(-50))
+            CreateBrewLogEntry(bean.Id, brewer.Id, grinder.Id, 90m, referenceTime.AddDays(-10)),
+            CreateBrewLogEntry(bean.Id, brewer.Id, grinder.Id, 90m, referenceTime.AddDays(-20)),
+            CreateBrewLogEntry(bean.Id, brewer.Id, grinder.Id, 90m, referenceTime.AddDays(-30)),
+            CreateBrewLogEntry(bean.Id, brewer.Id, grinder.Id, 90m, referenceTime.AddDays(-40)),
+            CreateBrewLogEntry(bean.Id, brewer.Id, grinder.Id, 90m, referenceTime.AddDays(-50))
         ]);
 
         // Act
@@ -61,8 +62,8 @@ public class GetDashboardStatsHandlerTests(IntegrationTestFactory factory) : Int
         // Assert
         result.CoffeeAvailableGrams.Should().Be(500m);
         result.TotalCoffeeConsumedGrams.Should().Be(450m);
-        result.EstimatedDaysRemaining.Should().Be(66);
-        result.AverageDailyConsumptionGrams.Should().Be(7.5m);
+        result.EstimatedDaysRemaining.Should().Be(55);
+        result.AverageDailyConsumptionGrams.Should().Be(9m);
     }
 
     [Fact]
@@ -96,14 +97,15 @@ public class GetDashboardStatsHandlerTests(IntegrationTestFactory factory) : Int
         var (roaster, brewer, grinder) = await CreateBrewDependenciesAsync();
         var bean = CreateBean("Empty bean", roaster.Id, 450m);
         await Insert(bean);
+        var referenceTime = DateTime.UtcNow.AddHours(1);
 
         await InsertMany(
         [
-            CreateBrewLogEntry(bean.Id, brewer.Id, grinder.Id, 90m, DateTime.UtcNow.AddDays(-10)),
-            CreateBrewLogEntry(bean.Id, brewer.Id, grinder.Id, 90m, DateTime.UtcNow.AddDays(-20)),
-            CreateBrewLogEntry(bean.Id, brewer.Id, grinder.Id, 90m, DateTime.UtcNow.AddDays(-30)),
-            CreateBrewLogEntry(bean.Id, brewer.Id, grinder.Id, 90m, DateTime.UtcNow.AddDays(-40)),
-            CreateBrewLogEntry(bean.Id, brewer.Id, grinder.Id, 90m, DateTime.UtcNow.AddDays(-50))
+            CreateBrewLogEntry(bean.Id, brewer.Id, grinder.Id, 90m, referenceTime.AddDays(-10)),
+            CreateBrewLogEntry(bean.Id, brewer.Id, grinder.Id, 90m, referenceTime.AddDays(-20)),
+            CreateBrewLogEntry(bean.Id, brewer.Id, grinder.Id, 90m, referenceTime.AddDays(-30)),
+            CreateBrewLogEntry(bean.Id, brewer.Id, grinder.Id, 90m, referenceTime.AddDays(-40)),
+            CreateBrewLogEntry(bean.Id, brewer.Id, grinder.Id, 90m, referenceTime.AddDays(-50))
         ]);
 
         // Act
@@ -112,7 +114,117 @@ public class GetDashboardStatsHandlerTests(IntegrationTestFactory factory) : Int
         // Assert
         result.CoffeeAvailableGrams.Should().Be(0m);
         result.EstimatedDaysRemaining.Should().Be(0);
-        result.AverageDailyConsumptionGrams.Should().Be(7.5m);
+        result.AverageDailyConsumptionGrams.Should().Be(9m);
+    }
+
+    [Fact]
+    public async Task Handle_WhenFirstRecentBrewAlmostFillsWindow_DividesConsumptionByNinetyDays()
+    {
+        // Arrange
+        var (roaster, brewer, grinder) = await CreateBrewDependenciesAsync();
+        var bean = CreateBean("Full window bean", roaster.Id, 950m);
+        await Insert(bean);
+        var referenceTime = DateTime.UtcNow;
+
+        await InsertMany(
+        [
+            CreateBrewLogEntry(bean.Id, brewer.Id, grinder.Id, 90m, referenceTime.AddDays(-89).AddHours(-1)),
+            CreateBrewLogEntry(bean.Id, brewer.Id, grinder.Id, 90m, referenceTime.AddDays(-70)),
+            CreateBrewLogEntry(bean.Id, brewer.Id, grinder.Id, 90m, referenceTime.AddDays(-50)),
+            CreateBrewLogEntry(bean.Id, brewer.Id, grinder.Id, 90m, referenceTime.AddDays(-30)),
+            CreateBrewLogEntry(bean.Id, brewer.Id, grinder.Id, 90m, referenceTime.AddDays(-10))
+        ]);
+
+        // Act
+        var result = await Send(new GetDashboardStatsQuery());
+
+        // Assert
+        result.CoffeeAvailableGrams.Should().Be(500m);
+        result.EstimatedDaysRemaining.Should().Be(100);
+        result.AverageDailyConsumptionGrams.Should().Be(5m);
+    }
+
+    [Fact]
+    public async Task Handle_WhenFirstRecentBrewIsThirtyDaysAgo_DividesConsumptionByThirtyDays()
+    {
+        // Arrange
+        var (roaster, brewer, grinder) = await CreateBrewDependenciesAsync();
+        var bean = CreateBean("Short history bean", roaster.Id, 950m);
+        await Insert(bean);
+        var referenceTime = DateTime.UtcNow.AddHours(1);
+
+        await InsertMany(
+        [
+            CreateBrewLogEntry(bean.Id, brewer.Id, grinder.Id, 90m, referenceTime.AddDays(-30)),
+            CreateBrewLogEntry(bean.Id, brewer.Id, grinder.Id, 90m, referenceTime.AddDays(-20)),
+            CreateBrewLogEntry(bean.Id, brewer.Id, grinder.Id, 90m, referenceTime.AddDays(-15)),
+            CreateBrewLogEntry(bean.Id, brewer.Id, grinder.Id, 90m, referenceTime.AddDays(-10)),
+            CreateBrewLogEntry(bean.Id, brewer.Id, grinder.Id, 90m, referenceTime.AddDays(-5))
+        ]);
+
+        // Act
+        var result = await Send(new GetDashboardStatsQuery());
+
+        // Assert
+        result.CoffeeAvailableGrams.Should().Be(500m);
+        result.EstimatedDaysRemaining.Should().Be(33);
+        result.AverageDailyConsumptionGrams.Should().Be(15m);
+    }
+
+    [Fact]
+    public async Task Handle_WhenAllRecentBrewsAreToday_DividesConsumptionByOneDay()
+    {
+        // Arrange
+        var (roaster, brewer, grinder) = await CreateBrewDependenciesAsync();
+        var bean = CreateBean("Same day bean", roaster.Id, 950m);
+        await Insert(bean);
+        var referenceTime = DateTime.UtcNow;
+
+        await InsertMany(
+        [
+            CreateBrewLogEntry(bean.Id, brewer.Id, grinder.Id, 90m, referenceTime.AddMinutes(-50)),
+            CreateBrewLogEntry(bean.Id, brewer.Id, grinder.Id, 90m, referenceTime.AddMinutes(-40)),
+            CreateBrewLogEntry(bean.Id, brewer.Id, grinder.Id, 90m, referenceTime.AddMinutes(-30)),
+            CreateBrewLogEntry(bean.Id, brewer.Id, grinder.Id, 90m, referenceTime.AddMinutes(-20)),
+            CreateBrewLogEntry(bean.Id, brewer.Id, grinder.Id, 90m, referenceTime.AddMinutes(-10))
+        ]);
+
+        // Act
+        var result = await Send(new GetDashboardStatsQuery());
+
+        // Assert
+        result.CoffeeAvailableGrams.Should().Be(500m);
+        result.EstimatedDaysRemaining.Should().Be(1);
+        result.AverageDailyConsumptionGrams.Should().Be(450m);
+    }
+
+    [Fact]
+    public async Task Handle_WhenOlderBrewsExist_ExcludesThemFromAverageDailyConsumption()
+    {
+        // Arrange
+        var (roaster, brewer, grinder) = await CreateBrewDependenciesAsync();
+        var bean = CreateBean("Old history bean", roaster.Id, 990m);
+        await Insert(bean);
+        var referenceTime = DateTime.UtcNow.AddHours(1);
+
+        await InsertMany(
+        [
+            CreateBrewLogEntry(bean.Id, brewer.Id, grinder.Id, 90m, referenceTime.AddDays(-120)),
+            CreateBrewLogEntry(bean.Id, brewer.Id, grinder.Id, 90m, referenceTime.AddDays(-30)),
+            CreateBrewLogEntry(bean.Id, brewer.Id, grinder.Id, 90m, referenceTime.AddDays(-20)),
+            CreateBrewLogEntry(bean.Id, brewer.Id, grinder.Id, 90m, referenceTime.AddDays(-15)),
+            CreateBrewLogEntry(bean.Id, brewer.Id, grinder.Id, 90m, referenceTime.AddDays(-10)),
+            CreateBrewLogEntry(bean.Id, brewer.Id, grinder.Id, 90m, referenceTime.AddDays(-5))
+        ]);
+
+        // Act
+        var result = await Send(new GetDashboardStatsQuery());
+
+        // Assert
+        result.CoffeeAvailableGrams.Should().Be(450m);
+        result.TotalCoffeeConsumedGrams.Should().Be(540m);
+        result.EstimatedDaysRemaining.Should().Be(30);
+        result.AverageDailyConsumptionGrams.Should().Be(15m);
     }
 
     private async Task<(Roaster Roaster, Brewer Brewer, Grinder Grinder)> CreateBrewDependenciesAsync()

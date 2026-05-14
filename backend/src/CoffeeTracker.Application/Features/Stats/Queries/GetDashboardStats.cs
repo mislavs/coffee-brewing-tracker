@@ -10,11 +10,14 @@ public sealed record GetDashboardStatsQuery : IRequest<DashboardStatsDto>;
 public sealed class GetDashboardStatsHandler(ApplicationDbContext dbContext)
     : IRequestHandler<GetDashboardStatsQuery, DashboardStatsDto>
 {
+    private const int RecentBrewWindowDays = 90;
+
     public async Task<DashboardStatsDto> Handle(
         GetDashboardStatsQuery request,
         CancellationToken cancellationToken)
     {
-        var recentBrewWindowStart = DateTime.UtcNow.AddDays(-60);
+        var utcNow = DateTime.UtcNow;
+        var recentBrewWindowStart = utcNow.AddDays(-RecentBrewWindowDays);
 
         var totalBrews = await dbContext.BrewLogEntries
             .AsNoTracking()
@@ -44,7 +47,8 @@ public sealed class GetDashboardStatsHandler(ApplicationDbContext dbContext)
             .Select(group => new
             {
                 BrewCount = group.Count(),
-                TotalDose = group.Sum(entity => entity.Dose)
+                TotalDose = group.Sum(entity => entity.Dose),
+                FirstBrewedAt = group.Min(entity => entity.BrewedAt)
             })
             .SingleOrDefaultAsync(cancellationToken);
 
@@ -55,7 +59,10 @@ public sealed class GetDashboardStatsHandler(ApplicationDbContext dbContext)
 
         if (recentBrewCount >= 5 && recentConsumptionGrams > 0m)
         {
-            averageDailyConsumptionGrams = recentConsumptionGrams / 60m;
+            var elapsedDays = (decimal)Math.Ceiling((utcNow - recentConsumptionStats!.FirstBrewedAt).TotalDays);
+            var daysInWindow = Math.Clamp(elapsedDays, 1m, RecentBrewWindowDays);
+
+            averageDailyConsumptionGrams = recentConsumptionGrams / daysInWindow;
             estimatedDaysRemaining = coffeeAvailableGrams == 0m
                 ? 0
                 : (int)Math.Floor(coffeeAvailableGrams / averageDailyConsumptionGrams.Value);
