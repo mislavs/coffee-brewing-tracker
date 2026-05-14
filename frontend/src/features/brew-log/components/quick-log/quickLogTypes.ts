@@ -4,7 +4,7 @@ import type {
   BrewLogFormValues,
 } from '@/features/brew-log/brewLogFormSchema'
 
-export type QuickLogForm = UseFormReturn<
+type QuickLogForm = UseFormReturn<
   BrewLogFormInput,
   undefined,
   BrewLogFormValues

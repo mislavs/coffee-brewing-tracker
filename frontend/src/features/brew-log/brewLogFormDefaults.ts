@@ -1,7 +1,7 @@
 import type { BrewLogDto } from '@/lib/api/schemas'
 import type { BrewLogFormValues } from '@/features/brew-log/brewLogFormSchema'
 
-export function toDateTimeLocalValue(value: Date | string | null | undefined) {
+function toDateTimeLocalValue(value: Date | string | null | undefined) {
   const parsed = value instanceof Date ? value : value ? new Date(value) : null
   if (!parsed || Number.isNaN(parsed.getTime())) {
     return ''

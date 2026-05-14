@@ -219,7 +219,7 @@ export function ImageExtractionDialog({
         {state === 'processing' && (
           <div className="flex flex-col items-center justify-center gap-4 py-8 text-center">
             <Loader2 className="size-8 animate-spin text-muted-foreground" />
-            <p className="text-sm text-muted-foreground">Analyzing image...</p>
+            <p className="text-sm text-muted-foreground">Analyzing image…</p>
           </div>
         )}
 

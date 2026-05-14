@@ -3,11 +3,13 @@ import { EntityMultiSelect } from '@/components/EntityMultiSelect'
 import { useBrewers } from '@/features/equipment/hooks/useBrewers'
 
 type BrewerMultiSelectProps = {
+  triggerId?: string
   selectedIds: string[]
   onChange: (ids: string[]) => void
 }
 
 export function BrewerMultiSelect({
+  triggerId,
   selectedIds,
   onChange,
 }: BrewerMultiSelectProps) {
@@ -30,6 +32,7 @@ export function BrewerMultiSelect({
 
   return (
     <EntityMultiSelect
+      triggerId={triggerId}
       options={brewerOptions}
       selectedIds={selectedIds}
       onChange={onChange}

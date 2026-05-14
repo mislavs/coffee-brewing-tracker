@@ -3,6 +3,26 @@ import {
   roastProfileLabels,
 } from '@/features/beans/beanShared'
 
+const decimalFormatters = new Map<string, Intl.NumberFormat>()
+
+function getDecimalFormatter(
+  maximumFractionDigits: number,
+  minimumFractionDigits: number,
+) {
+  const key = `${minimumFractionDigits}:${maximumFractionDigits}`
+  const existingFormatter = decimalFormatters.get(key)
+  if (existingFormatter) {
+    return existingFormatter
+  }
+
+  const formatter = new Intl.NumberFormat(undefined, {
+    minimumFractionDigits,
+    maximumFractionDigits,
+  })
+  decimalFormatters.set(key, formatter)
+  return formatter
+}
+
 export function formatOriginType(value: number | null | undefined) {
   if (value === null || value === undefined) {
     return '—'
@@ -28,10 +48,7 @@ export function formatDecimal(
     return '—'
   }
 
-  return new Intl.NumberFormat(undefined, {
-    minimumFractionDigits,
-    maximumFractionDigits,
-  }).format(value)
+  return getDecimalFormatter(maximumFractionDigits, minimumFractionDigits).format(value)
 }
 
 export function formatPrice(

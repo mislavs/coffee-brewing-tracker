@@ -1,11 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
-  Controller,
   type Path,
   type PathValue,
   useForm,
-  useWatch,
 } from 'react-hook-form'
 import { ImagePlus } from 'lucide-react'
 import { Link } from 'react-router-dom'
@@ -26,33 +24,27 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { DatePicker } from '@/components/ui/date-picker'
-import { Input } from '@/components/ui/input'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import { Switch } from '@/components/ui/switch'
 import {
   beanFormSchema,
   type BeanFormInput,
   type BeanFormValues,
 } from '@/features/beans/beanFormSchema'
 import {
-  originTypeLabels,
-  roastProfileLabels,
   toDateInputValue,
   toOriginTypeValue,
   toRoastProfileValue,
 } from '@/features/beans/beanShared'
+import {
+  BeanClassificationSection,
+  BeanFlavorAndOriginSection,
+  BeanIdentitySection,
+  BeanInventorySection,
+  BeanProcessingSection,
+} from '@/features/beans/components/BeanFormSections'
 import { ImageExtractionDialog } from '@/features/beans/components/ImageExtractionDialog'
 import { useCountries } from '@/features/beans/hooks/useCountries'
 import { useFlavorNotes } from '@/features/beans/hooks/useFlavorNotes'
 import { applyBeanFormServerErrors } from '@/features/beans/mapApiValidationErrors'
-import { TagCombobox } from '@/features/beans/components/TagCombobox'
 import { useRoasters } from '@/features/roasters/hooks/useRoasters'
 import { useCreateRoaster } from '@/features/roasters/hooks/useCreateRoaster'
 import { RoasterFormCard } from '@/features/roasters/components/RoasterFormCard'
@@ -66,9 +58,6 @@ import type { ParseBeanImageResponse } from '@/lib/api/schemas'
 import {
   type RoasterFormValues,
 } from '@/features/roasters/roasterFormSchema'
-
-const createRoasterValue = '__create_roaster__'
-const noRoasterValue = '__no_roaster__'
 
 function toDistinctOptions(values: (string | null | undefined)[]) {
   const distinct: string[] = []
@@ -104,7 +93,7 @@ type BeanFormCardProps = {
   existingImageUrl?: string | null
 }
 
-export type BeanImageSubmission = {
+type BeanImageSubmission = {
   file: File | null
   removeExistingImage: boolean
 }
@@ -135,7 +124,6 @@ export function BeanFormCard({
   const [isImageExtractionOpen, setIsImageExtractionOpen] = useState(false)
   const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null)
   const [removeExistingImage, setRemoveExistingImage] = useState(false)
-  const watchedRoastDate = useWatch({ control: form.control, name: 'roastDate' })
   const selectedImagePreviewUrl = useMemo(
     () => (selectedImageFile ? URL.createObjectURL(selectedImageFile) : null),
     [selectedImageFile],
@@ -330,280 +318,29 @@ export function BeanFormCard({
               disabled={isSubmitting}
             />
 
-            <div className="space-y-2">
-              <label htmlFor="name" className="text-sm font-medium">
-                Name
-              </label>
-              <Input id="name" {...form.register('name')} />
-              <FieldErrorText message={form.formState.errors.name?.message} />
-            </div>
+            <BeanIdentitySection
+              form={form}
+              roasterOptions={roasterOptions}
+              onCreateRoaster={() => setIsCreateRoasterOpen(true)}
+            />
 
-            <div className="space-y-2">
-              <label htmlFor="roasterId" className="text-sm font-medium">
-                Roaster
-              </label>
-              <Controller
-                control={form.control}
-                name="roasterId"
-                render={({ field }) => (
-                  <Select
-                    value={field.value || noRoasterValue}
-                    onValueChange={(nextValue) => {
-                      if (nextValue === noRoasterValue) {
-                        field.onChange('')
-                        return
-                      }
+            <BeanClassificationSection
+              form={form}
+              countryOptions={countryOptions}
+              originCountryIdsError={originCountryIdsError}
+              toCountryNames={toCountryNames}
+              toCountryIds={toCountryIds}
+            />
 
-                      if (nextValue === createRoasterValue) {
-                        setIsCreateRoasterOpen(true)
-                        return
-                      }
+            <BeanFlavorAndOriginSection
+              form={form}
+              flavorNoteOptions={flavorNoteOptions}
+              flavorNotesError={flavorNotesError}
+            />
 
-                      field.onChange(nextValue)
-                    }}
-                  >
-                    <SelectTrigger id="roasterId" className="w-full">
-                      <SelectValue placeholder="Select a roaster" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value={noRoasterValue}>
-                        Select a roaster
-                      </SelectItem>
-                      <SelectItem value={createRoasterValue}>
-                        + Create roaster
-                      </SelectItem>
-                      {roasterOptions.map((roaster) => (
-                        <SelectItem key={roaster.id} value={roaster.id}>
-                          {roaster.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-              <FieldErrorText message={form.formState.errors.roasterId?.message} />
-            </div>
+            <BeanProcessingSection form={form} />
 
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <label htmlFor="originType" className="text-sm font-medium">
-                  Origin Type
-                </label>
-                <Controller
-                  control={form.control}
-                  name="originType"
-                  render={({ field }) => (
-                    <Select
-                      value={String(field.value)}
-                      onValueChange={(nextValue) => field.onChange(Number(nextValue))}
-                    >
-                      <SelectTrigger id="originType" className="w-full">
-                        <SelectValue placeholder="Select origin type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {Object.entries(originTypeLabels).map(([value, label]) => (
-                          <SelectItem key={value} value={value}>
-                            {label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  )}
-                />
-                <FieldErrorText message={form.formState.errors.originType?.message} />
-              </div>
-
-              <div className="space-y-2">
-                <label htmlFor="roastProfile" className="text-sm font-medium">
-                  Roast Profile
-                </label>
-                <Controller
-                  control={form.control}
-                  name="roastProfile"
-                  render={({ field }) => (
-                    <Select
-                      value={String(field.value)}
-                      onValueChange={(nextValue) => field.onChange(Number(nextValue))}
-                    >
-                      <SelectTrigger id="roastProfile" className="w-full">
-                        <SelectValue placeholder="Select roast profile" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {Object.entries(roastProfileLabels).map(([value, label]) => (
-                          <SelectItem key={value} value={value}>
-                            {label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  )}
-                />
-                <FieldErrorText
-                  message={form.formState.errors.roastProfile?.message}
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Origin Countries</label>
-              <Controller
-                control={form.control}
-                name="originCountryIds"
-                render={({ field }) => (
-                  <TagCombobox
-                    placeholder="Select countries"
-                    searchPlaceholder="Search countries..."
-                    emptyMessage="No countries found."
-                    createLabel={(value) => `Create "${value}"`}
-                    allowCreate={false}
-                    values={toCountryNames(field.value ?? [])}
-                    options={countryOptions.map((country) => country.name)}
-                    onChange={(values) => field.onChange(toCountryIds(values))}
-                  />
-                )}
-              />
-              <FieldErrorText message={originCountryIdsError} />
-            </div>
-
-            <div className="space-y-2">
-              <label htmlFor="region" className="text-sm font-medium">
-                Region
-              </label>
-              <Input id="region" {...form.register('region')} />
-              <FieldErrorText message={form.formState.errors.region?.message} />
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Flavor Notes</label>
-              <Controller
-                control={form.control}
-                name="flavorNoteNames"
-                render={({ field }) => (
-                  <TagCombobox
-                    placeholder="Select or create flavor notes"
-                    searchPlaceholder="Search flavor notes..."
-                    emptyMessage="No flavor notes found."
-                    createLabel={(value) => `Create "${value}"`}
-                    values={field.value ?? []}
-                    options={flavorNoteOptions}
-                    onChange={field.onChange}
-                  />
-                )}
-              />
-              <FieldErrorText message={flavorNotesError} />
-            </div>
-
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <label htmlFor="variety" className="text-sm font-medium">
-                  Variety
-                </label>
-                <Input id="variety" {...form.register('variety')} />
-                <FieldErrorText message={form.formState.errors.variety?.message} />
-              </div>
-
-              <div className="space-y-2">
-                <label htmlFor="processingMethod" className="text-sm font-medium">
-                  Processing Method
-                </label>
-                <Input
-                  id="processingMethod"
-                  {...form.register('processingMethod')}
-                />
-                <FieldErrorText
-                  message={form.formState.errors.processingMethod?.message}
-                />
-              </div>
-            </div>
-
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <label htmlFor="roastDate" className="text-sm font-medium">
-                  Roast Date
-                </label>
-                <DatePicker
-                  id="roastDate"
-                  value={typeof watchedRoastDate === 'string' ? watchedRoastDate : undefined}
-                  onChange={(nextValue) => {
-                    form.clearErrors('roastDate')
-                    form.setValue('roastDate', nextValue, {
-                      shouldDirty: true,
-                      shouldValidate: true,
-                    })
-                  }}
-                  onInvalidInput={() => {
-                    form.setError('roastDate', {
-                      type: 'manual',
-                      message: 'Use format dd.mm.yyyy.',
-                    })
-                  }}
-                />
-                <FieldErrorText message={form.formState.errors.roastDate?.message} />
-              </div>
-
-              <div className="space-y-2">
-                <label htmlFor="altitude" className="text-sm font-medium">
-                  Altitude (m)
-                </label>
-                <Input
-                  id="altitude"
-                  type="number"
-                  {...form.register('altitude', { valueAsNumber: true })}
-                />
-                <FieldErrorText message={form.formState.errors.altitude?.message} />
-              </div>
-            </div>
-
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <label htmlFor="bagWeight" className="text-sm font-medium">
-                  Bag Weight (g)
-                </label>
-                <Input
-                  id="bagWeight"
-                  type="number"
-                  {...form.register('bagWeight', { valueAsNumber: true })}
-                />
-                <FieldErrorText message={form.formState.errors.bagWeight?.message} />
-              </div>
-
-              <div className="space-y-2">
-                <label htmlFor="price" className="text-sm font-medium">
-                  Price
-                </label>
-                <Input
-                  id="price"
-                  type="number"
-                  step="0.01"
-                  {...form.register('price', { valueAsNumber: true })}
-                />
-                <FieldErrorText message={form.formState.errors.price?.message} />
-              </div>
-            </div>
-
-            {isEditMode ? (
-              <div className="flex items-center justify-between rounded-lg border p-3">
-                <div className="space-y-0.5">
-                  <label htmlFor="isAvailable" className="text-sm font-medium">
-                    Available
-                  </label>
-                  <p className="text-sm text-muted-foreground">
-                    Unavailable beans are hidden from lists by default.
-                  </p>
-                </div>
-                <Controller
-                  control={form.control}
-                  name="isAvailable"
-                  render={({ field }) => (
-                    <Switch
-                      id="isAvailable"
-                      checked={Boolean(field.value)}
-                      onCheckedChange={field.onChange}
-                    />
-                  )}
-                />
-              </div>
-            ) : null}
+            <BeanInventorySection form={form} isEditMode={isEditMode} />
 
             <FieldErrorText message={form.formState.errors.root?.serverError?.message} />
 

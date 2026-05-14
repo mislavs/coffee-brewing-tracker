@@ -16,43 +16,43 @@ export const featureRoutes: FeatureRoute[] = [
 
 export const defaultFeatureRoute = '/brew-log'
 
-export const loadRoasterDetailPage = () =>
+const loadRoasterDetailPage = () =>
   import('@/features/roasters/pages/RoasterDetailPage')
 
-export const loadRoasterFormPage = () =>
+const loadRoasterFormPage = () =>
   import('@/features/roasters/pages/RoasterFormPage')
 
-export const loadBeanDetailPage = () => import('@/features/beans/pages/BeanDetailPage')
+const loadBeanDetailPage = () => import('@/features/beans/pages/BeanDetailPage')
 
-export const loadBeanFormPage = () => import('@/features/beans/pages/BeanFormPage')
+const loadBeanFormPage = () => import('@/features/beans/pages/BeanFormPage')
 
-export const loadRecipeDetailPage = () =>
+const loadRecipeDetailPage = () =>
   import('@/features/recipes/pages/RecipeDetailPage')
 
-export const loadRecipeFormPage = () => import('@/features/recipes/pages/RecipeFormPage')
+const loadRecipeFormPage = () => import('@/features/recipes/pages/RecipeFormPage')
 
-export const loadBrewLogDetailPage = () =>
+const loadBrewLogDetailPage = () =>
   import('@/features/brew-log/pages/BrewLogDetailPage')
 
-export const loadBrewLogFormPage = () =>
+const loadBrewLogFormPage = () =>
   import('@/features/brew-log/pages/BrewLogFormPage')
 
-export const loadBrewerDetailPage = () =>
+const loadBrewerDetailPage = () =>
   import('@/features/equipment/pages/BrewerDetailPage')
 
-export const loadBrewerFormPage = () =>
+const loadBrewerFormPage = () =>
   import('@/features/equipment/pages/BrewerFormPage')
 
-export const loadGrinderDetailPage = () =>
+const loadGrinderDetailPage = () =>
   import('@/features/equipment/pages/GrinderDetailPage')
 
-export const loadGrinderFormPage = () =>
+const loadGrinderFormPage = () =>
   import('@/features/equipment/pages/GrinderFormPage')
 
-export const loadAccessoryDetailPage = () =>
+const loadAccessoryDetailPage = () =>
   import('@/features/equipment/pages/AccessoryDetailPage')
 
-export const loadAccessoryFormPage = () =>
+const loadAccessoryFormPage = () =>
   import('@/features/equipment/pages/AccessoryFormPage')
 
 export function preloadRoasterFeatureRoutes() {

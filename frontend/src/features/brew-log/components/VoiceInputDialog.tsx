@@ -278,13 +278,12 @@ export function VoiceInputDialog({
                 className="relative z-10 rounded-full bg-red-100 p-4 text-red-700 transition-transform duration-150 ease-out"
                 style={{
                   transform: `scale(${micBubbleScale})`,
-                  willChange: 'transform',
                 }}
               >
                 <Mic className="size-8" />
               </div>
             </div>
-            <p className="text-sm font-medium">Listening...</p>
+            <p className="text-sm font-medium">Listening…</p>
             <div className="flex items-center gap-2">
               <Button variant="outline" onClick={cancel}>
                 Cancel
@@ -301,7 +300,7 @@ export function VoiceInputDialog({
           <div className="flex flex-col items-center justify-center gap-4 py-8 text-center">
             <Loader2 className="size-8 animate-spin text-muted-foreground" />
             <p className="text-sm text-muted-foreground">
-              Processing your brew description...
+              Processing your brew description…
             </p>
           </div>
         )}

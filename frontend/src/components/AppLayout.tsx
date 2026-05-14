@@ -225,7 +225,7 @@ export function AppLayout() {
               </Button>
             </SheetTrigger>
             <SheetContent side="left" className="w-[18rem] gap-0 p-0">
-              <SheetHeader className="border-b px-4 py-4">
+              <SheetHeader className="border-b p-4">
                 <SheetTitle>Navigate</SheetTitle>
                 <SheetDescription>
                   Jump between coffee tracking features.

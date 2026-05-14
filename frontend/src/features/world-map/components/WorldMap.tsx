@@ -133,7 +133,7 @@ function WorldMapComponent({
     <section className="w-full">
       {isFetching ? (
         <div className="mb-2 flex justify-end">
-          <span className="text-muted-foreground text-xs">Refreshing map...</span>
+          <span className="text-muted-foreground text-xs">Refreshing map…</span>
         </div>
       ) : null}
       {isError && countryStats.length === 0 ? (

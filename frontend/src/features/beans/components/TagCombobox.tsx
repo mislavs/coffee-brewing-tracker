@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useId, useMemo, useState } from 'react'
 import { ChevronsUpDownIcon, PlusIcon, XIcon } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -17,6 +17,7 @@ import {
 } from '@/components/ui/popover'
 
 type TagComboboxProps = {
+  triggerId?: string
   placeholder: string
   searchPlaceholder: string
   emptyMessage: string
@@ -58,6 +59,7 @@ function normalizeDistinct(values: string[]) {
 }
 
 export function TagCombobox({
+  triggerId,
   placeholder,
   searchPlaceholder,
   emptyMessage,
@@ -69,6 +71,9 @@ export function TagCombobox({
 }: TagComboboxProps) {
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
+  const generatedTriggerId = useId()
+  const generatedContentId = useId()
+  const resolvedTriggerId = triggerId ?? generatedTriggerId
 
   const normalizedValues = useMemo(
     () => values.map((value) => normalize(value)),
@@ -128,9 +133,12 @@ export function TagCombobox({
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
+            id={resolvedTriggerId}
             type="button"
             variant="outline"
             role="combobox"
+            aria-controls={generatedContentId}
+            aria-expanded={open}
             className="w-full justify-between"
           >
             {normalizedValues.length > 0
@@ -139,7 +147,10 @@ export function TagCombobox({
             <ChevronsUpDownIcon className="text-muted-foreground ml-2 size-4 shrink-0 opacity-70" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-(--radix-popover-trigger-width) p-0">
+        <PopoverContent
+          id={generatedContentId}
+          className="w-(--radix-popover-trigger-width) p-0"
+        >
           <Command>
             <CommandInput
               value={query}

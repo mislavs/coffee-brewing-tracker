@@ -43,7 +43,7 @@ export function DashboardStats() {
 
   if (isError && !data) {
     return (
-      <section className="flex flex-col gap-3 rounded-xl border bg-card/50 px-3 py-3 sm:flex-row sm:items-center sm:justify-between">
+      <section className="flex flex-col gap-3 rounded-xl border bg-card/50 p-3 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-muted-foreground text-sm">
           Dashboard stats are temporarily unavailable.
         </p>

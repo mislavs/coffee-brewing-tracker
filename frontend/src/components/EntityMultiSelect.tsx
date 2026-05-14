@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useId, useMemo, useState } from 'react'
 import { CheckIcon, ChevronsUpDownIcon } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -22,6 +22,7 @@ type EntityOption = {
 }
 
 type EntityMultiSelectProps = {
+  triggerId?: string
   options: EntityOption[]
   selectedIds: string[]
   onChange: (ids: string[]) => void
@@ -35,6 +36,7 @@ function includesIgnoreCase(text: string, query: string) {
 }
 
 export function EntityMultiSelect({
+  triggerId,
   options,
   selectedIds,
   onChange,
@@ -44,6 +46,9 @@ export function EntityMultiSelect({
 }: EntityMultiSelectProps) {
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
+  const generatedTriggerId = useId()
+  const generatedContentId = useId()
+  const resolvedTriggerId = triggerId ?? generatedTriggerId
   const selectedIdSet = useMemo(() => new Set(selectedIds), [selectedIds])
 
   const selectedOptions = useMemo(
@@ -76,9 +81,12 @@ export function EntityMultiSelect({
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
+            id={resolvedTriggerId}
             type="button"
             variant="outline"
             role="combobox"
+            aria-controls={generatedContentId}
+            aria-expanded={open}
             className="w-full justify-between"
           >
             {selectedOptions.length > 0
@@ -87,7 +95,10 @@ export function EntityMultiSelect({
             <ChevronsUpDownIcon className="text-muted-foreground ml-2 size-4 shrink-0 opacity-70" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-(--radix-popover-trigger-width) p-0">
+        <PopoverContent
+          id={generatedContentId}
+          className="w-(--radix-popover-trigger-width) p-0"
+        >
           <Command>
             <CommandInput
               value={query}

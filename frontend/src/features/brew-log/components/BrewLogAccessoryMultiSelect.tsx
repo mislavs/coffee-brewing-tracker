@@ -4,11 +4,13 @@ import { useAccessories } from '@/features/equipment/hooks/useAccessories'
 import { toIdNameOptions } from '@/features/brew-log/components/brewLogFormShared'
 
 type BrewLogAccessoryMultiSelectProps = {
+  triggerId?: string
   selectedIds: string[]
   onChange: (ids: string[]) => void
 }
 
 export function BrewLogAccessoryMultiSelect({
+  triggerId,
   selectedIds,
   onChange,
 }: BrewLogAccessoryMultiSelectProps) {
@@ -21,6 +23,7 @@ export function BrewLogAccessoryMultiSelect({
 
   return (
     <EntityMultiSelect
+      triggerId={triggerId}
       options={accessoryOptions}
       selectedIds={selectedIds}
       onChange={onChange}

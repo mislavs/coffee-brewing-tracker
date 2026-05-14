@@ -40,7 +40,7 @@ type RoasterFormCardProps = {
   onCancel?: () => void
 }
 
-export type RoasterLogoSubmission = {
+type RoasterLogoSubmission = {
   file: File | null
   removeExistingLogo: boolean
 }

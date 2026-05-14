@@ -19,7 +19,7 @@ export const worldMapProjectionOptions = [
 
 export type WorldMapProjection = (typeof worldMapProjectionOptions)[number]
 
-export type MapPointer = {
+type MapPointer = {
   x: number
   y: number
 }

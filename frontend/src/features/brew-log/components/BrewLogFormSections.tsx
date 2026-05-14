@@ -156,12 +156,15 @@ export function BeanAndEquipmentSection({
       </div>
 
       <div className="space-y-2">
-        <label className="text-sm font-medium">Accessories</label>
+        <label htmlFor="accessoryIds" className="text-sm font-medium">
+          Accessories
+        </label>
         <Controller
           control={form.control}
           name="accessoryIds"
           render={({ field }) => (
             <BrewLogAccessoryMultiSelect
+              triggerId="accessoryIds"
               selectedIds={field.value ?? []}
               onChange={field.onChange}
             />
@@ -225,7 +228,7 @@ export function BrewParametersSection({ form }: FormSectionProps) {
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-medium">Brew ratio</label>
+          <span className="text-sm font-medium">Brew ratio</span>
           <div className="border-input bg-muted/30 flex h-9 items-center rounded-md border px-3 text-sm tabular-nums">
             {liveRatio}
           </div>
@@ -306,8 +309,8 @@ export function ResultsSection({ form }: FormSectionProps) {
         </div>
       </div>
 
-      <div className="space-y-2">
-        <label className="text-sm font-medium">Rating</label>
+      <fieldset className="space-y-2">
+        <legend className="text-sm font-medium">Rating</legend>
         <Controller
           control={form.control}
           name="rating"
@@ -319,7 +322,7 @@ export function ResultsSection({ form }: FormSectionProps) {
           )}
         />
         <FieldErrorText message={form.formState.errors.rating?.message} />
-      </div>
+      </fieldset>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">

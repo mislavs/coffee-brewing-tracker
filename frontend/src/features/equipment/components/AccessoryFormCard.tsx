@@ -71,12 +71,15 @@ export function AccessoryFormCard({
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">Compatible Brewers</label>
+            <label htmlFor="brewerIds" className="text-sm font-medium">
+              Compatible Brewers
+            </label>
             <Controller
               control={form.control}
               name="brewerIds"
               render={({ field }) => (
                 <BrewerMultiSelect
+                  triggerId="brewerIds"
                   selectedIds={field.value ?? []}
                   onChange={field.onChange}
                 />
