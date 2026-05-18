@@ -90,7 +90,7 @@ export function RecipeFormCard({
             <label htmlFor="name" className="text-sm font-medium">
               Name
             </label>
-            <Input id="name" {...form.register('name')} />
+            <Input id="name" enterKeyHint="next" {...form.register('name')} />
             <FieldErrorText message={form.formState.errors.name?.message} />
           </div>
 
@@ -126,6 +126,7 @@ export function RecipeFormCard({
             <Textarea
               id="description"
               rows={5}
+              enterKeyHint="done"
               {...form.register('description')}
             />
             <FieldErrorText message={form.formState.errors.description?.message} />

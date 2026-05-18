@@ -207,6 +207,7 @@ export function BrewParametersSection({ form }: FormSectionProps) {
             id="dose"
             type="number"
             inputMode="decimal"
+            enterKeyHint="next"
             step="0.1"
             {...form.register('dose')}
           />
@@ -221,6 +222,7 @@ export function BrewParametersSection({ form }: FormSectionProps) {
             id="waterAmount"
             type="number"
             inputMode="decimal"
+            enterKeyHint="next"
             step="0.1"
             {...form.register('waterAmount')}
           />
@@ -242,6 +244,7 @@ export function BrewParametersSection({ form }: FormSectionProps) {
             id="waterTemperature"
             type="number"
             inputMode="decimal"
+            enterKeyHint="next"
             step="0.1"
             {...form.register('waterTemperature')}
           />
@@ -256,6 +259,7 @@ export function BrewParametersSection({ form }: FormSectionProps) {
             id="grindSize"
             type="number"
             inputMode="decimal"
+            enterKeyHint="next"
             step="0.1"
             {...form.register('grindSize')}
           />
@@ -284,6 +288,7 @@ export function ResultsSection({ form }: FormSectionProps) {
             <Input
               id="brewTimeMinutes"
               type="number"
+              enterKeyHint="next"
               className="w-24"
               {...form.register('brewTimeMinutes')}
             />
@@ -301,6 +306,7 @@ export function ResultsSection({ form }: FormSectionProps) {
               type="number"
               min={0}
               max={59}
+              enterKeyHint="next"
               className="w-24"
               {...form.register('brewTimeSeconds')}
             />
@@ -332,6 +338,7 @@ export function ResultsSection({ form }: FormSectionProps) {
           <Textarea
             id="tastingNotes"
             rows={4}
+            enterKeyHint="next"
             {...form.register('tastingNotes')}
           />
           <FieldErrorText message={form.formState.errors.tastingNotes?.message} />
@@ -344,6 +351,7 @@ export function ResultsSection({ form }: FormSectionProps) {
           <Textarea
             id="adjustmentIdeas"
             rows={4}
+            enterKeyHint="done"
             {...form.register('adjustmentIdeas')}
           />
           <FieldErrorText message={form.formState.errors.adjustmentIdeas?.message} />

@@ -64,7 +64,7 @@ export function GrinderFormCard({
             <label htmlFor="name" className="text-sm font-medium">
               Name
             </label>
-            <Input id="name" {...form.register('name')} />
+            <Input id="name" enterKeyHint="done" {...form.register('name')} />
             <FieldErrorText message={form.formState.errors.name?.message} />
           </div>
 

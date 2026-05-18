@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm, useWatch } from 'react-hook-form'
 import type { Guid } from '@/lib/api-types'
@@ -412,6 +412,21 @@ export function QuickLogWizardDialog({
     }
   })
 
+  const handleStepFormSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+
+    if (isBusy) {
+      return
+    }
+
+    if (isLastStep) {
+      void handleSubmit()
+      return
+    }
+
+    void handleNext()
+  }
+
   return (
     <>
       <Dialog open={open} onOpenChange={handleDialogOpenChange}>
@@ -471,8 +486,10 @@ export function QuickLogWizardDialog({
               </>
             }
           >
-            {currentStepDefinition.render()}
-            <FieldErrorText message={form.formState.errors.root?.serverError?.message} />
+            <form onSubmit={handleStepFormSubmit}>
+              {currentStepDefinition.render()}
+              <FieldErrorText message={form.formState.errors.root?.serverError?.message} />
+            </form>
           </WizardShell>
         </DialogContent>
       </Dialog>

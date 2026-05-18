@@ -122,7 +122,7 @@ export function RoasterFormCard({
             <label htmlFor="name" className="text-sm font-medium">
               Name
             </label>
-            <Input id="name" {...form.register('name')} />
+            <Input id="name" enterKeyHint="next" {...form.register('name')} />
             <FieldErrorText message={form.formState.errors.name?.message} />
           </div>
 
@@ -130,7 +130,7 @@ export function RoasterFormCard({
             <label htmlFor="city" className="text-sm font-medium">
               City
             </label>
-            <Input id="city" {...form.register('city')} />
+            <Input id="city" enterKeyHint="next" {...form.register('city')} />
             <FieldErrorText message={form.formState.errors.city?.message} />
           </div>
 
@@ -169,7 +169,12 @@ export function RoasterFormCard({
             <label htmlFor="websiteUrl" className="text-sm font-medium">
               Website URL
             </label>
-            <Input id="websiteUrl" type="url" {...form.register('websiteUrl')} />
+            <Input
+              id="websiteUrl"
+              type="url"
+              enterKeyHint="done"
+              {...form.register('websiteUrl')}
+            />
             <FieldErrorText message={form.formState.errors.websiteUrl?.message} />
           </div>
 

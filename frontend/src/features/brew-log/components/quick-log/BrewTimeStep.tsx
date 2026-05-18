@@ -16,6 +16,7 @@ export function BrewTimeStep({ form, disabled = false }: QuickLogStepProps) {
           type="number"
           min={0}
           inputMode="numeric"
+          enterKeyHint="next"
           disabled={disabled}
           {...form.register('brewTimeMinutes')}
         />
@@ -33,6 +34,7 @@ export function BrewTimeStep({ form, disabled = false }: QuickLogStepProps) {
           min={0}
           max={59}
           inputMode="numeric"
+          enterKeyHint="done"
           disabled={disabled}
           {...form.register('brewTimeSeconds')}
         />

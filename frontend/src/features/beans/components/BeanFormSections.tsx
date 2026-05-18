@@ -47,7 +47,7 @@ export function BeanIdentitySection({
         <label htmlFor="name" className="text-sm font-medium">
           Name
         </label>
-        <Input id="name" {...form.register('name')} />
+        <Input id="name" enterKeyHint="next" {...form.register('name')} />
         <FieldErrorText message={form.formState.errors.name?.message} />
       </div>
 
@@ -215,7 +215,7 @@ export function BeanFlavorAndOriginSection({
         <label htmlFor="region" className="text-sm font-medium">
           Region
         </label>
-        <Input id="region" {...form.register('region')} />
+        <Input id="region" enterKeyHint="next" {...form.register('region')} />
         <FieldErrorText message={form.formState.errors.region?.message} />
       </div>
 
@@ -259,7 +259,7 @@ export function BeanProcessingSection({ form }: BeanProcessingSectionProps) {
           <label htmlFor="variety" className="text-sm font-medium">
             Variety
           </label>
-          <Input id="variety" {...form.register('variety')} />
+          <Input id="variety" enterKeyHint="next" {...form.register('variety')} />
           <FieldErrorText message={form.formState.errors.variety?.message} />
         </div>
 
@@ -267,7 +267,11 @@ export function BeanProcessingSection({ form }: BeanProcessingSectionProps) {
           <label htmlFor="processingMethod" className="text-sm font-medium">
             Processing Method
           </label>
-          <Input id="processingMethod" {...form.register('processingMethod')} />
+          <Input
+            id="processingMethod"
+            enterKeyHint="next"
+            {...form.register('processingMethod')}
+          />
           <FieldErrorText
             message={form.formState.errors.processingMethod?.message}
           />
@@ -306,6 +310,7 @@ export function BeanProcessingSection({ form }: BeanProcessingSectionProps) {
           <Input
             id="altitude"
             type="number"
+            enterKeyHint="next"
             {...form.register('altitude', { valueAsNumber: true })}
           />
           <FieldErrorText message={form.formState.errors.altitude?.message} />
@@ -334,6 +339,7 @@ export function BeanInventorySection({
           <Input
             id="bagWeight"
             type="number"
+            enterKeyHint="next"
             {...form.register('bagWeight', { valueAsNumber: true })}
           />
           <FieldErrorText message={form.formState.errors.bagWeight?.message} />
@@ -346,6 +352,7 @@ export function BeanInventorySection({
           <Input
             id="price"
             type="number"
+            enterKeyHint="done"
             step="0.01"
             {...form.register('price', { valueAsNumber: true })}
           />

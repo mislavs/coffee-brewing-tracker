@@ -31,6 +31,7 @@ export function BrewParametersStep({ form, disabled = false }: QuickLogStepProps
           id="quick-log-dose"
           type="number"
           inputMode="decimal"
+          enterKeyHint="next"
           step="0.1"
           disabled={disabled}
           {...form.register('dose')}
@@ -46,6 +47,7 @@ export function BrewParametersStep({ form, disabled = false }: QuickLogStepProps
           id="quick-log-water-amount"
           type="number"
           inputMode="decimal"
+          enterKeyHint="next"
           step="0.1"
           disabled={disabled}
           {...form.register('waterAmount')}
@@ -67,6 +69,7 @@ export function BrewParametersStep({ form, disabled = false }: QuickLogStepProps
           id="quick-log-water-temperature"
           type="number"
           inputMode="decimal"
+          enterKeyHint="next"
           step="0.1"
           disabled={disabled}
           {...form.register('waterTemperature')}
@@ -82,6 +85,7 @@ export function BrewParametersStep({ form, disabled = false }: QuickLogStepProps
           id="quick-log-grind-size"
           type="number"
           inputMode="decimal"
+          enterKeyHint="done"
           step="0.1"
           disabled={disabled}
           {...form.register('grindSize')}

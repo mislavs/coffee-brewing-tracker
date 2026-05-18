@@ -16,6 +16,7 @@ export function NotesStep({ form, disabled = false }: QuickLogStepProps) {
         <Textarea
           id="quick-log-tasting-notes"
           rows={5}
+          enterKeyHint="next"
           disabled={disabled}
           {...form.register('tastingNotes')}
         />
@@ -29,6 +30,7 @@ export function NotesStep({ form, disabled = false }: QuickLogStepProps) {
         <Textarea
           id="quick-log-adjustment-ideas"
           rows={5}
+          enterKeyHint="done"
           disabled={disabled}
           {...form.register('adjustmentIdeas')}
         />
