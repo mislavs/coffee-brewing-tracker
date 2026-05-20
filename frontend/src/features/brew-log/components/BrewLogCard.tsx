@@ -17,7 +17,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
-import { getRatingDisplay } from '@/features/brew-log/formatters'
+import { formatBrewTime, getRatingDisplay } from '@/features/brew-log/formatters'
 
 type BrewLogCardProps = {
   brewLog: BrewLogSummaryDto
@@ -123,6 +123,11 @@ export function BrewLogCard({ brewLog }: BrewLogCardProps) {
             <dt className="text-muted-foreground">Grinder</dt>
             <dd className="min-w-0 break-words font-medium text-foreground">
               {grinderAndSetting}
+            </dd>
+
+            <dt className="text-muted-foreground">Brew time</dt>
+            <dd className="min-w-0 break-words font-medium text-foreground">
+              {formatBrewTime(brewLog.brewTimeSeconds)}
             </dd>
 
             <dt className="text-muted-foreground">Rating</dt>

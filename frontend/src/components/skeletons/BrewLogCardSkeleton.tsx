@@ -14,6 +14,7 @@ const detailRowWidths: Array<{ labelWidth: string; valueWidth: string }> = [
   { labelWidth: 'w-28', valueWidth: 'w-32' },
   { labelWidth: 'w-20', valueWidth: 'w-28' },
   { labelWidth: 'w-14', valueWidth: 'w-24' },
+  { labelWidth: 'w-20', valueWidth: 'w-16' },
   { labelWidth: 'w-14', valueWidth: 'w-20' },
 ]
 
