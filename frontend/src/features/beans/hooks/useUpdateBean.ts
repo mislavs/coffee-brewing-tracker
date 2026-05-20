@@ -6,6 +6,7 @@ import {
   countryQueryKeys,
   flavorNoteQueryKeys,
 } from '@/features/beans/queryKeys'
+import { statsQueryKeys } from '@/features/stats/queryKeys'
 import { useEntityMutation } from '@/lib/useEntityMutation'
 
 type UpdateBeanInput = {
@@ -21,6 +22,8 @@ export function useUpdateBean() {
       beanQueryKeys.detail(variables.id),
       countryQueryKeys.all,
       flavorNoteQueryKeys.all,
+      statsQueryKeys.dashboard,
+      statsQueryKeys.countryMap,
     ],
     successMessage: 'Bean updated.',
   })

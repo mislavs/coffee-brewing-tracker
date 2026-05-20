@@ -1,8 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
 import type { DashboardStatsDto } from '@/lib/api/schemas'
 import { apiClient } from '@/lib/api-client'
+import { statsQueryKeys } from '@/features/stats/queryKeys'
 
-export const dashboardStatsQueryKey = ['stats', 'dashboard'] as const
+export const dashboardStatsQueryKey = statsQueryKeys.dashboard
 
 export function useDashboardStats() {
   return useQuery({

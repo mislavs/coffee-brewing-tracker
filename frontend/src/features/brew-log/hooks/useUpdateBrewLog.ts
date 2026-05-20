@@ -3,6 +3,7 @@ import type { UpdateBrewLogRequest } from '@/lib/api/schemas'
 import { apiClient } from '@/lib/api-client'
 import { beanQueryKeys } from '@/features/beans/queryKeys'
 import { brewLogQueryKeys } from '@/features/brew-log/queryKeys'
+import { statsQueryKeys } from '@/features/stats/queryKeys'
 import { useEntityMutation } from '@/lib/useEntityMutation'
 
 type UpdateBrewLogInput = {
@@ -17,6 +18,8 @@ export function useUpdateBrewLog() {
       brewLogQueryKeys.root,
       beanQueryKeys.all,
       brewLogQueryKeys.detail(variables.id),
+      statsQueryKeys.dashboard,
+      statsQueryKeys.countryMap,
     ],
     successMessage: 'Brew log updated.',
   })

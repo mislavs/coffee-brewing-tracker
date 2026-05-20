@@ -2,6 +2,7 @@ import type { Guid } from '@/lib/api-types'
 import { apiClient } from '@/lib/api-client'
 import { beanQueryKeys } from '@/features/beans/queryKeys'
 import { brewLogQueryKeys } from '@/features/brew-log/queryKeys'
+import { statsQueryKeys } from '@/features/stats/queryKeys'
 import { useEntityMutation } from '@/lib/useEntityMutation'
 
 type SetBrewLogRatingInput = {
@@ -16,6 +17,7 @@ export function useSetBrewLogRating() {
       brewLogQueryKeys.root,
       beanQueryKeys.all,
       brewLogQueryKeys.detail(variables.id),
+      statsQueryKeys.countryMap,
     ],
     successMessage: 'Rating saved.',
   })

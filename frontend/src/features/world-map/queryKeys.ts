@@ -1,3 +1,5 @@
+import { statsQueryKeys } from '@/features/stats/queryKeys'
+
 export const countryMapStatsQueryKeys = {
-  all: ['stats', 'country-map'] as const,
+  all: statsQueryKeys.countryMap,
 }
