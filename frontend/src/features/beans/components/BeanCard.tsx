@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import type { BeanSummaryDto } from '@/lib/api/schemas'
 import { Badge } from '@/components/ui/badge'
+import { Progress } from '@/components/ui/progress'
 import {
   Card,
   CardDescription,
@@ -50,12 +51,14 @@ export function BeanCard({ bean }: BeanCardProps) {
   const imageUrl = resolveBeanImageUrl(bean.imageUrl)
   const initials = getBeanInitials(bean.name)
   const roastAge = formatAgeInDays(bean.roastDate)
-  const isLowStock = Boolean(
-    bean.bagWeight &&
-      bean.remainingQuantity !== null &&
-      bean.remainingQuantity !== undefined &&
-      bean.remainingQuantity / bean.bagWeight < 0.2,
-  )
+  const bagWeight = bean.bagWeight ?? 0
+  const remainingQuantity = bean.remainingQuantity ?? bagWeight
+  const clampedRemainingQuantity = Math.max(remainingQuantity, 0)
+  const isLowStock = bagWeight > 0 && clampedRemainingQuantity / bagWeight < 0.2
+  const remainingPercentage = bagWeight > 0
+    ? Math.min(100, (clampedRemainingQuantity / bagWeight) * 100)
+    : 0
+  const isAvailable = bean.isAvailable !== false
 
   return (
     <Card className="card-interactive h-full">
@@ -116,13 +119,15 @@ export function BeanCard({ bean }: BeanCardProps) {
               </Badge>
             ) : null}
             <Badge variant="outline">{formatPricePerKg(bean.pricePerKg)}</Badge>
-            <Badge
-              variant="outline"
-              className={isLowStock ? 'border-destructive/40 text-destructive' : undefined}
-            >
-              Remaining: {formatDecimal(bean.remainingQuantity)} g
-            </Badge>
           </div>
+          {isAvailable ? (
+            <div className="space-y-1">
+              <p className={isLowStock ? 'text-xs font-medium text-destructive' : 'text-xs font-medium'}>
+                {formatDecimal(clampedRemainingQuantity)} g / {formatDecimal(bean.bagWeight)} g
+              </p>
+              <Progress value={remainingPercentage} />
+            </div>
+          ) : null}
         </div>
       </CardHeader>
     </Card>
