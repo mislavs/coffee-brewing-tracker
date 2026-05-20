@@ -39,12 +39,31 @@ public class GetDashboardStatsHandlerTests(IntegrationTestFactory factory) : Int
     }
 
     [Fact]
+    public async Task Handle_WhenBeanIsUnavailable_ExcludesItFromAvailableCoffee()
+    {
+        // Arrange
+        var (roaster, _, _) = await CreateBrewDependenciesAsync();
+        var availableBean = CreateBean("Available bean", roaster.Id, 500m);
+        var unavailableBean = CreateBean("Unavailable bean", roaster.Id, 750m);
+        unavailableBean.SetAvailability(false);
+        await InsertMany([availableBean, unavailableBean]);
+
+        // Act
+        var result = await Send(new GetDashboardStatsQuery());
+
+        // Assert
+        result.CoffeeAvailableGrams.Should().Be(500m);
+    }
+
+    [Fact]
     public async Task Handle_WhenEnoughRecentBrewsExist_ReturnsEstimatedDaysRemaining()
     {
         // Arrange
         var (roaster, brewer, grinder) = await CreateBrewDependenciesAsync();
         var bean = CreateBean("Forecast bean", roaster.Id, 950m);
-        await Insert(bean);
+        var unavailableBean = CreateBean("Unavailable forecast bean", roaster.Id, 900m);
+        unavailableBean.SetAvailability(false);
+        await InsertMany([bean, unavailableBean]);
         var referenceTime = DateTime.UtcNow.AddHours(1);
 
         await InsertMany(

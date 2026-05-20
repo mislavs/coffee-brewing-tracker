@@ -35,6 +35,7 @@ public sealed class GetDashboardStatsHandler(ApplicationDbContext dbContext)
 
         var coffeeAvailableGrams = await dbContext.Beans
             .AsNoTracking()
+            .Where(entity => entity.IsAvailable)
             .Select(entity => Math.Max(0m, entity.BagWeight - (dbContext.BrewLogEntries
                 .Where(entry => entry.BeanId == entity.Id)
                 .Sum(entry => (decimal?)entry.Dose) ?? 0m)))
