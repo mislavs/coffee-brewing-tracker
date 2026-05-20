@@ -31,6 +31,7 @@ import { NotesStep } from '@/features/brew-log/components/quick-log/NotesStep'
 import { RatingStep } from '@/features/brew-log/components/quick-log/RatingStep'
 import { RecipeStep } from '@/features/brew-log/components/quick-log/RecipeStep'
 import { WizardShell } from '@/features/brew-log/components/quick-log/WizardShell'
+import { useFilterAccessoryIdsOnBrewerChange } from '@/features/brew-log/components/useFilterAccessoryIdsOnBrewerChange'
 import { useResetRecipeOnBrewerChange } from '@/features/brew-log/components/useResetRecipeOnBrewerChange'
 import { useCreateBrewLog } from '@/features/brew-log/hooks/useCreateBrewLog'
 import { useLatestBrewLogForBean } from '@/features/brew-log/hooks/useLatestBrewLogForBean'
@@ -118,6 +119,7 @@ export function QuickLogWizardDialog({
   useResetRecipeOnBrewerChange(form, watchedBrewerId, '', {
     skipNextResetRef: skipNextRecipeResetRef,
   })
+  useFilterAccessoryIdsOnBrewerChange(form, watchedBrewerId, '')
 
   useEffect(() => {
     if (skipNextRecipeResetRef.current) {

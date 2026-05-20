@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { useWatch } from 'react-hook-form'
 import { FieldErrorText } from '@/features/brew-log/components/BrewLogFormUi'
 import {
+  filterAccessoriesByBrewer,
   getFieldErrorMessage,
   sortOptionsByPreferredIds,
   toIdNameOptions,
@@ -21,14 +22,18 @@ export function AccessoriesStep({
 }: AccessoriesStepProps) {
   const selectedAccessoryIds =
     useWatch({ control: form.control, name: 'accessoryIds' }) ?? []
+  const selectedBrewerId = useWatch({ control: form.control, name: 'brewerId' }) ?? ''
   const { data: accessories = [] } = useAccessories()
   const options = useMemo(
     () =>
       sortOptionsByPreferredIds(
-        toIdNameOptions(accessories, 'Unnamed accessory'),
+        toIdNameOptions(
+          filterAccessoriesByBrewer(accessories, selectedBrewerId),
+          'Unnamed accessory',
+        ),
         preferredIds,
       ),
-    [accessories, preferredIds],
+    [accessories, preferredIds, selectedBrewerId],
   )
 
   return (
@@ -47,7 +52,7 @@ export function AccessoriesStep({
           })
         }}
         mode="multi"
-        emptyMessage="No accessories yet. Add one in the Equipment section."
+        emptyMessage="No accessories compatible with this brewer. Add or update one in the Equipment section."
         disabled={disabled}
       />
       <FieldErrorText message={getFieldErrorMessage(form.formState.errors.accessoryIds)} />

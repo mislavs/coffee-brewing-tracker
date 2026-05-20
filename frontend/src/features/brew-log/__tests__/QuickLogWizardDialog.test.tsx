@@ -53,6 +53,7 @@ const grinderId = '66666666-6666-6666-6666-666666666666'
 const grinderBId = '88888888-8888-8888-8888-888888888888'
 const accessoryId = '77777777-7777-7777-7777-777777777777'
 const accessoryBId = '99999999-9999-9999-9999-999999999999'
+const universalAccessoryId = '12121212-1212-1212-1212-121212121212'
 
 const mutateAsyncMock = vi.fn()
 const setBeanAvailabilityMock = vi.fn()
@@ -245,6 +246,112 @@ describe('QuickLogWizardDialog', () => {
         .getAllByRole('button', { name: 'Grinder' })
         .every((button) => (button as HTMLButtonElement).disabled),
     ).toBe(true)
+  })
+
+  it('filters accessory options to the selected brewer and universal accessories', async () => {
+    const user = userEvent.setup()
+    vi.mocked(useAccessories).mockReturnValue(
+      createQueryResult([
+        {
+          id: accessoryId,
+          name: 'Accessory A',
+          compatibleBrewers: [{ id: brewerAId, name: 'Brewer A' }],
+        },
+        {
+          id: universalAccessoryId,
+          name: 'Universal Accessory',
+          compatibleBrewers: [],
+        },
+        {
+          id: accessoryBId,
+          name: 'Accessory B',
+          compatibleBrewers: [{ id: brewerBId, name: 'Brewer B' }],
+        },
+      ]) as ReturnType<typeof useAccessories>,
+    )
+    renderDialog()
+
+    await user.click(screen.getByRole('radio', { name: 'Bean One' }))
+    await user.click(await screen.findByRole('radio', { name: 'Brewer A' }))
+    await user.click(await screen.findByRole('radio', { name: 'Recipe A' }))
+    await user.click(await screen.findByRole('radio', { name: 'Grinder One' }))
+
+    await findCurrentStepButton('Accessories')
+    expect(screen.getByRole('button', { name: 'Accessory A' })).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Universal Accessory' })).toBeTruthy()
+    expect(screen.queryByRole('button', { name: 'Accessory B' })).toBeNull()
+  })
+
+  it('drops latest-brew accessories that are incompatible after changing brewer', async () => {
+    const user = userEvent.setup()
+    const latestBrew: BrewLogDto = {
+      id: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+      beanId,
+      brewerId: brewerBId,
+      recipeId: recipeBId,
+      grinderId: grinderBId,
+      accessories: [{ id: accessoryBId, name: 'Accessory B' }],
+      dose: 20,
+      waterAmount: 320,
+      brewedAt: '2026-04-26T08:00:00Z',
+    }
+    mutateAsyncMock.mockResolvedValue(undefined)
+    vi.mocked(useLatestBrewLogForBean).mockReturnValue(
+      createQueryResult(latestBrew) as ReturnType<typeof useLatestBrewLogForBean>,
+    )
+    vi.mocked(useGrinders).mockReturnValue(
+      createQueryResult([
+        { id: grinderId, name: 'Grinder One' },
+        { id: grinderBId, name: 'Grinder Two' },
+      ]) as ReturnType<typeof useGrinders>,
+    )
+    vi.mocked(useAccessories).mockReturnValue(
+      createQueryResult([
+        {
+          id: accessoryId,
+          name: 'Accessory A',
+          compatibleBrewers: [{ id: brewerAId, name: 'Brewer A' }],
+        },
+        {
+          id: accessoryBId,
+          name: 'Accessory B',
+          compatibleBrewers: [{ id: brewerBId, name: 'Brewer B' }],
+        },
+      ]) as ReturnType<typeof useAccessories>,
+    )
+    renderDialog()
+
+    await user.click(screen.getByRole('radio', { name: 'Bean One' }))
+    await findCurrentStepButton('Brewer')
+    await user.click(screen.getByRole('radio', { name: 'Brewer A' }))
+
+    await findCurrentStepButton('Recipe')
+    await user.click(screen.getByRole('radio', { name: 'Recipe A' }))
+    await findCurrentStepButton('Grinder')
+    await user.click(screen.getByRole('radio', { name: 'Grinder One' }))
+
+    await findCurrentStepButton('Accessories')
+    expect(screen.queryByRole('button', { name: 'Accessory B' })).toBeNull()
+
+    await user.click(screen.getByRole('button', { name: 'Next' }))
+    await findCurrentStepButton('Parameters')
+    await user.click(screen.getByRole('button', { name: 'Next' }))
+    await findCurrentStepButton('Brew time')
+    await user.click(screen.getByRole('button', { name: 'Skip' }))
+    await findCurrentStepButton('Rating')
+    await user.click(screen.getByRole('button', { name: 'Skip' }))
+    await findCurrentStepButton('Notes')
+    await user.click(screen.getByRole('button', { name: 'Log brew' }))
+
+    await waitFor(() => {
+      expect(mutateAsyncMock).toHaveBeenCalledTimes(1)
+    })
+
+    const [request] = mutateAsyncMock.mock.calls[0]
+    expect(request).toMatchObject({
+      brewerId: brewerAId,
+      accessoryIds: undefined,
+    })
   })
 
   it('jumps back to the matching step when submit returns server validation errors', async () => {

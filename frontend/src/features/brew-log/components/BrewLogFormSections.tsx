@@ -44,6 +44,7 @@ export function BeanAndEquipmentSection({
   hasSelectedBrewer,
 }: BeanAndEquipmentSectionProps) {
   const accessoryError = getFieldErrorMessage(form.formState.errors.accessoryIds)
+  const selectedBrewerId = useWatch({ control: form.control, name: 'brewerId' }) ?? ''
 
   return (
     <section className="space-y-4">
@@ -165,6 +166,7 @@ export function BeanAndEquipmentSection({
           render={({ field }) => (
             <BrewLogAccessoryMultiSelect
               triggerId="accessoryIds"
+              brewerId={selectedBrewerId}
               selectedIds={field.value ?? []}
               onChange={field.onChange}
             />

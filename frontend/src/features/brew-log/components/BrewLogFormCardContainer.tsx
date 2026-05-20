@@ -28,6 +28,7 @@ import {
   toIdNameOptions,
 } from '@/features/brew-log/components/brewLogFormShared'
 import { FieldErrorText } from '@/features/brew-log/components/BrewLogFormUi'
+import { useFilterAccessoryIdsOnBrewerChange } from '@/features/brew-log/components/useFilterAccessoryIdsOnBrewerChange'
 import { useResetRecipeOnBrewerChange } from '@/features/brew-log/components/useResetRecipeOnBrewerChange'
 import { applyBrewLogFormServerErrors } from '@/features/brew-log/mapApiValidationErrors'
 import { useBeans } from '@/features/beans/hooks/useBeans'
@@ -92,6 +93,7 @@ export function BrewLogFormCard({
   }, [recipes, watchedBrewerId])
 
   useResetRecipeOnBrewerChange(form, watchedBrewerId, initialValues.brewerId)
+  useFilterAccessoryIdsOnBrewerChange(form, watchedBrewerId, initialValues.brewerId)
 
   const submitForm = form.handleSubmit(async (values) => {
     form.clearErrors('root.serverError')

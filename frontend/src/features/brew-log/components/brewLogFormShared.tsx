@@ -1,3 +1,5 @@
+import type { AccessoryDto } from '@/lib/api/schemas'
+
 type OptionSource = {
   id?: string | null
   name?: string | null
@@ -56,6 +58,32 @@ export function sortOptionsByPreferredIds(
     ...preferredOptions,
     ...options.filter((option) => !preferredIdSet.has(option.id)),
   ]
+}
+
+export function isAccessoryCompatibleWithBrewer(
+  accessory: AccessoryDto,
+  brewerId: string | null | undefined,
+) {
+  if (!brewerId) {
+    return true
+  }
+
+  const compatibleBrewers = accessory.compatibleBrewers ?? []
+
+  if (compatibleBrewers.length === 0) {
+    return true
+  }
+
+  return compatibleBrewers.some((brewer) => brewer.id === brewerId)
+}
+
+export function filterAccessoriesByBrewer(
+  accessories: AccessoryDto[],
+  brewerId: string | null | undefined,
+) {
+  return accessories.filter((accessory) =>
+    isAccessoryCompatibleWithBrewer(accessory, brewerId),
+  )
 }
 
 export { getFieldErrorMessage } from '@/lib/formUtils'
