@@ -8,7 +8,7 @@
   <ItemGroup>
     <PackageReference Include="FluentValidation" Version="*" />
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="*" />
-    <PackageReference Include="MediatR" Version="*" />
+    <PackageReference Include="MediatR" Version="[12.5.0]" />
     <PackageReference Include="Microsoft.Extensions.AI.Abstractions" Version="10.4.1" />
   </ItemGroup>
 
