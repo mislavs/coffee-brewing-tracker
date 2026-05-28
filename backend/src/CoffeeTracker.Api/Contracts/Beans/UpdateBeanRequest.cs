@@ -14,6 +14,8 @@ public sealed record UpdateBeanRequest(
     int? Altitude,
     decimal BagWeight,
     decimal? Price,
+    int? Rating,
+    string? Notes,
     bool IsAvailable,
     IReadOnlyList<string>? FlavorNoteNames,
     string? Region = null);

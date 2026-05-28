@@ -20,6 +20,8 @@ public interface IBeanCommand
     int? Altitude { get; }
     decimal BagWeight { get; }
     decimal? Price { get; }
+    int? Rating { get; }
+    string? Notes { get; }
     IReadOnlyList<string>? FlavorNoteNames { get; }
 }
 
@@ -56,6 +58,13 @@ public sealed class BeanCommandValidationRules<T> : AbstractValidator<T>
         RuleFor(c => c.Price)
             .GreaterThanOrEqualTo(0)
             .When(c => c.Price.HasValue);
+
+        RuleFor(c => c.Rating)
+            .InclusiveBetween(1, 5)
+            .When(c => c.Rating.HasValue);
+
+        RuleFor(c => c.Notes)
+            .MaximumLength(2000);
 
         RuleFor(c => c.Altitude)
             .GreaterThan(0)

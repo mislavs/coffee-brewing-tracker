@@ -99,6 +99,34 @@ public class CreateBeanValidatorTests
         result.ShouldHaveValidationErrorFor(entry => entry.Region);
     }
 
+    [Theory]
+    [InlineData(0)]
+    [InlineData(6)]
+    public void Validate_WhenRatingIsOutOfRange_ShouldHaveValidationError(int rating)
+    {
+        // Arrange
+        var command = CreateValidCommand() with { Rating = rating };
+
+        // Act
+        var result = _sut.TestValidate(command);
+
+        // Assert
+        result.ShouldHaveValidationErrorFor(entry => entry.Rating);
+    }
+
+    [Fact]
+    public void Validate_WhenNotesAreTooLong_ShouldHaveValidationError()
+    {
+        // Arrange
+        var command = CreateValidCommand() with { Notes = new string('x', 2001) };
+
+        // Act
+        var result = _sut.TestValidate(command);
+
+        // Assert
+        result.ShouldHaveValidationErrorFor(entry => entry.Notes);
+    }
+
     private static CreateBeanCommand CreateValidCommand()
     {
         return new CreateBeanCommand(

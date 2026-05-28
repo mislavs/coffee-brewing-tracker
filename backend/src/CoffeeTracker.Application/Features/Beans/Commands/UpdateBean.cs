@@ -23,7 +23,9 @@ public sealed record UpdateBeanCommand(
     decimal? Price,
     bool IsAvailable,
     IReadOnlyList<string>? FlavorNoteNames,
-    string? Region = null) : IRequest, IBeanCommand;
+    string? Region = null,
+    int? Rating = null,
+    string? Notes = null) : IRequest, IBeanCommand;
 
 public sealed class UpdateBeanValidator : AbstractValidator<UpdateBeanCommand>
 {
@@ -72,6 +74,7 @@ public sealed class UpdateBeanHandler(ApplicationDbContext dbContext)
             throw new NotFoundException("One or more origin countries were not found.");
         }
 
+        var rating = request.Rating.HasValue ? (BeanRating?)request.Rating.Value : null;
         bean.Update(
             request.Name,
             request.RoasterId,
@@ -84,6 +87,8 @@ public sealed class UpdateBeanHandler(ApplicationDbContext dbContext)
             request.Altitude,
             request.BagWeight,
             request.Price,
+            rating,
+            request.Notes,
             request.IsAvailable,
             request.Region);
 

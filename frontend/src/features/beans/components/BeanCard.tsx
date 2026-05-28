@@ -18,6 +18,7 @@ import {
 } from '@/components/ui/tooltip'
 import {
   formatDecimal,
+  getRatingDisplay,
   formatPricePerKg,
   formatRoastProfile,
 } from '@/features/beans/formatters'
@@ -51,6 +52,7 @@ export function BeanCard({ bean }: BeanCardProps) {
   const imageUrl = resolveBeanImageUrl(bean.imageUrl)
   const initials = getBeanInitials(bean.name)
   const roastAge = formatAgeInDays(bean.roastDate)
+  const ratingDisplay = getRatingDisplay(bean.rating)
   const bagWeight = bean.bagWeight ?? 0
   const remainingQuantity = bean.remainingQuantity ?? bagWeight
   const clampedRemainingQuantity = Math.max(remainingQuantity, 0)
@@ -119,6 +121,11 @@ export function BeanCard({ bean }: BeanCardProps) {
               </Badge>
             ) : null}
             <Badge variant="outline">{formatPricePerKg(bean.pricePerKg)}</Badge>
+            {ratingDisplay !== '—' ? (
+              <Badge variant="outline" aria-label={`Rating ${bean.rating} out of 5`}>
+                {ratingDisplay}
+              </Badge>
+            ) : null}
           </div>
           {isAvailable ? (
             <div className="space-y-1">

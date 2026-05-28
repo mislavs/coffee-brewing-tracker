@@ -36,6 +36,8 @@ function toBeanRequestBase(values: BeanFormValues): CreateBeanRequest {
     altitude: values.altitude,
     bagWeight: values.bagWeight,
     price: values.price,
+    rating: values.rating,
+    notes: values.notes,
     flavorNoteNames:
       normalizedFlavorNotes.length > 0 ? normalizedFlavorNotes : undefined,
   }
@@ -66,6 +68,8 @@ function createInitialValues(): BeanFormValues {
     altitude: undefined,
     bagWeight: 250,
     price: undefined,
+    rating: undefined,
+    notes: '',
     isAvailable: true,
     flavorNoteNames: [],
   }
@@ -94,6 +98,8 @@ function createInitialValuesFromBean(
     altitude: bean.altitude ?? undefined,
     bagWeight: bean.bagWeight ?? 0,
     price: bean.price ?? undefined,
+    rating: bean.rating ?? undefined,
+    notes: bean.notes ?? '',
     isAvailable: options?.isAvailable ?? (bean.isAvailable ?? true),
     flavorNoteNames:
       bean.flavorNotes

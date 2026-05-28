@@ -18,6 +18,8 @@ public sealed record BeanDto(
     int? Altitude,
     decimal BagWeight,
     decimal? Price,
+    int? Rating,
+    string? Notes,
     decimal? PricePerKg,
     IReadOnlyList<FlavorNoteDto> FlavorNotes,
     bool HasImage,

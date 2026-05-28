@@ -33,7 +33,9 @@ public class GetBeanByIdHandlerTests(IntegrationTestFactory factory) : Integrati
             1800,
             250m,
             40m,
-            region: "Nyeri");
+            region: "Nyeri",
+            rating: BeanRating.Excellent,
+            notes: "Bright acidity.");
         bean.SetImage("kenya-ab.png", [1, 2, 3]);
         bean.SetFlavorNotes([citrus, chocolate]);
         await Insert(bean);
@@ -49,6 +51,8 @@ public class GetBeanByIdHandlerTests(IntegrationTestFactory factory) : Integrati
         result.RoasterId.Should().Be(roaster.Id);
         result.RoasterName.Should().Be("Kawa");
         result.Region.Should().Be("Nyeri");
+        result.Rating.Should().Be(5);
+        result.Notes.Should().Be("Bright acidity.");
         result.OriginCountries.Should().ContainSingle();
         result.OriginCountries.Single().Id.Should().Be(kenya.Id);
         result.OriginCountries.Single().Name.Should().Be("Kenya");

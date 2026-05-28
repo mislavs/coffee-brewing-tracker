@@ -18,6 +18,7 @@ import {
 import { Progress } from '@/components/ui/progress'
 import {
   formatDecimal,
+  getRatingDisplay,
   formatOriginType,
   formatPrice,
   formatPricePerKg,
@@ -175,20 +176,30 @@ function BeanDetailContent({ beanId }: { beanId: Guid }) {
 
               <section className="space-y-4">
                 <SectionDivider label="Tasting" />
-                {bean.flavorNotes && bean.flavorNotes.length > 0 ? (
-                  <div className="flex flex-wrap gap-2">
-                    {bean.flavorNotes
-                      .map((flavorNote) => flavorNote.name?.trim())
-                      .filter((name): name is string => Boolean(name))
-                      .map((name) => (
-                        <Badge key={name} variant="secondary">
-                          {name}
-                        </Badge>
-                      ))}
-                  </div>
-                ) : (
-                  <p className="text-muted-foreground">No flavor notes set.</p>
-                )}
+                <div className="grid gap-3">
+                  <DetailField label="Rating" stacked>
+                    {getRatingDisplay(bean.rating)}
+                  </DetailField>
+                  <DetailField label="Flavor Notes" stacked>
+                    {bean.flavorNotes && bean.flavorNotes.length > 0 ? (
+                      <div className="flex flex-wrap gap-2">
+                        {bean.flavorNotes
+                          .map((flavorNote) => flavorNote.name?.trim())
+                          .filter((name): name is string => Boolean(name))
+                          .map((name) => (
+                            <Badge key={name} variant="secondary">
+                              {name}
+                            </Badge>
+                          ))}
+                      </div>
+                    ) : (
+                      <p className="text-muted-foreground">No flavor notes set.</p>
+                    )}
+                  </DetailField>
+                  <DetailField label="Notes" stacked>
+                    {bean.notes || '—'}
+                  </DetailField>
+                </div>
               </section>
             </div>
           </div>

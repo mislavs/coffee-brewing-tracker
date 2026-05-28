@@ -19,6 +19,7 @@ public static class BeanSummaryProjection
             entity.Price.HasValue && entity.BagWeight > 0
                 ? entity.Price.Value / (entity.BagWeight / 1000m)
                 : null,
+            entity.Rating.HasValue ? (int?)entity.Rating.Value : null,
             entity.ImageData != null,
             entity.IsAvailable,
             Math.Max(0m, entity.BagWeight - (dbContext.BrewLogEntries
@@ -34,6 +35,7 @@ public static class BeanSummaryProjection
             entity.RoastDate,
             entity.BagWeight,
             entity.PricePerKg,
+            entity.Rating,
             entity.HasImage,
             entity.HasImage ? $"/api/beans/{entity.Id}/image" : null,
             entity.IsAvailable,
@@ -48,6 +50,7 @@ public sealed record BeanSummaryData(
     DateOnly? RoastDate,
     decimal BagWeight,
     decimal? PricePerKg,
+    int? Rating,
     bool HasImage,
     bool IsAvailable,
     decimal RemainingQuantity);

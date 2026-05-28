@@ -23,6 +23,8 @@ function buildInput(overrides: Record<string, unknown> = {}) {
     altitude: '1200',
     bagWeight: '250',
     price: '14.5',
+    rating: '4',
+    notes: 'Bright cup',
     isAvailable: true,
     flavorNoteNames: ['Chocolate'],
     ...overrides,
@@ -105,6 +107,42 @@ describe('beanFormSchema', () => {
     if (stringResult.success) {
       expect(stringResult.data.region).toBe('Huila')
     }
+  })
+
+  it('normalizes optional rating values', () => {
+    const emptyResult = beanFormSchema.safeParse(buildInput({ rating: '' }))
+    expect(emptyResult.success).toBe(true)
+    if (emptyResult.success) {
+      expect(emptyResult.data.rating).toBeUndefined()
+    }
+
+    const stringResult = beanFormSchema.safeParse(buildInput({ rating: '5' }))
+    expect(stringResult.success).toBe(true)
+    if (stringResult.success) {
+      expect(stringResult.data.rating).toBe(5)
+    }
+
+    expect(beanFormSchema.safeParse(buildInput({ rating: 0 })).success).toBe(false)
+    expect(beanFormSchema.safeParse(buildInput({ rating: 6 })).success).toBe(false)
+    expect(beanFormSchema.safeParse(buildInput({ rating: 1.5 })).success).toBe(false)
+  })
+
+  it('normalizes optional notes values', () => {
+    const emptyResult = beanFormSchema.safeParse(buildInput({ notes: '   ' }))
+    expect(emptyResult.success).toBe(true)
+    if (emptyResult.success) {
+      expect(emptyResult.data.notes).toBeUndefined()
+    }
+
+    const stringResult = beanFormSchema.safeParse(buildInput({ notes: ' Bright cup ' }))
+    expect(stringResult.success).toBe(true)
+    if (stringResult.success) {
+      expect(stringResult.data.notes).toBe('Bright cup')
+    }
+
+    expect(beanFormSchema.safeParse(buildInput({ notes: 'x'.repeat(2001) })).success).toBe(
+      false,
+    )
   })
 
   it('requires positive bagWeight after preprocessing', () => {

@@ -1550,6 +1550,15 @@
             "format": "double",
             "nullable": true
           },
+          "rating": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "notes": {
+            "type": "string",
+            "nullable": true
+          },
           "pricePerKg": {
             "type": "number",
             "format": "double",
@@ -1623,6 +1632,11 @@
           "pricePerKg": {
             "type": "number",
             "format": "double",
+            "nullable": true
+          },
+          "rating": {
+            "type": "integer",
+            "format": "int32",
             "nullable": true
           },
           "hasImage": {
@@ -2030,6 +2044,15 @@
           "price": {
             "type": "number",
             "format": "double",
+            "nullable": true
+          },
+          "rating": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "notes": {
+            "type": "string",
             "nullable": true
           },
           "flavorNoteNames": {
@@ -2913,6 +2936,15 @@
           "price": {
             "type": "number",
             "format": "double",
+            "nullable": true
+          },
+          "rating": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "notes": {
+            "type": "string",
             "nullable": true
           },
           "isAvailable": {

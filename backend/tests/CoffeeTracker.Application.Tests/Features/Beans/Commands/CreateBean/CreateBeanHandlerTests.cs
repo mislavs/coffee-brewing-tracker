@@ -19,7 +19,9 @@ public class CreateBeanHandlerTests(IntegrationTestFactory factory) : Integratio
         await Insert(kenya);
         var command = CreateCommand(roaster.Id, kenya.Id, ["Citrus", "Chocolate"]) with
         {
-            Region = " Nyeri "
+            Region = " Nyeri ",
+            Rating = 4,
+            Notes = " Bright cup "
         };
 
         // Act
@@ -38,6 +40,8 @@ public class CreateBeanHandlerTests(IntegrationTestFactory factory) : Integratio
         bean!.Name.Should().Be("Kenya AB");
         bean.RoasterId.Should().Be(roaster.Id);
         bean.Region.Should().Be("Nyeri");
+        bean.Rating.Should().Be(BeanRating.Good);
+        bean.Notes.Should().Be("Bright cup");
         bean.OriginCountries.Select(entity => entity.Name)
             .Should()
             .ContainSingle("Kenya");

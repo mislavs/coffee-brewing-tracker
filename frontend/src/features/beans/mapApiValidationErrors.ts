@@ -15,6 +15,8 @@ const beanFieldNames: Record<string, keyof BeanFormValues> = {
   altitude: 'altitude',
   bagWeight: 'bagWeight',
   price: 'price',
+  rating: 'rating',
+  notes: 'notes',
   flavorNoteNames: 'flavorNoteNames',
 }
 

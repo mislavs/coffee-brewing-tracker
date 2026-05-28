@@ -26,7 +26,9 @@ public class Bean
         DateOnly? roastDate,
         int? altitude,
         decimal bagWeight,
-        decimal? price)
+        decimal? price,
+        BeanRating? rating,
+        string? notes)
     {
         Id = id;
         Name = EntityNormalization.NormalizeRequired(name, nameof(name));
@@ -41,6 +43,8 @@ public class Bean
         Altitude = altitude;
         BagWeight = bagWeight;
         Price = price;
+        Rating = rating;
+        Notes = EntityNormalization.NormalizeOptional(notes);
     }
 
     public Guid Id { get; private set; }
@@ -69,6 +73,10 @@ public class Bean
 
     public decimal? Price { get; private set; }
 
+    public BeanRating? Rating { get; private set; }
+
+    public string? Notes { get; private set; }
+
     public string? ImageFileName { get; private set; }
 
     public byte[]? ImageData { get; private set; }
@@ -95,7 +103,9 @@ public class Bean
         int? altitude,
         decimal bagWeight,
         decimal? price,
-        string? region = null)
+        string? region = null,
+        BeanRating? rating = null,
+        string? notes = null)
     {
         return new Bean(
             Guid.NewGuid(),
@@ -110,7 +120,9 @@ public class Bean
             roastDate,
             altitude,
             bagWeight,
-            price);
+            price,
+            rating,
+            notes);
     }
 
     public void Update(
@@ -125,6 +137,8 @@ public class Bean
         int? altitude,
         decimal bagWeight,
         decimal? price,
+        BeanRating? rating,
+        string? notes,
         bool isAvailable,
         string? region = null)
     {
@@ -140,6 +154,8 @@ public class Bean
         Altitude = altitude;
         BagWeight = bagWeight;
         Price = price;
+        Rating = rating;
+        Notes = EntityNormalization.NormalizeOptional(notes);
         IsAvailable = isAvailable;
     }
 

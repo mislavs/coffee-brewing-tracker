@@ -57,7 +57,9 @@ public class UpdateBeanHandlerTests(IntegrationTestFactory factory) : Integratio
             45m,
             true,
             ["Floral"],
-            " Huila ");
+            " Huila ",
+            Rating: 5,
+            Notes: " Stone fruit ");
 
         // Act
         await Send(command);
@@ -76,6 +78,8 @@ public class UpdateBeanHandlerTests(IntegrationTestFactory factory) : Integratio
         updatedBean.RoasterId.Should().Be(roasterB.Id);
         updatedBean.OriginType.Should().Be(OriginType.Blend);
         updatedBean.Region.Should().Be("Huila");
+        updatedBean.Rating.Should().Be(BeanRating.Excellent);
+        updatedBean.Notes.Should().Be("Stone fruit");
         updatedBean.OriginCountries.Select(country => country.Name)
             .Should()
             .Contain(["Brazil", "Ethiopia"]);
@@ -104,7 +108,8 @@ public class UpdateBeanHandlerTests(IntegrationTestFactory factory) : Integratio
             null,
             250m,
             35m,
-            region: "Nyeri");
+            region: "Nyeri",
+            notes: "Imported note");
         await Insert(bean);
 
         var command = new UpdateBeanCommand(
@@ -122,19 +127,21 @@ public class UpdateBeanHandlerTests(IntegrationTestFactory factory) : Integratio
             35m,
             true,
             null,
-            "   ");
+            "   ",
+            Notes: "   ");
 
         // Act
         await Send(command);
 
         // Assert
-        var updatedRegion = await DbContext.Beans
+        var updatedFields = await DbContext.Beans
             .AsNoTracking()
             .Where(entity => entity.Id == bean.Id)
-            .Select(entity => entity.Region)
+            .Select(entity => new { entity.Region, entity.Notes })
             .SingleAsync(TestContext.Current.CancellationToken);
 
-        updatedRegion.Should().BeNull();
+        updatedFields.Region.Should().BeNull();
+        updatedFields.Notes.Should().BeNull();
     }
 
     [Fact]

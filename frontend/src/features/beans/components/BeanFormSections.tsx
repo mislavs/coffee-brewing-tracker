@@ -1,6 +1,7 @@
 import { Controller, useWatch, type UseFormReturn } from 'react-hook-form'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
 import {
   Select,
   SelectContent,
@@ -19,6 +20,7 @@ import {
 } from '@/features/beans/beanShared'
 import { TagCombobox } from '@/features/beans/components/TagCombobox'
 import { FieldErrorText } from '@/components/FieldErrorText'
+import { EmojiRatingPicker } from '@/features/brew-log/components/EmojiRatingPicker'
 
 const createRoasterValue = '__create_roaster__'
 const noRoasterValue = '__no_roaster__'
@@ -240,6 +242,35 @@ export function BeanFlavorAndOriginSection({
           )}
         />
         <FieldErrorText message={flavorNotesError} />
+      </div>
+
+      <fieldset className="space-y-2">
+        <legend className="text-sm font-medium">Rating</legend>
+        <Controller
+          control={form.control}
+          name="rating"
+          render={({ field }) => (
+            <EmojiRatingPicker
+              value={typeof field.value === 'number' ? field.value : undefined}
+              onChange={field.onChange}
+              ariaLabel="Bean rating"
+            />
+          )}
+        />
+        <FieldErrorText message={form.formState.errors.rating?.message} />
+      </fieldset>
+
+      <div className="space-y-2">
+        <label htmlFor="notes" className="text-sm font-medium">
+          Notes
+        </label>
+        <Textarea
+          id="notes"
+          rows={4}
+          enterKeyHint="next"
+          {...form.register('notes')}
+        />
+        <FieldErrorText message={form.formState.errors.notes?.message} />
       </div>
     </>
   )

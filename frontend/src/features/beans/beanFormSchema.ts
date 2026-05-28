@@ -21,6 +21,15 @@ const optionalPositiveIntegerSchema = z.preprocess((value) => {
   return Number.isNaN(parsed) ? undefined : parsed
 }, z.number().int('Must be a whole number.').positive('Must be greater than 0.').optional())
 
+const optionalNumberSchema = z.preprocess((value) => {
+  if (value === '' || value === null || value === undefined) {
+    return undefined
+  }
+
+  const parsed = typeof value === 'number' ? value : Number(value)
+  return Number.isNaN(parsed) ? undefined : parsed
+}, z.number().optional())
+
 const optionalDateSchema = z.preprocess((value) => {
   if (value === '' || value === null || value === undefined) {
     return undefined
@@ -65,6 +74,15 @@ export const beanFormSchema = z.object({
     return typeof value === 'number' ? value : Number(value)
   }, z.number().positive('Bag weight must be greater than 0.')),
   price: optionalPositiveNumberSchema,
+  rating: optionalNumberSchema.refine(
+    (value) =>
+      value === undefined || (Number.isInteger(value) && value >= 1 && value <= 5),
+    'Rating must be between 1 and 5.',
+  ),
+  notes: optionalTrimmedStringSchema.refine(
+    (value) => value === undefined || value.length <= 2000,
+    'Notes must be 2000 characters or fewer.',
+  ),
   isAvailable: z.boolean().default(true),
   flavorNoteNames: z.array(z.string().trim().min(1)).default([]),
 })

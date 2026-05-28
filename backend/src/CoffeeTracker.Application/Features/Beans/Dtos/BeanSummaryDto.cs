@@ -10,6 +10,7 @@ public sealed record BeanSummaryDto(
     DateOnly? RoastDate,
     decimal BagWeight,
     decimal? PricePerKg,
+    int? Rating,
     bool HasImage,
     string? ImageUrl,
     bool IsAvailable,

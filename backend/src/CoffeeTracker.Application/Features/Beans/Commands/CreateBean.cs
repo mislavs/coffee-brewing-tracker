@@ -22,7 +22,9 @@ public sealed record CreateBeanCommand(
     decimal BagWeight,
     decimal? Price,
     IReadOnlyList<string>? FlavorNoteNames,
-    string? Region = null) : IRequest<Guid>, IBeanCommand;
+    string? Region = null,
+    int? Rating = null,
+    string? Notes = null) : IRequest<Guid>, IBeanCommand;
 
 public sealed class CreateBeanValidator : AbstractValidator<CreateBeanCommand>
 {
@@ -57,6 +59,7 @@ public sealed class CreateBeanHandler(ApplicationDbContext dbContext)
             throw new NotFoundException("One or more origin countries were not found.");
         }
 
+        var rating = request.Rating.HasValue ? (BeanRating?)request.Rating.Value : null;
         var bean = Bean.Create(
             request.Name,
             request.RoasterId,
@@ -69,7 +72,9 @@ public sealed class CreateBeanHandler(ApplicationDbContext dbContext)
             request.Altitude,
             request.BagWeight,
             request.Price,
-            request.Region);
+            request.Region,
+            rating,
+            request.Notes);
 
         bean.SetFlavorNotes(flavorNotes);
 

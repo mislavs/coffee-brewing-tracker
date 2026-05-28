@@ -23,6 +23,9 @@ public class BeanConfiguration : IEntityTypeConfiguration<Bean>
         builder.Property(bean => bean.Region)
             .HasMaxLength(200);
 
+        builder.Property(bean => bean.Notes)
+            .HasMaxLength(2000);
+
         builder.Property(bean => bean.ImageFileName)
             .HasMaxLength(255);
 

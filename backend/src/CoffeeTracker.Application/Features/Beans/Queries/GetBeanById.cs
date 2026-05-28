@@ -35,6 +35,8 @@ public sealed class GetBeanByIdHandler(ApplicationDbContext dbContext)
                 entity.Altitude,
                 entity.BagWeight,
                 entity.Price,
+                Rating = entity.Rating.HasValue ? (int?)entity.Rating.Value : null,
+                entity.Notes,
                 FlavorNotes = entity.FlavorNotes
                     .Select(note => new { note.Id, note.Name })
                     .ToList(),
@@ -75,6 +77,8 @@ public sealed class GetBeanByIdHandler(ApplicationDbContext dbContext)
             bean.Altitude,
             bean.BagWeight,
             bean.Price,
+            bean.Rating,
+            bean.Notes,
             pricePerKg,
             bean.FlavorNotes
                 .OrderBy(note => note.Name)
