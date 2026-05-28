@@ -224,6 +224,22 @@ describe('QuickLogWizardDialog', () => {
     expect(screen.getByText('Water amount must be greater than 0.')).toBeTruthy()
   })
 
+  it('moves to the next brew parameter field when pressing Enter on a next field', async () => {
+    const user = userEvent.setup()
+    renderDialog()
+
+    await goToBrewParameters(user)
+    const doseInput = screen.getByLabelText('Dose (g)')
+    const waterInput = screen.getByLabelText('Water (ml)')
+
+    doseInput.focus()
+    fireEvent.keyDown(doseInput, { key: 'Enter' })
+
+    expect(document.activeElement).toBe(waterInput)
+    expectCurrentStepButton('Parameters')
+    expect(screen.queryByText('Dose must be greater than 0.')).toBeNull()
+  })
+
   it('forces recipe re-entry after changing the brewer', async () => {
     const user = userEvent.setup()
     renderDialog()
