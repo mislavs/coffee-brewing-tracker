@@ -76,9 +76,10 @@ export function BrewLogListPage() {
   const [searchParams, setSearchParams] = useSearchParams()
   const beanId = searchParams.get('beanId') ?? ''
   const recipeId = searchParams.get('recipeId') ?? ''
-  const includeUnavailable = searchParams.get('includeUnavailable') === 'true'
+  const hideUnavailable = searchParams.get('hideUnavailable') === 'true'
+  const includeUnavailableBeans = !hideUnavailable
   const [isFiltersOpen, setIsFiltersOpen] = useState(
-    Boolean(beanId) || Boolean(recipeId) || includeUnavailable,
+    Boolean(beanId) || Boolean(recipeId) || hideUnavailable,
   )
   const page = parsePageParam(searchParams.get('page'))
   const setFilterSearchParams = useCallback(
@@ -123,7 +124,7 @@ export function BrewLogListPage() {
     },
     [setSearchParams],
   )
-  const { data: beans = [] } = useBeans(undefined, includeUnavailable)
+  const { data: beans = [] } = useBeans(undefined, includeUnavailableBeans)
   const { data: recipes = [] } = useRecipes()
   const selectedBean = beans.find((bean) => bean.id === beanId)
 
@@ -165,12 +166,12 @@ export function BrewLogListPage() {
       (previous) => {
         const next = new URLSearchParams(previous)
         if (checked) {
-          next.set('includeUnavailable', 'true')
-        } else {
-          next.delete('includeUnavailable')
+          next.set('hideUnavailable', 'true')
           if (selectedBean?.isAvailable === false) {
             next.delete('beanId')
           }
+        } else {
+          next.delete('hideUnavailable')
         }
 
         return next
@@ -198,7 +199,7 @@ export function BrewLogListPage() {
     undefined,
     undefined,
     undefined,
-    includeUnavailable,
+    includeUnavailableBeans,
     beanId || undefined,
     page,
     BREW_LOG_PAGE_SIZE,
@@ -311,17 +312,17 @@ export function BrewLogListPage() {
               </div>
 
               <div className="space-y-2">
-                <label htmlFor="brew-log-include-unavailable" className="text-sm font-medium">
+                <p className="text-sm font-medium">
                   Availability
-                </label>
+                </p>
                 <div className="flex items-center gap-3 pt-2">
                   <Switch
                     id="brew-log-include-unavailable"
-                    checked={includeUnavailable}
+                    checked={hideUnavailable}
                     onCheckedChange={handleToggleUnavailable}
                   />
                   <label htmlFor="brew-log-include-unavailable" className="text-sm font-medium">
-                    Show unavailable beans
+                    Hide unavailable beans
                   </label>
                 </div>
               </div>
