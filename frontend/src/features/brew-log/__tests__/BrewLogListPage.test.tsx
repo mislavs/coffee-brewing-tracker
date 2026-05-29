@@ -90,7 +90,7 @@ describe('BrewLogListPage', () => {
       createQueryResult(beans) as ReturnType<typeof useBeans>,
     )
     vi.mocked(useRecipes).mockReturnValue(
-      createQueryResult([] satisfies RecipeSummaryDto[]) as ReturnType<typeof useRecipes>,
+      createQueryResult<RecipeSummaryDto[]>([]) as ReturnType<typeof useRecipes>,
     )
     vi.mocked(useBrewLogs).mockReturnValue({
       data: createBrewLogsPage(),
