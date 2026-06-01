@@ -50,3 +50,4 @@ backend/models/*.bin
 frontend/src/lib/api/generated/
 
 aspire.config.json
+docs/exec-plans/active/.gitkeep
