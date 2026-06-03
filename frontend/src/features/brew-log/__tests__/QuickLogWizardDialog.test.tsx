@@ -212,6 +212,34 @@ describe('QuickLogWizardDialog', () => {
     expect(await findCurrentStepButton('Parameters')).toBeTruthy()
   })
 
+  it('skips the accessories step when no accessories are compatible with the brewer', async () => {
+    const user = userEvent.setup()
+    vi.mocked(useAccessories).mockReturnValue(
+      createQueryResult([
+        {
+          id: accessoryId,
+          name: 'Accessory A',
+          compatibleBrewers: [{ id: brewerAId, name: 'Brewer A' }],
+        },
+      ]) as ReturnType<typeof useAccessories>,
+    )
+    renderDialog()
+
+    await user.click(screen.getByRole('radio', { name: 'Bean One' }))
+    await findCurrentStepButton('Brewer')
+
+    await user.click(screen.getByRole('radio', { name: 'Brewer B' }))
+    await findCurrentStepButton('Recipe')
+
+    await user.click(screen.getByRole('radio', { name: 'Recipe B' }))
+    await findCurrentStepButton('Grinder')
+
+    await user.click(screen.getByRole('radio', { name: 'Grinder One' }))
+
+    expect(await findCurrentStepButton('Parameters')).toBeTruthy()
+    expect(screen.queryByRole('button', { name: 'Accessories' })).toBeNull()
+  })
+
   it('keeps the user on the brew parameters step when required values are missing', async () => {
     const user = userEvent.setup()
     renderDialog()

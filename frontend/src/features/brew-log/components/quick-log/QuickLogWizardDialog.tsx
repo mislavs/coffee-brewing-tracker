@@ -21,6 +21,7 @@ import {
 import { getBrewLogLowStockPrompt } from '@/features/brew-log/brewLogLowStockUtils'
 import { createInitialBrewLogValues } from '@/features/brew-log/brewLogFormDefaults'
 import { FieldErrorText } from '@/features/brew-log/components/BrewLogFormUi'
+import { filterAccessoriesByBrewer } from '@/features/brew-log/components/brewLogFormShared'
 import { AccessoriesStep } from '@/features/brew-log/components/quick-log/AccessoriesStep'
 import { BeanStep } from '@/features/brew-log/components/quick-log/BeanStep'
 import { BrewerStep } from '@/features/brew-log/components/quick-log/BrewerStep'
@@ -110,7 +111,12 @@ export function QuickLogWizardDialog({
   const { data: latestBrewForBean = null } = useLatestBrewLogForBean(watchedBeanId)
   const accessoriesQuery = useAccessories()
   const hasDefinedAccessories = (accessoriesQuery.data?.length ?? 0) > 0
-  const hideAccessoriesStep = !accessoriesQuery.isPending && !hasDefinedAccessories
+  const availableAccessoriesForBrewer = filterAccessoriesByBrewer(
+    accessoriesQuery.data ?? [],
+    watchedBrewerId,
+  )
+  const hideAccessoriesStep =
+    !accessoriesQuery.isPending && availableAccessoriesForBrewer.length === 0
   const { mutateAsync, isPending } = useCreateBrewLog()
   const { mutateAsync: setBeanAvailability, isPending: isSettingAvailability } =
     useSetBeanAvailability()
