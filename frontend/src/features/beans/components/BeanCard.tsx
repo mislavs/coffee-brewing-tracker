@@ -120,7 +120,9 @@ export function BeanCard({ bean }: BeanCardProps) {
                 Unavailable
               </Badge>
             ) : null}
-            <Badge variant="outline">{formatPricePerKg(bean.pricePerKg)}</Badge>
+            {bean.pricePerKg != null ? (
+              <Badge variant="outline">{formatPricePerKg(bean.pricePerKg)}</Badge>
+            ) : null}
             {ratingDisplay !== '—' ? (
               <Badge variant="outline" aria-label={`Rating ${bean.rating} out of 5`}>
                 {ratingDisplay}
