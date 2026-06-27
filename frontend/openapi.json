@@ -1316,6 +1316,28 @@
             "description": "OK"
           }
         }
+      },
+      "delete": {
+        "tags": [
+          "Roasters"
+        ],
+        "operationId": "DeleteRoaster",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
       }
     },
     "/api/roasters/{id}/logo": {

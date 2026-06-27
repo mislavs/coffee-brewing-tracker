@@ -48,6 +48,7 @@ import {
 } from '@/lib/api/generated/recipes/recipes'
 import {
   getCreateRoasterUrl,
+  getDeleteRoasterUrl,
   getDeleteRoasterLogoUrl,
   getGetRoasterByIdUrl,
   getGetRoastersUrl,
@@ -400,6 +401,10 @@ export const apiClient = {
             method: 'PUT',
             headers: jsonRequestHeaders,
             body: serializeJsonBody(request),
+          }),
+        delete: () =>
+          requestVoid(getDeleteRoasterUrl(id), {
+            method: 'DELETE',
           }),
         logo: {
           put: async (file: File) => {

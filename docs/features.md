@@ -8,7 +8,7 @@ Coffee Brewing Tracker helps a coffee enthusiast track beans, roasters, brewing 
 
 ### Roaster Library
 
-Users can create, view, edit, and browse roasters. Roasters can include location details and optional logos, and beans reference roasters so roaster information is entered once and reused.
+Users can create, view, edit, delete unused roasters, and browse roasters. Roasters can include location details and optional logos, and beans reference roasters so roaster information is entered once and reused.
 
 ### Bean Library
 

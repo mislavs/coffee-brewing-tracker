@@ -38,6 +38,9 @@ public static class RoasterEndpoints
         group.MapPut("/{id:guid}", UpdateRoaster)
             .WithName("UpdateRoaster");
 
+        group.MapDelete("/{id:guid}", DeleteRoaster)
+            .WithName("DeleteRoaster");
+
         group.MapPut("/{id:guid}/logo", UploadRoasterLogo)
             .DisableAntiforgery()
             .Accepts<IFormFile>("multipart/form-data")
@@ -101,6 +104,15 @@ public static class RoasterEndpoints
             cancellationToken);
 
         return TypedResults.Ok();
+    }
+
+    private static async Task<NoContent> DeleteRoaster(
+        Guid id,
+        ISender sender,
+        CancellationToken cancellationToken)
+    {
+        await sender.Send(new DeleteRoasterCommand(id), cancellationToken);
+        return TypedResults.NoContent();
     }
 
     private static async Task<NoContent> UploadRoasterLogo(
