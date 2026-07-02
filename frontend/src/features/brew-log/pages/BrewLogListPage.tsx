@@ -4,10 +4,6 @@ import { Link, useSearchParams } from 'react-router-dom'
 import { EmptyState } from '@/components/EmptyState'
 import { Button } from '@/components/ui/button'
 import {
-  Card,
-  CardContent,
-} from '@/components/ui/card'
-import {
   Pagination,
   PaginationContent,
   PaginationEllipsis,
@@ -87,46 +83,45 @@ export function BrewLogListPage() {
       nextInit: Parameters<typeof setSearchParams>[0],
       navigateOptions?: Parameters<typeof setSearchParams>[1],
     ) => {
-      setSearchParams(
-        (previous) => {
-          const nextValue = typeof nextInit === 'function' ? nextInit(previous) : nextInit
-          const next =
-            nextValue instanceof URLSearchParams ||
-            Array.isArray(nextValue) ||
-            typeof nextValue === 'string'
-              ? new URLSearchParams(nextValue)
-              : new URLSearchParams()
+      setSearchParams((previous) => {
+        const nextValue =
+          typeof nextInit === 'function' ? nextInit(previous) : nextInit
+        const next =
+          nextValue instanceof URLSearchParams ||
+          Array.isArray(nextValue) ||
+          typeof nextValue === 'string'
+            ? new URLSearchParams(nextValue)
+            : new URLSearchParams()
 
-          if (
-            nextValue &&
-            !(nextValue instanceof URLSearchParams) &&
-            !Array.isArray(nextValue) &&
-            typeof nextValue !== 'string'
-          ) {
-            for (const [key, value] of Object.entries(nextValue)) {
-              if (Array.isArray(value)) {
-                for (const item of value) {
-                  next.append(key, item)
-                }
-              } else {
-                next.set(key, value)
+        if (
+          nextValue &&
+          !(nextValue instanceof URLSearchParams) &&
+          !Array.isArray(nextValue) &&
+          typeof nextValue !== 'string'
+        ) {
+          for (const [key, value] of Object.entries(nextValue)) {
+            if (Array.isArray(value)) {
+              for (const item of value) {
+                next.append(key, item)
               }
+            } else {
+              next.set(key, value)
             }
           }
+        }
 
-          next.delete('page')
-          next.delete('dateFrom')
-          next.delete('dateTo')
-          return next
-        },
-        navigateOptions,
-      )
+        next.delete('page')
+        next.delete('dateFrom')
+        next.delete('dateTo')
+        return next
+      }, navigateOptions)
     },
     [setSearchParams],
   )
   const { data: beans = [] } = useBeans(undefined, includeUnavailableBeans)
   const { data: recipes = [] } = useRecipes()
   const selectedBean = beans.find((bean) => bean.id === beanId)
+  const selectedRecipe = recipes.find((recipe) => recipe.id === recipeId)
 
   const handleBeanFilterChange = (nextValue: string) => {
     setFilterSearchParams(
@@ -211,19 +206,69 @@ export function BrewLogListPage() {
   const totalPages = Math.max(1, brewLogsPage?.totalPages ?? 1)
   const currentPage = brewLogsPage?.page ?? page
   const showingFrom = totalCount === 0 ? 0 : (currentPage - 1) * pageSize + 1
-  const showingTo = totalCount === 0 ? 0 : Math.min(currentPage * pageSize, totalCount)
+  const showingTo =
+    totalCount === 0 ? 0 : Math.min(currentPage * pageSize, totalCount)
   const paginationItems = getPaginationItems(currentPage, totalPages)
   const { data: features } = useFeatures()
+  const filterSummaryParts = [
+    beanId ? (selectedBean?.name ?? 'Selected bean') : null,
+    recipeId ? (selectedRecipe?.name ?? 'Selected recipe') : null,
+    hideUnavailable ? 'Available beans only' : null,
+  ].filter((part): part is string => Boolean(part))
+  const resultCountLabel =
+    totalCount === 0
+      ? 'No brews'
+      : `${totalCount} ${totalCount === 1 ? 'brew' : 'brews'}`
+  const hasActiveFilters = filterSummaryParts.length > 0
 
   return (
     <>
-      <Card>
-        <CardContent className="space-y-4">
-          <div className="flex flex-wrap items-center justify-between gap-2">
+      <section aria-labelledby="brew-log-heading" className="space-y-4">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex min-w-0 flex-wrap items-center gap-2">
+            <h1 id="brew-log-heading" className="sr-only">
+              Brew Log
+            </h1>
+            <p className="text-sm font-medium text-foreground">
+              {resultCountLabel}
+            </p>
+            {hasActiveFilters && !isFiltersOpen ? (
+              <div className="flex min-w-0 flex-wrap items-center gap-1.5">
+                {filterSummaryParts.map((part, index) => (
+                  <span
+                    key={`${part}-${index}`}
+                    className="inline-flex h-7 max-w-48 items-center truncate rounded-md border bg-muted/40 px-2.5 text-xs font-medium text-muted-foreground"
+                  >
+                    {part}
+                  </span>
+                ))}
+              </div>
+            ) : null}
+          </div>
+
+          <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center sm:justify-end">
+            <Button className="col-span-2 sm:col-span-1" asChild>
+              <Link to="/brew-log/new">Log Brew</Link>
+            </Button>
             <Button
               type="button"
-              variant={isFiltersOpen ? 'default' : 'ghost'}
-              size="icon"
+              variant="secondary"
+              onClick={() => setQuickLogOpen(true)}
+            >
+              Quick Log
+            </Button>
+            {features?.voiceBrewLogParsing ? (
+              <Button variant="outline" asChild>
+                <Link to="/brew-log/new?dictate=true">
+                  <Mic className="size-4" />
+                  Dictate brew
+                </Link>
+              </Button>
+            ) : null}
+            <Button
+              type="button"
+              variant={isFiltersOpen ? 'secondary' : 'outline'}
+              size="sm"
               aria-expanded={isFiltersOpen}
               aria-controls="brew-log-filters"
               aria-label={isFiltersOpen ? 'Hide filters' : 'Show filters'}
@@ -231,28 +276,30 @@ export function BrewLogListPage() {
               onClick={() => setIsFiltersOpen((current) => !current)}
             >
               <Filter className="size-4" />
-            </Button>
-            <div className="flex flex-wrap items-center justify-end gap-2">
-              {features?.voiceBrewLogParsing ? (
-                <Button variant="outline" asChild>
-                  <Link to="/brew-log/new?dictate=true">
-                    <Mic className="size-4" />
-                    Dictate brew
-                  </Link>
-                </Button>
+              Filters
+              {hasActiveFilters ? (
+                <span
+                  aria-hidden="true"
+                  className="ml-1 inline-flex min-w-5 items-center justify-center rounded-full bg-primary/10 px-1.5 text-xs font-semibold text-primary"
+                >
+                  {filterSummaryParts.length}
+                </span>
               ) : null}
-              <Button type="button" variant="secondary" onClick={() => setQuickLogOpen(true)}>
-                Quick Log
-              </Button>
-              <Button asChild>
-                <Link to="/brew-log/new">Log Brew</Link>
-              </Button>
-            </div>
+            </Button>
           </div>
+        </div>
+
+        <div className="space-y-4">
           {isFiltersOpen ? (
-            <div id="brew-log-filters" className="grid gap-4 md:grid-cols-3">
+            <div
+              id="brew-log-filters"
+              className="grid gap-4 rounded-lg border bg-card/60 p-3 md:grid-cols-3"
+            >
               <div className="space-y-2">
-                <label htmlFor="brew-log-bean-filter" className="text-sm font-medium">
+                <label
+                  htmlFor="brew-log-bean-filter"
+                  className="text-sm font-medium"
+                >
                   Filter by bean
                 </label>
                 <Select
@@ -283,7 +330,10 @@ export function BrewLogListPage() {
               </div>
 
               <div className="space-y-2">
-                <label htmlFor="brew-log-recipe-filter" className="text-sm font-medium">
+                <label
+                  htmlFor="brew-log-recipe-filter"
+                  className="text-sm font-medium"
+                >
                   Filter by recipe
                 </label>
                 <Select
@@ -312,16 +362,17 @@ export function BrewLogListPage() {
               </div>
 
               <div className="space-y-2">
-                <p className="text-sm font-medium">
-                  Availability
-                </p>
+                <p className="text-sm font-medium">Availability</p>
                 <div className="flex items-center gap-3 pt-2">
                   <Switch
                     id="brew-log-include-unavailable"
                     checked={hideUnavailable}
                     onCheckedChange={handleToggleUnavailable}
                   />
-                  <label htmlFor="brew-log-include-unavailable" className="text-sm font-medium">
+                  <label
+                    htmlFor="brew-log-include-unavailable"
+                    className="text-sm font-medium"
+                  >
                     Hide unavailable beans
                   </label>
                 </div>
@@ -363,7 +414,10 @@ export function BrewLogListPage() {
               <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                 {brewLogs.map((brewLog) => (
                   <BrewLogCard
-                    key={brewLog.id ?? `${brewLog.beanName ?? 'brew'}-${brewLog.brewedAt ?? ''}`}
+                    key={
+                      brewLog.id ??
+                      `${brewLog.beanName ?? 'brew'}-${brewLog.brewedAt ?? ''}`
+                    }
                     brewLog={brewLog}
                   />
                 ))}
@@ -392,7 +446,10 @@ export function BrewLogListPage() {
                     {paginationItems.map((item) =>
                       typeof item === 'number' ? (
                         <PaginationItem key={item}>
-                          <PaginationLink asChild isActive={item === currentPage}>
+                          <PaginationLink
+                            asChild
+                            isActive={item === currentPage}
+                          >
                             <button type="button" onClick={() => setPage(item)}>
                               {item}
                             </button>
@@ -422,11 +479,14 @@ export function BrewLogListPage() {
               </div>
             </div>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </section>
 
       {quickLogOpen ? (
-        <QuickLogWizardDialog open={quickLogOpen} onOpenChange={setQuickLogOpen} />
+        <QuickLogWizardDialog
+          open={quickLogOpen}
+          onOpenChange={setQuickLogOpen}
+        />
       ) : null}
     </>
   )
