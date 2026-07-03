@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react'
 import { ChevronLeft, ChevronRight, Coffee, Filter, Mic } from 'lucide-react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { EmptyState } from '@/components/EmptyState'
+import { FeatureListToolbar } from '@/components/FeatureListToolbar'
 import { Button } from '@/components/ui/button'
 import {
   Pagination,
@@ -219,52 +220,38 @@ export function BrewLogListPage() {
     totalCount === 0
       ? 'No brews'
       : `${totalCount} ${totalCount === 1 ? 'brew' : 'brews'}`
-  const hasActiveFilters = filterSummaryParts.length > 0
 
   return (
     <>
       <section aria-labelledby="brew-log-heading" className="space-y-4">
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex min-w-0 flex-wrap items-center gap-2">
-            <h1 id="brew-log-heading" className="sr-only">
-              Brew Log
-            </h1>
-            <p className="text-sm font-medium text-foreground">
-              {resultCountLabel}
-            </p>
-            {hasActiveFilters && !isFiltersOpen ? (
-              <div className="flex min-w-0 flex-wrap items-center gap-1.5">
-                {filterSummaryParts.map((part, index) => (
-                  <span
-                    key={`${part}-${index}`}
-                    className="inline-flex h-7 max-w-48 items-center truncate rounded-md border bg-muted/40 px-2.5 text-xs font-medium text-muted-foreground"
-                  >
-                    {part}
-                  </span>
-                ))}
-              </div>
-            ) : null}
-          </div>
-
-          <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center sm:justify-end">
-            <Button className="col-span-2 sm:col-span-1" asChild>
-              <Link to="/brew-log/new">Log Brew</Link>
-            </Button>
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={() => setQuickLogOpen(true)}
-            >
-              Quick Log
-            </Button>
-            {features?.voiceBrewLogParsing ? (
-              <Button variant="outline" asChild>
-                <Link to="/brew-log/new?dictate=true">
-                  <Mic className="size-4" />
-                  Dictate brew
-                </Link>
+        <FeatureListToolbar
+          heading="Brew Log"
+          headingId="brew-log-heading"
+          countLabel={resultCountLabel}
+          activeChips={isFiltersOpen ? [] : filterSummaryParts}
+          actions={
+            <>
+              <Button className="col-span-2 sm:col-span-1" asChild>
+                <Link to="/brew-log/new">Log Brew</Link>
               </Button>
-            ) : null}
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => setQuickLogOpen(true)}
+              >
+                Quick Log
+              </Button>
+              {features?.voiceBrewLogParsing ? (
+                <Button variant="outline" asChild>
+                  <Link to="/brew-log/new?dictate=true">
+                    <Mic className="size-4" />
+                    Dictate brew
+                  </Link>
+                </Button>
+              ) : null}
+            </>
+          }
+          controls={
             <Button
               type="button"
               variant={isFiltersOpen ? 'secondary' : 'outline'}
@@ -277,7 +264,7 @@ export function BrewLogListPage() {
             >
               <Filter className="size-4" />
               Filters
-              {hasActiveFilters ? (
+              {filterSummaryParts.length > 0 ? (
                 <span
                   aria-hidden="true"
                   className="ml-1 inline-flex min-w-5 items-center justify-center rounded-full bg-primary/10 px-1.5 text-xs font-semibold text-primary"
@@ -286,8 +273,8 @@ export function BrewLogListPage() {
                 </span>
               ) : null}
             </Button>
-          </div>
-        </div>
+          }
+        />
 
         <div className="space-y-4">
           {isFiltersOpen ? (
