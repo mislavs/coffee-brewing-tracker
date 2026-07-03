@@ -1,17 +1,11 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, type ReactNode } from 'react'
 import type { Guid } from '@/lib/api-types'
+import { ArrowLeft, Pencil, RotateCcw, Trash2 } from 'lucide-react'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { DeleteConfirmationDialog } from '@/components/DeleteConfirmationDialog'
 import { DetailField } from '@/components/DetailField'
-import { SectionDivider } from '@/components/SectionDivider'
 import { Button } from '@/components/ui/button'
-import {
-  Card,
-  CardAction,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import {
   formatBrewTime,
   formatRatio,
@@ -22,6 +16,116 @@ import { useBrewLog } from '@/features/brew-log/hooks/useBrewLog'
 import { useDeleteBrewLog } from '@/features/brew-log/hooks/useDeleteBrewLog'
 import { formatDateTime } from '@/lib/date'
 import { useEntityFormId } from '@/lib/useEntityFormId'
+
+type DetailSectionProps = {
+  children: ReactNode
+  id: string
+  title: string
+}
+
+type SummaryMetricProps = {
+  detail?: ReactNode
+  label: string
+  value: ReactNode
+}
+
+function DetailSection({ children, id, title }: DetailSectionProps) {
+  return (
+    <section aria-labelledby={id} className="space-y-4">
+      <div className="flex items-center gap-3">
+        <h2 id={id} className="text-sm font-semibold">
+          {title}
+        </h2>
+        <div className="h-px flex-1 bg-border" />
+      </div>
+      {children}
+    </section>
+  )
+}
+
+function DetailLink({ children, to }: { children: ReactNode; to: string }) {
+  return (
+    <Link
+      to={to}
+      className="font-medium text-primary underline-offset-4 hover:underline focus-visible:rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
+    >
+      {children}
+    </Link>
+  )
+}
+
+function SummaryMetric({ detail, label, value }: SummaryMetricProps) {
+  return (
+    <div className="min-w-0 space-y-1">
+      <dt className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+        {label}
+      </dt>
+      <dd className="min-w-0 text-base font-semibold text-foreground">
+        {value}
+        {detail ? (
+          <span className="mt-0.5 block truncate text-xs font-normal text-muted-foreground">
+            {detail}
+          </span>
+        ) : null}
+      </dd>
+    </div>
+  )
+}
+
+function NotesBlock({ children, title }: { children: ReactNode; title: string }) {
+  return (
+    <div className="space-y-2">
+      <h3 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+        {title}
+      </h3>
+      <p className="whitespace-pre-wrap leading-relaxed text-muted-foreground">{children}</p>
+    </div>
+  )
+}
+
+function compactRatio(value: number | null | undefined) {
+  return formatRatio(value).replace(/\.0$/, '')
+}
+
+function formatDose(value: number | null | undefined) {
+  return value !== null && value !== undefined ? `${value} g` : '—'
+}
+
+function formatWaterAmount(value: number | null | undefined) {
+  return value !== null && value !== undefined ? `${value} ml` : '—'
+}
+
+function getRatingLabel(rating: number | null | undefined) {
+  switch (rating) {
+    case 1:
+      return 'Poor'
+    case 2:
+      return 'Fair'
+    case 3:
+      return 'Good'
+    case 4:
+      return 'Great'
+    case 5:
+      return 'Excellent'
+    default:
+      return 'Not rated'
+  }
+}
+
+function RatingValue({ rating }: { rating: number | null | undefined }) {
+  const ratingDisplay = getRatingDisplay(rating)
+  const ratingLabel = getRatingLabel(rating)
+
+  if (ratingDisplay === '—') {
+    return '—'
+  }
+
+  return (
+    <span aria-label={ratingLabel} role="img">
+      {ratingDisplay}
+    </span>
+  )
+}
 
 function BrewLogDetailContent({ brewLogId }: { brewLogId: Guid }) {
   const navigate = useNavigate()
@@ -38,6 +142,15 @@ function BrewLogDetailContent({ brewLogId }: { brewLogId: Guid }) {
     return names.length > 0 ? names.join(', ') : '—'
   }, [brewLog.accessories])
 
+  const brewTitle = brewLog.beanName ?? 'Brew log entry'
+  const brewDate = formatDateTime(brewLog.brewedAt)
+  const brewRatio = compactRatio(brewLog.brewRatio)
+  const dose = formatDose(brewLog.dose)
+  const waterAmount = formatWaterAmount(brewLog.waterAmount)
+  const ratingLabel = getRatingLabel(brewLog.rating)
+  const notes = brewLog.notes?.trim()
+  const adjustmentIdeas = brewLog.adjustmentIdeas?.trim()
+
   const confirmDelete = async () => {
     await deleteBrewLog(brewLogId)
     setIsDeleteDialogOpen(false)
@@ -46,73 +159,124 @@ function BrewLogDetailContent({ brewLogId }: { brewLogId: Guid }) {
 
   return (
     <>
-      <Card>
-        <CardHeader>
-          <CardAction className="flex items-center gap-2">
-            <Button asChild>
-              <Link to={`/brew-log/${brewLogId}/edit`}>Edit</Link>
-            </Button>
-            <Button variant="outline" asChild>
-              <Link to={`/brew-log/new?repeatFrom=${brewLogId}`}>Repeat</Link>
-            </Button>
-            <Button
-              type="button"
-              variant="destructive"
-              onClick={() => setIsDeleteDialogOpen(true)}
-              disabled={isDeleting}
-            >
-              Delete
-            </Button>
-            <Button variant="outline" asChild>
-              <Link to="/brew-log">Back</Link>
-            </Button>
-          </CardAction>
-          <CardTitle>{brewLog.beanName ?? 'Brew log entry'}</CardTitle>
+      <Card className="overflow-hidden">
+        <CardHeader className="gap-5 border-b pb-5">
+          <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+            <div className="min-w-0 space-y-3">
+              <Button
+                asChild
+                variant="ghost"
+                size="sm"
+                className="-ml-2 w-fit text-muted-foreground"
+              >
+                <Link to="/brew-log">
+                  <ArrowLeft className="size-4" />
+                  Brew log
+                </Link>
+              </Button>
+              <div className="space-y-2">
+                <h1 className="text-2xl font-semibold tracking-tight text-balance">
+                  {brewTitle}
+                </h1>
+                <dl className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground">
+                  <div>
+                    <dt className="sr-only">Brew date</dt>
+                    <dd>{brewDate}</dd>
+                  </div>
+                  <div>
+                    <dt className="sr-only">Brewer</dt>
+                    <dd>{brewLog.brewerName ?? 'No brewer recorded'}</dd>
+                  </div>
+                  <div>
+                    <dt className="sr-only">Rating</dt>
+                    <dd>{ratingLabel}</dd>
+                  </div>
+                </dl>
+              </div>
+            </div>
+
+            <div className="flex w-full flex-wrap gap-2 sm:w-auto lg:justify-end">
+              <Button asChild className="flex-1 sm:flex-none">
+                <Link to={`/brew-log/new?repeatFrom=${brewLogId}`}>
+                  <RotateCcw className="size-4" />
+                  Repeat
+                </Link>
+              </Button>
+              <Button variant="outline" asChild className="flex-1 sm:flex-none">
+                <Link to={`/brew-log/${brewLogId}/edit`}>
+                  <Pencil className="size-4" />
+                  Edit
+                </Link>
+              </Button>
+              <Button
+                type="button"
+                variant="destructive"
+                onClick={() => setIsDeleteDialogOpen(true)}
+                disabled={isDeleting}
+                className="flex-1 sm:flex-none"
+              >
+                <Trash2 className="size-4" />
+                Delete
+              </Button>
+            </div>
+          </div>
         </CardHeader>
-        <CardContent className="text-sm">
-          <div className="grid gap-8 md:grid-cols-2">
+
+        <CardContent className="space-y-8 pt-6 text-sm">
+          <section aria-labelledby="brew-summary-heading" className="space-y-3">
+            <h2 id="brew-summary-heading" className="text-sm font-semibold">
+              Brew summary
+            </h2>
+            <dl className="grid gap-4 border-y py-4 sm:grid-cols-2 lg:grid-cols-4">
+              <SummaryMetric
+                label="Method"
+                value={brewLog.brewerName ?? '—'}
+                detail={brewLog.recipeName ?? 'No recipe'}
+              />
+              <SummaryMetric label="Dose / water" value={`${dose} / ${waterAmount}`} />
+              <SummaryMetric label="Ratio" value={brewRatio} />
+              <SummaryMetric
+                label="Rating"
+                value={<RatingValue rating={brewLog.rating} />}
+                detail={ratingLabel}
+              />
+            </dl>
+          </section>
+
+          <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
             <div className="space-y-8">
-              <section className="space-y-4">
-                <SectionDivider label="Equipment" />
-                <div className="grid gap-3">
+              <DetailSection id="brew-equipment-heading" title="Equipment">
+                <div className="grid gap-4 sm:grid-cols-2">
                   <DetailField label="Bean" stacked>
                     {brewLog.beanId ? (
-                      <Link to={`/beans/${brewLog.beanId}`} className="hover:underline">
-                        {brewLog.beanName ?? 'View bean'}
-                      </Link>
+                      <DetailLink to={`/beans/${brewLog.beanId}`}>{brewTitle}</DetailLink>
                     ) : (
-                      (brewLog.beanName ?? '—')
+                      brewTitle
                     )}
                   </DetailField>
                   <DetailField label="Brewer" stacked>
                     {brewLog.brewerId ? (
-                      <Link
-                        to={`/equipment/brewers/${brewLog.brewerId}`}
-                        className="hover:underline"
-                      >
+                      <DetailLink to={`/equipment/brewers/${brewLog.brewerId}`}>
                         {brewLog.brewerName ?? 'View brewer'}
-                      </Link>
+                      </DetailLink>
                     ) : (
                       (brewLog.brewerName ?? '—')
                     )}
                   </DetailField>
                   <DetailField label="Grinder" stacked>
                     {brewLog.grinderId ? (
-                      <Link
-                        to={`/equipment/grinders/${brewLog.grinderId}`}
-                        className="hover:underline"
-                      >
+                      <DetailLink to={`/equipment/grinders/${brewLog.grinderId}`}>
                         {brewLog.grinderName ?? 'View grinder'}
-                      </Link>
+                      </DetailLink>
                     ) : (
                       (brewLog.grinderName ?? '—')
                     )}
                   </DetailField>
                   <DetailField label="Recipe" stacked>
                     {brewLog.recipeId ? (
-                      <Link to={`/recipes/${brewLog.recipeId}`} className="hover:underline">
+                      <DetailLink to={`/recipes/${brewLog.recipeId}`}>
                         {brewLog.recipeName ?? 'View recipe'}
-                      </Link>
+                      </DetailLink>
                     ) : (
                       (brewLog.recipeName ?? '—')
                     )}
@@ -121,42 +285,39 @@ function BrewLogDetailContent({ brewLogId }: { brewLogId: Guid }) {
                     {accessoriesText}
                   </DetailField>
                 </div>
-              </section>
+              </DetailSection>
 
-              <section className="space-y-4">
-                <SectionDivider label="Notes" />
-                <p className="whitespace-pre-wrap leading-relaxed text-muted-foreground">
-                  {brewLog.notes || '—'}
-                </p>
-              </section>
-
-              <section className="space-y-4">
-                <SectionDivider label="Adjustments" />
-                <p className="whitespace-pre-wrap leading-relaxed text-muted-foreground">
-                  {brewLog.adjustmentIdeas || '—'}
-                </p>
-              </section>
+              <DetailSection id="brew-notes-heading" title="Notes and adjustments">
+                {notes || adjustmentIdeas ? (
+                  <div className="grid gap-5">
+                    {notes ? <NotesBlock title="Notes">{notes}</NotesBlock> : null}
+                    {adjustmentIdeas ? (
+                      <NotesBlock title="Adjustments">{adjustmentIdeas}</NotesBlock>
+                    ) : null}
+                  </div>
+                ) : (
+                  <p className="leading-relaxed text-muted-foreground">
+                    No notes or adjustment ideas were recorded for this brew.
+                  </p>
+                )}
+              </DetailSection>
             </div>
 
             <div className="space-y-8">
-              <section className="space-y-4">
-                <SectionDivider label="Brew Parameters" />
-                <div className="grid gap-3">
+              <DetailSection id="brew-parameters-heading" title="Brew parameters">
+                <div className="grid gap-4 sm:grid-cols-2">
                   <DetailField label="Dose" stacked>
-                    {brewLog.dose !== null && brewLog.dose !== undefined
-                      ? `${brewLog.dose} g`
-                      : '—'}
+                    {dose}
                   </DetailField>
-                  <DetailField label="Water amount" stacked>
-                    {brewLog.waterAmount !== null && brewLog.waterAmount !== undefined
-                      ? `${brewLog.waterAmount} ml`
-                      : '—'}
+                  <DetailField label="Water" stacked>
+                    {waterAmount}
                   </DetailField>
                   <DetailField label="Brew ratio" stacked>
-                    {formatRatio(brewLog.brewRatio)}
+                    {brewRatio}
                   </DetailField>
                   <DetailField label="Water temperature" stacked>
-                    {brewLog.waterTemperature !== null && brewLog.waterTemperature !== undefined
+                    {brewLog.waterTemperature !== null &&
+                    brewLog.waterTemperature !== undefined
                       ? `${brewLog.waterTemperature}°C`
                       : '—'}
                   </DetailField>
@@ -169,23 +330,21 @@ function BrewLogDetailContent({ brewLogId }: { brewLogId: Guid }) {
                     {formatBrewTime(brewLog.brewTimeSeconds)}
                   </DetailField>
                 </div>
-              </section>
+              </DetailSection>
 
-              <section className="space-y-4">
-                <SectionDivider label="Result" />
-                <div className="grid gap-3">
+              <DetailSection id="brew-result-heading" title="Result">
+                <div className="grid gap-4 sm:grid-cols-3">
                   <DetailField label="Rating" stacked>
-                    {getRatingDisplay(brewLog.rating)}
+                    <RatingValue rating={brewLog.rating} />
                   </DetailField>
                   <DetailField label="Bean cost" stacked>
                     {formatPrice(brewLog.beanCostPerCup)}
                   </DetailField>
                   <DetailField label="Brew date" stacked>
-                    {formatDateTime(brewLog.brewedAt)}
+                    {brewDate}
                   </DetailField>
                 </div>
-              </section>
-
+              </DetailSection>
             </div>
           </div>
         </CardContent>
@@ -196,7 +355,7 @@ function BrewLogDetailContent({ brewLogId }: { brewLogId: Guid }) {
         onOpenChange={setIsDeleteDialogOpen}
         onConfirm={confirmDelete}
         isPending={isDeleting}
-        entityName="brew log"
+        entityName={`brew log for ${brewTitle}`}
       />
     </>
   )

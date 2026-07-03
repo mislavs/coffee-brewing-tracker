@@ -208,7 +208,7 @@ export function AppLayout() {
   )
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen overflow-x-hidden bg-background text-foreground">
       <header className="sticky top-0 z-30 border-b bg-background/90 backdrop-blur-lg supports-[backdrop-filter]:bg-background/70">
         <div className="mx-auto flex max-w-7xl flex-nowrap items-center gap-2 px-4 py-3 sm:gap-4 sm:px-6 md:flex-wrap lg:px-8">
           <Sheet open={isMobileNavOpen} onOpenChange={setIsMobileNavOpen}>
@@ -312,3 +312,4 @@ export function AppLayout() {
     </div>
   )
 }
+
