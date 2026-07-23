@@ -16,9 +16,11 @@ import { useBrewLog } from '@/features/brew-log/hooks/useBrewLog'
 import { useDeleteBrewLog } from '@/features/brew-log/hooks/useDeleteBrewLog'
 import { formatDateTime } from '@/lib/date'
 import { useEntityFormId } from '@/lib/useEntityFormId'
+import { cn } from '@/lib/utils'
 
 type DetailSectionProps = {
   children: ReactNode
+  emphasis?: 'default' | 'quiet'
   id: string
   title: string
 }
@@ -29,14 +31,31 @@ type SummaryMetricProps = {
   value: ReactNode
 }
 
-function DetailSection({ children, id, title }: DetailSectionProps) {
+const primaryDetailValueClassName = 'font-medium text-foreground'
+
+function DetailSection({
+  children,
+  emphasis = 'default',
+  id,
+  title,
+}: DetailSectionProps) {
+  const isQuiet = emphasis === 'quiet'
+
   return (
-    <section aria-labelledby={id} className="space-y-4">
+    <section aria-labelledby={id} className={isQuiet ? 'space-y-3' : 'space-y-4'}>
       <div className="flex items-center gap-3">
-        <h2 id={id} className="text-sm font-semibold">
+        <h2
+          id={id}
+          className={cn(
+            'text-sm',
+            isQuiet
+              ? 'font-medium text-muted-foreground'
+              : 'font-semibold text-foreground',
+          )}
+        >
           {title}
         </h2>
-        <div className="h-px flex-1 bg-border" />
+        <div className={cn('h-px flex-1', isQuiet ? 'bg-border/70' : 'bg-border')} />
       </div>
       {children}
     </section>
@@ -60,10 +79,10 @@ function SummaryMetric({ detail, label, value }: SummaryMetricProps) {
       <dt className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
         {label}
       </dt>
-      <dd className="min-w-0 text-base font-semibold text-foreground">
+      <dd className="min-w-0 text-lg font-semibold tracking-tight text-foreground tabular-nums">
         {value}
         {detail ? (
-          <span className="mt-0.5 block truncate text-xs font-normal text-muted-foreground">
+          <span className="mt-0.5 block truncate text-xs font-medium tracking-normal text-muted-foreground">
             {detail}
           </span>
         ) : null}
@@ -78,7 +97,9 @@ function NotesBlock({ children, title }: { children: ReactNode; title: string })
       <h3 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
         {title}
       </h3>
-      <p className="whitespace-pre-wrap leading-relaxed text-muted-foreground">{children}</p>
+      <p className="max-w-prose whitespace-pre-wrap leading-6 text-foreground">
+        {children}
+      </p>
     </div>
   )
 }
@@ -223,11 +244,14 @@ function BrewLogDetailContent({ brewLogId }: { brewLogId: Guid }) {
         </CardHeader>
 
         <CardContent className="space-y-8 pt-6 text-sm">
-          <section aria-labelledby="brew-summary-heading" className="space-y-3">
-            <h2 id="brew-summary-heading" className="text-sm font-semibold">
+          <section aria-labelledby="brew-summary-heading" className="space-y-4">
+            <h2
+              id="brew-summary-heading"
+              className="text-base font-semibold tracking-tight"
+            >
               Brew summary
             </h2>
-            <dl className="grid gap-4 border-y py-4 sm:grid-cols-2 lg:grid-cols-4">
+            <dl className="grid gap-5 border-y py-5 sm:grid-cols-2 lg:grid-cols-4">
               <SummaryMetric
                 label="Method"
                 value={brewLog.brewerName ?? '—'}
@@ -247,14 +271,22 @@ function BrewLogDetailContent({ brewLogId }: { brewLogId: Guid }) {
             <div className="space-y-8">
               <DetailSection id="brew-equipment-heading" title="Equipment">
                 <div className="grid gap-4 sm:grid-cols-2">
-                  <DetailField label="Bean" stacked>
+                  <DetailField
+                    label="Bean"
+                    stacked
+                    valueClassName={primaryDetailValueClassName}
+                  >
                     {brewLog.beanId ? (
                       <DetailLink to={`/beans/${brewLog.beanId}`}>{brewTitle}</DetailLink>
                     ) : (
                       brewTitle
                     )}
                   </DetailField>
-                  <DetailField label="Brewer" stacked>
+                  <DetailField
+                    label="Brewer"
+                    stacked
+                    valueClassName={primaryDetailValueClassName}
+                  >
                     {brewLog.brewerId ? (
                       <DetailLink to={`/equipment/brewers/${brewLog.brewerId}`}>
                         {brewLog.brewerName ?? 'View brewer'}
@@ -263,7 +295,11 @@ function BrewLogDetailContent({ brewLogId }: { brewLogId: Guid }) {
                       (brewLog.brewerName ?? '—')
                     )}
                   </DetailField>
-                  <DetailField label="Grinder" stacked>
+                  <DetailField
+                    label="Grinder"
+                    stacked
+                    valueClassName={primaryDetailValueClassName}
+                  >
                     {brewLog.grinderId ? (
                       <DetailLink to={`/equipment/grinders/${brewLog.grinderId}`}>
                         {brewLog.grinderName ?? 'View grinder'}
@@ -272,7 +308,11 @@ function BrewLogDetailContent({ brewLogId }: { brewLogId: Guid }) {
                       (brewLog.grinderName ?? '—')
                     )}
                   </DetailField>
-                  <DetailField label="Recipe" stacked>
+                  <DetailField
+                    label="Recipe"
+                    stacked
+                    valueClassName={primaryDetailValueClassName}
+                  >
                     {brewLog.recipeId ? (
                       <DetailLink to={`/recipes/${brewLog.recipeId}`}>
                         {brewLog.recipeName ?? 'View recipe'}
@@ -281,7 +321,11 @@ function BrewLogDetailContent({ brewLogId }: { brewLogId: Guid }) {
                       (brewLog.recipeName ?? '—')
                     )}
                   </DetailField>
-                  <DetailField label="Accessories" stacked>
+                  <DetailField
+                    label="Accessories"
+                    stacked
+                    valueClassName={primaryDetailValueClassName}
+                  >
                     {accessoriesText}
                   </DetailField>
                 </div>
@@ -306,33 +350,57 @@ function BrewLogDetailContent({ brewLogId }: { brewLogId: Guid }) {
             <div className="space-y-8">
               <DetailSection id="brew-parameters-heading" title="Brew parameters">
                 <div className="grid gap-4 sm:grid-cols-2">
-                  <DetailField label="Dose" stacked>
+                  <DetailField
+                    label="Dose"
+                    stacked
+                    valueClassName={primaryDetailValueClassName}
+                  >
                     {dose}
                   </DetailField>
-                  <DetailField label="Water" stacked>
+                  <DetailField
+                    label="Water"
+                    stacked
+                    valueClassName={primaryDetailValueClassName}
+                  >
                     {waterAmount}
                   </DetailField>
-                  <DetailField label="Brew ratio" stacked>
+                  <DetailField
+                    label="Brew ratio"
+                    stacked
+                    valueClassName={primaryDetailValueClassName}
+                  >
                     {brewRatio}
                   </DetailField>
-                  <DetailField label="Water temperature" stacked>
+                  <DetailField
+                    label="Water temperature"
+                    stacked
+                    valueClassName={primaryDetailValueClassName}
+                  >
                     {brewLog.waterTemperature !== null &&
                     brewLog.waterTemperature !== undefined
                       ? `${brewLog.waterTemperature}°C`
                       : '—'}
                   </DetailField>
-                  <DetailField label="Grind size" stacked>
+                  <DetailField
+                    label="Grind size"
+                    stacked
+                    valueClassName={primaryDetailValueClassName}
+                  >
                     {brewLog.grindSize !== null && brewLog.grindSize !== undefined
                       ? brewLog.grindSize
                       : '—'}
                   </DetailField>
-                  <DetailField label="Brew time" stacked>
+                  <DetailField
+                    label="Brew time"
+                    stacked
+                    valueClassName={primaryDetailValueClassName}
+                  >
                     {formatBrewTime(brewLog.brewTimeSeconds)}
                   </DetailField>
                 </div>
               </DetailSection>
 
-              <DetailSection id="brew-result-heading" title="Result">
+              <DetailSection id="brew-result-heading" title="Result" emphasis="quiet">
                 <div className="grid gap-4 sm:grid-cols-3">
                   <DetailField label="Rating" stacked>
                     <RatingValue rating={brewLog.rating} />

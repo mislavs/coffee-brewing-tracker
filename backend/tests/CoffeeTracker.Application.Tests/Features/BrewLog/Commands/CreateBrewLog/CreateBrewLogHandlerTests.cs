@@ -1,3 +1,4 @@
+using CoffeeTracker.Application.Features.Beans.Queries;
 using CoffeeTracker.Application.Features.BrewLog.Commands;
 using CoffeeTracker.Domain.Entities;
 using CoffeeTracker.Domain.Enums;
@@ -156,6 +157,49 @@ public class CreateBrewLogHandlerTests(IntegrationTestFactory factory) : Integra
 
         // Assert
         brewLogResult.RemainingBeanQuantity.Should().Be(0m);
+    }
+
+    [Fact]
+    public async Task Handle_WhenNewBrewHasHighestRating_IncludesItInBeanSuggestion()
+    {
+        // Arrange
+        var (bean, brewer, grinder) = await SeedRequiredEntities("suggestion");
+        await Insert(BrewLogEntry.Create(
+            bean.Id,
+            brewer.Id,
+            grinder.Id,
+            null,
+            18m,
+            300m,
+            null,
+            null,
+            null,
+            BrewRating.Good,
+            null,
+            null,
+            DateTime.UtcNow.AddDays(-1)));
+        var command = new CreateBrewLogCommand(
+            bean.Id,
+            brewer.Id,
+            grinder.Id,
+            null,
+            null,
+            18m,
+            300m,
+            null,
+            null,
+            null,
+            5,
+            null,
+            null,
+            DateTime.UtcNow);
+
+        // Act
+        await Send(command);
+        var result = await Send(new GetBeanByIdQuery(bean.Id));
+
+        // Assert
+        result.SuggestedRating.Should().Be(5);
     }
 
     private async Task<(Bean Bean, Brewer Brewer, Grinder Grinder)> SeedRequiredEntities(string suffix)

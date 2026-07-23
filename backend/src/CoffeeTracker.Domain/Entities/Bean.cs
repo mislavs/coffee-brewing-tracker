@@ -164,6 +164,12 @@ public class Bean
         IsAvailable = isAvailable;
     }
 
+    public void SetReview(BeanRating? rating, string? notes)
+    {
+        Rating = rating;
+        Notes = EntityNormalization.NormalizeOptional(notes);
+    }
+
     public void SetImage(string fileName, byte[] data)
     {
         var normalizedFileName = EntityNormalization.NormalizeRequired(fileName, nameof(fileName));

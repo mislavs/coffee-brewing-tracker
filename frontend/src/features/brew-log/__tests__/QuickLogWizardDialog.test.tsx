@@ -2,6 +2,7 @@ import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/re
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { QuickLogWizardDialog } from '@/features/brew-log/components/quick-log/QuickLogWizardDialog'
+import { useBeanReview } from '@/features/beans/hooks/useBeanReview'
 import { useBeans } from '@/features/beans/hooks/useBeans'
 import { useSetBeanAvailability } from '@/features/beans/hooks/useSetBeanAvailability'
 import { useCreateBrewLog } from '@/features/brew-log/hooks/useCreateBrewLog'
@@ -14,6 +15,10 @@ import type { BrewLogDto } from '@/lib/api/schemas'
 
 vi.mock('@/features/beans/hooks/useBeans', () => ({
   useBeans: vi.fn(),
+}))
+
+vi.mock('@/features/beans/hooks/useBeanReview', () => ({
+  useBeanReview: vi.fn(),
 }))
 
 vi.mock('@/features/equipment/hooks/useBrewers', () => ({
@@ -63,7 +68,11 @@ function createQueryResult<T>(data: T) {
 }
 
 function renderDialog() {
-  return render(<QuickLogWizardDialog open onOpenChange={vi.fn()} />)
+  const onOpenChange = vi.fn()
+  return {
+    ...render(<QuickLogWizardDialog open onOpenChange={onOpenChange} />),
+    onOpenChange,
+  }
 }
 
 async function findCurrentStepButton(name: string) {
@@ -167,9 +176,24 @@ describe('QuickLogWizardDialog', () => {
     vi.mocked(useLatestBrewLogForBean).mockReturnValue(
       createQueryResult(null) as ReturnType<typeof useLatestBrewLogForBean>,
     )
+    vi.mocked(useBeanReview).mockReturnValue({
+      data: {
+        id: beanId,
+        rating: 4,
+        suggestedRating: 5,
+        notes: 'Existing bean notes',
+      },
+      isPending: false,
+      isError: false,
+      isFetching: false,
+      refetch: vi.fn(),
+    } as unknown as ReturnType<typeof useBeanReview>)
     vi.mocked(useSetBeanAvailability).mockReturnValue({
       mutateAsync: setBeanAvailabilityMock,
       isPending: false,
+      isError: false,
+      error: null,
+      reset: vi.fn(),
     } as unknown as ReturnType<typeof useSetBeanAvailability>)
   })
 
@@ -534,10 +558,10 @@ describe('QuickLogWizardDialog', () => {
     expect((screen.getByLabelText('Adjustment ideas') as HTMLTextAreaElement).value).toBe('')
   })
 
-  it('opens the low-stock prompt when the remaining bean quantity is low', async () => {
+  it('completes the bean review when the remaining bean quantity is low', async () => {
     const user = userEvent.setup()
     mutateAsyncMock.mockResolvedValue({ remainingBeanQuantity: 10 })
-    renderDialog()
+    const result = renderDialog()
 
     await completeRequiredFlow(user)
 
@@ -547,5 +571,22 @@ describe('QuickLogWizardDialog', () => {
       await screen.findByRole('heading', { name: 'Mark bean as unavailable?' }),
     ).toBeTruthy()
     expect(screen.getByText(/Only 10\.0g remains for this bean\./)).toBeTruthy()
+
+    await user.click(
+      screen.getByRole('button', { name: 'Review & mark unavailable' }),
+    )
+    await user.click(
+      screen.getByRole('button', { name: 'Save & mark unavailable' }),
+    )
+
+    expect(setBeanAvailabilityMock).toHaveBeenCalledWith({
+      id: beanId,
+      isAvailable: false,
+      review: {
+        rating: 5,
+        notes: 'Existing bean notes',
+      },
+    })
+    expect(result.onOpenChange).toHaveBeenCalledWith(false)
   })
 })

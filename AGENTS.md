@@ -18,6 +18,7 @@ This file is the short entry point for coding agents and contributors.
 - Frontend build: from `frontend`, run `npm run build`
 - Frontend tests: from `frontend`, run `npm run test`
 - Frontend lint: from `frontend`, run `npm run lint`
+- Browser validation: after making changes, use `playwright-cli` to test all affected user-facing behavior in the running application
 
 ## Local Run
 

@@ -219,7 +219,14 @@ public static class BeanEndpoints
         CancellationToken cancellationToken)
     {
         await sender.Send(
-            new SetBeanAvailabilityCommand(id, request.IsAvailable),
+            new SetBeanAvailabilityCommand(
+                id,
+                request.IsAvailable,
+                request.Review is null
+                    ? null
+                    : new BeanAvailabilityReview(
+                        request.Review.Rating,
+                        request.Review.Notes)),
             cancellationToken);
 
         return TypedResults.Ok();

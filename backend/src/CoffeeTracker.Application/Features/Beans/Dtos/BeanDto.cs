@@ -19,6 +19,7 @@ public sealed record BeanDto(
     decimal BagWeight,
     decimal? Price,
     int? Rating,
+    int? SuggestedRating,
     string? Notes,
     decimal? PricePerKg,
     IReadOnlyList<FlavorNoteDto> FlavorNotes,

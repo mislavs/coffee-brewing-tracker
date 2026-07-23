@@ -52,6 +52,7 @@ public class GetBeanByIdHandlerTests(IntegrationTestFactory factory) : Integrati
         result.RoasterName.Should().Be("Kawa");
         result.Region.Should().Be("Nyeri");
         result.Rating.Should().Be(5);
+        result.SuggestedRating.Should().BeNull();
         result.Notes.Should().Be("Bright acidity.");
         result.OriginCountries.Should().ContainSingle();
         result.OriginCountries.Single().Id.Should().Be(kenya.Id);
@@ -63,6 +64,82 @@ public class GetBeanByIdHandlerTests(IntegrationTestFactory factory) : Integrati
         result.FlavorNotes.Select(entity => entity.Name)
             .Should()
             .Contain(["Citrus", "Chocolate"]);
+    }
+
+    [Fact]
+    public async Task Handle_WhenBeanHasRatedBrews_ReturnsHighestRatingAndIgnoresUnratedBrews()
+    {
+        // Arrange
+        var roaster = Roaster.Create("Suggestion Roaster", null, null);
+        await Insert(roaster);
+        var bean = Bean.Create(
+            "Suggestion Bean",
+            roaster.Id,
+            OriginType.SingleOrigin,
+            null,
+            null,
+            null,
+            RoastProfile.Filter,
+            null,
+            null,
+            250m,
+            null);
+        var brewer = Brewer.Create("Suggestion Brewer");
+        var grinder = Grinder.Create("Suggestion Grinder");
+        await Insert(bean);
+        await Insert(brewer);
+        await Insert(grinder);
+
+        await InsertMany([
+            BrewLogEntry.Create(
+                bean.Id,
+                brewer.Id,
+                grinder.Id,
+                null,
+                18m,
+                300m,
+                null,
+                null,
+                null,
+                BrewRating.Average,
+                null,
+                null,
+                DateTime.UtcNow.AddDays(-2)),
+            BrewLogEntry.Create(
+                bean.Id,
+                brewer.Id,
+                grinder.Id,
+                null,
+                18m,
+                300m,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                DateTime.UtcNow.AddDays(-1)),
+            BrewLogEntry.Create(
+                bean.Id,
+                brewer.Id,
+                grinder.Id,
+                null,
+                18m,
+                300m,
+                null,
+                null,
+                null,
+                BrewRating.Excellent,
+                null,
+                null,
+                DateTime.UtcNow)
+        ]);
+
+        // Act
+        var result = await Send(new GetBeanByIdQuery(bean.Id));
+
+        // Assert
+        result.SuggestedRating.Should().Be(5);
     }
 
     [Fact]

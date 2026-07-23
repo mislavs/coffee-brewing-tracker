@@ -8,7 +8,6 @@ import {
   DialogContent,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { useSetBeanAvailability } from '@/features/beans/hooks/useSetBeanAvailability'
 import {
   brewLogFormSchema,
   normalizeBrewLogFormValues,
@@ -118,9 +117,7 @@ export function QuickLogWizardDialog({
   const hideAccessoriesStep =
     !accessoriesQuery.isPending && availableAccessoriesForBrewer.length === 0
   const { mutateAsync, isPending } = useCreateBrewLog()
-  const { mutateAsync: setBeanAvailability, isPending: isSettingAvailability } =
-    useSetBeanAvailability()
-  const isBusy = isPending || isSettingAvailability
+  const isBusy = isPending
 
   useResetRecipeOnBrewerChange(form, watchedBrewerId, '', {
     skipNextResetRef: skipNextRecipeResetRef,
@@ -504,25 +501,12 @@ export function QuickLogWizardDialog({
 
       <BrewLogLowStockPromptDialog
         prompt={lowStockPrompt}
-        isPending={isSettingAvailability}
         onOpenChange={(nextOpen) => {
-          if (!nextOpen && !isSettingAvailability) {
+          if (!nextOpen) {
             closeWizard()
           }
         }}
-        onMarkUnavailable={() => {
-          if (!lowStockPrompt || isSettingAvailability) {
-            return
-          }
-
-          void (async () => {
-            await setBeanAvailability({
-              id: lowStockPrompt.beanId,
-              isAvailable: false,
-            })
-            closeWizard()
-          })()
-        }}
+        onCompleted={closeWizard}
       />
     </>
   )

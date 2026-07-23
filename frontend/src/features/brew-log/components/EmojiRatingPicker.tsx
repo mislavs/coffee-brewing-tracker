@@ -8,11 +8,11 @@ type EmojiRatingPickerProps = {
 }
 
 const ratingOptions = [
-  { value: 1, emoji: '😞' },
-  { value: 2, emoji: '🙁' },
-  { value: 3, emoji: '😐' },
-  { value: 4, emoji: '🙂' },
-  { value: 5, emoji: '🤩' },
+  { value: 1, emoji: '😞', label: 'Terrible' },
+  { value: 2, emoji: '🙁', label: 'Poor' },
+  { value: 3, emoji: '😐', label: 'Average' },
+  { value: 4, emoji: '🙂', label: 'Good' },
+  { value: 5, emoji: '🤩', label: 'Excellent' },
 ] as const
 
 export function EmojiRatingPicker({
@@ -36,6 +36,7 @@ export function EmojiRatingPicker({
             type="button"
             role="radio"
             aria-checked={isSelected}
+            aria-label={`${option.label}, ${option.value} out of 5`}
             onClick={() => onChange(isSelected ? undefined : option.value)}
             className={cn(
               'border-input bg-background hover:bg-muted/60 focus-visible:ring-ring/50 rounded-md border px-3 py-2 transition-all focus-visible:ring-[3px] focus-visible:outline-none',

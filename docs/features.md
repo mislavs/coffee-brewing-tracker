@@ -14,6 +14,8 @@ Users can create, view, edit, delete unused roasters, and browse roasters. Roast
 
 Users can catalog purchased coffee beans with roaster, origin countries, variety, processing method, roast profile, roast date, altitude, flavor notes, bag weight, price, rating, notes, and availability. Bean lists support search, country filtering, sorting, and available/unavailable visibility. Remaining quantity is calculated from logged brew doses.
 
+After a brew leaves fewer than 15 grams, users can keep the bean available or finish it with a final rating and notes before marking it unavailable. The final review suggests the highest rating from the bean's rated brews while remaining fully editable.
+
 ### Bean Image Parsing
 
 When AI extraction is configured, users can upload a bean bag image to prefill bean form fields. When AI extraction is unavailable, the app continues to run without exposing that capability.
@@ -49,7 +51,6 @@ The production container serves both the API and the built SPA. PostgreSQL is ex
 ## Planned Or Unresolved Behavior
 
 - Keep `docs/SPEC.md` as the broader product specification while this file remains the concise behavior map.
-- Revisit low-bean notification behavior before treating it as shipped user-facing behavior.
 - Add ADRs for future decisions that change persistence shape, external integrations, ownership boundaries, or deployment assumptions.
 
 ## Out Of Scope

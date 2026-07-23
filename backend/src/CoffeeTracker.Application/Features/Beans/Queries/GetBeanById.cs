@@ -55,6 +55,13 @@ public sealed class GetBeanByIdHandler(ApplicationDbContext dbContext)
             .Where(entry => entry.BeanId == request.Id)
             .SumAsync(entry => (decimal?)entry.Dose, cancellationToken) ?? 0m;
 
+        var suggestedRating = await dbContext.BrewLogEntries
+            .AsNoTracking()
+            .Where(entry => entry.BeanId == request.Id)
+            .MaxAsync(
+                entry => entry.Rating.HasValue ? (int?)entry.Rating.Value : null,
+                cancellationToken);
+
         var pricePerKg = bean.Price.HasValue && bean.BagWeight > 0
             ? bean.Price.Value / (bean.BagWeight / 1000m)
             : (decimal?)null;
@@ -78,6 +85,7 @@ public sealed class GetBeanByIdHandler(ApplicationDbContext dbContext)
             bean.BagWeight,
             bean.Price,
             bean.Rating,
+            suggestedRating,
             bean.Notes,
             pricePerKg,
             bean.FlavorNotes

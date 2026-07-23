@@ -1,19 +1,26 @@
 import type { ReactNode } from 'react'
+import { cn } from '@/lib/utils'
 
 type DetailFieldProps = {
   label: string
   children: ReactNode
   stacked?: boolean
+  valueClassName?: string
 }
 
-export function DetailField({ label, children, stacked = false }: DetailFieldProps) {
+export function DetailField({
+  label,
+  children,
+  stacked = false,
+  valueClassName,
+}: DetailFieldProps) {
   if (stacked) {
     return (
       <div className="space-y-1">
         <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
           {label}
         </p>
-        <div className="text-sm">{children}</div>
+        <div className={cn('text-sm', valueClassName)}>{children}</div>
       </div>
     )
   }
@@ -23,7 +30,7 @@ export function DetailField({ label, children, stacked = false }: DetailFieldPro
       <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
         {label}
       </span>
-      <span className="text-sm">{children}</span>
+      <span className={cn('text-sm', valueClassName)}>{children}</span>
     </div>
   )
 }

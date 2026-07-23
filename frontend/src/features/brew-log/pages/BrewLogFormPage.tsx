@@ -1,14 +1,11 @@
 import type { Guid } from '@/lib/api-types'
 import { useState } from 'react'
 import { Navigate, useNavigate, useSearchParams } from 'react-router-dom'
-import { useSetBeanAvailability } from '@/features/beans/hooks/useSetBeanAvailability'
 import {
   normalizeBrewLogFormValues,
   type BrewLogFormValues,
 } from '@/features/brew-log/brewLogFormSchema'
-import {
-  BrewLogLowStockPromptDialog,
-} from '@/features/brew-log/brewLogLowStock'
+import { BrewLogLowStockPromptDialog } from '@/features/brew-log/brewLogLowStock'
 import { getBrewLogLowStockPrompt } from '@/features/brew-log/brewLogLowStockUtils'
 import {
   createInitialBrewLogValues,
@@ -38,8 +35,6 @@ function CreateLikeBrewLogForm({
 }: CreateLikeBrewLogFormProps) {
   const navigate = useNavigate()
   const { mutateAsync, isPending } = useCreateBrewLog()
-  const { mutateAsync: setBeanAvailability, isPending: isSettingAvailability } =
-    useSetBeanAvailability()
   const [lowStockPrompt, setLowStockPrompt] = useState<{
     beanId: Guid
     remainingQuantity: number
@@ -76,26 +71,12 @@ function CreateLikeBrewLogForm({
 
       <BrewLogLowStockPromptDialog
         prompt={lowStockPrompt}
-        isPending={isSettingAvailability}
         onOpenChange={(open) => {
-          if (!open && !isSettingAvailability) {
+          if (!open) {
             closeLowStockPrompt()
           }
         }}
-        onKeepAvailable={closeLowStockPrompt}
-        onMarkUnavailable={() => {
-          if (!lowStockPrompt || isSettingAvailability) {
-            return
-          }
-
-          void (async () => {
-            await setBeanAvailability({
-              id: lowStockPrompt.beanId,
-              isAvailable: false,
-            })
-            closeLowStockPrompt()
-          })()
-        }}
+        onCompleted={closeLowStockPrompt}
       />
     </>
   )
