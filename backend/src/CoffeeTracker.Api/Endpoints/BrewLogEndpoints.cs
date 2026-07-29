@@ -33,6 +33,9 @@ public static class BrewLogEndpoints
         group.MapGet("/", GetBrewLogs)
             .WithName("GetBrewLogs");
 
+        group.MapGet("/quick-log-usage", GetQuickLogUsage)
+            .WithName("GetQuickLogUsage");
+
         group.MapGet("/{id:guid}", GetBrewLogById)
             .WithName("GetBrewLogById");
 
@@ -83,6 +86,17 @@ public static class BrewLogEndpoints
                 pageSize ?? 12),
             cancellationToken);
         return TypedResults.Ok(brewLogs);
+    }
+
+    private static async Task<Ok<QuickLogUsageDto>> GetQuickLogUsage(
+        Guid beanId,
+        ISender sender,
+        CancellationToken cancellationToken)
+    {
+        var usage = await sender.Send(
+            new GetQuickLogUsageQuery(beanId),
+            cancellationToken);
+        return TypedResults.Ok(usage);
     }
 
     private static async Task<Ok<BrewLogDto>> GetBrewLogById(

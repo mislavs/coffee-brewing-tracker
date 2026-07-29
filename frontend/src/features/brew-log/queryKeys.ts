@@ -11,5 +11,7 @@ export const brewLogQueryKeys = {
     pageSize?: number
   }) =>
     ['brew-logs', params] as const,
+  quickLogUsage: (beanId: string) =>
+    ['brew-logs', 'quick-log-usage', beanId] as const,
   detail: (id: string) => ['brew-logs', id] as const,
 }

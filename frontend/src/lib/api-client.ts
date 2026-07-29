@@ -20,6 +20,7 @@ import {
   getDeleteBrewLogUrl,
   getGetBrewLogByIdUrl,
   getGetBrewLogsUrl,
+  getGetQuickLogUsageUrl,
   getParseVoiceBrewLogUrl,
   getSetBrewLogRatingUrl,
   getUpdateBrewLogUrl,
@@ -94,6 +95,7 @@ import type {
   GrinderSummaryDto,
   ParseBeanImageResponse,
   ParseVoiceBrewLogResponse,
+  QuickLogUsageDto,
   RecipeDto,
   RecipeSummaryDto,
   RoasterDto,
@@ -248,6 +250,13 @@ export const apiClient = {
           },
         )
       },
+      getQuickLogUsage: (beanId: Guid) =>
+        requestJson<QuickLogUsageDto>(
+          getGetQuickLogUsageUrl({ beanId }),
+          {
+            method: 'GET',
+          },
+        ),
       post: (request: CreateBrewLogRequest) =>
         requestJson<CreateBrewLogResponse>(getCreateBrewLogUrl(), {
           method: 'POST',

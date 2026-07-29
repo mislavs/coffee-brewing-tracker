@@ -35,6 +35,7 @@ import { useFilterAccessoryIdsOnBrewerChange } from '@/features/brew-log/compone
 import { useResetRecipeOnBrewerChange } from '@/features/brew-log/components/useResetRecipeOnBrewerChange'
 import { useCreateBrewLog } from '@/features/brew-log/hooks/useCreateBrewLog'
 import { useLatestBrewLogForBean } from '@/features/brew-log/hooks/useLatestBrewLogForBean'
+import { useQuickLogUsage } from '@/features/brew-log/hooks/useQuickLogUsage'
 import { useAccessories } from '@/features/equipment/hooks/useAccessories'
 import { applyBrewLogFormServerErrors } from '@/features/brew-log/mapApiValidationErrors'
 import {
@@ -108,6 +109,7 @@ export function QuickLogWizardDialog({
   const lastAppliedBeanIdRef = useRef('')
   const skipNextRecipeResetRef = useRef(false)
   const { data: latestBrewForBean = null } = useLatestBrewLogForBean(watchedBeanId)
+  const { data: quickLogUsage } = useQuickLogUsage(watchedBeanId)
   const accessoriesQuery = useAccessories()
   const hasDefinedAccessories = (accessoriesQuery.data?.length ?? 0) > 0
   const availableAccessoriesForBrewer = filterAccessoriesByBrewer(
@@ -309,6 +311,7 @@ export function QuickLogWizardDialog({
           disabled={isBusy}
           onSelect={handleBrewerSelect}
           preferredId={latestBrewForBean?.brewerId ?? undefined}
+          usageCounts={quickLogUsage?.brewers}
         />
       ),
     },
@@ -323,6 +326,7 @@ export function QuickLogWizardDialog({
           disabled={isBusy}
           onSelect={(recipeId) => handleAutoAdvanceField('recipeId', recipeId)}
           preferredId={latestBrewForBean?.recipeId ?? undefined}
+          usageCounts={quickLogUsage?.recipes}
         />
       ),
     },

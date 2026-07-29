@@ -1,15 +1,17 @@
 import { useMemo } from 'react'
 import { useWatch } from 'react-hook-form'
 import {
-  sortOptionsByPreferredId,
+  sortOptionsByUsage,
   toIdNameOptions,
 } from '@/features/brew-log/components/brewLogFormShared'
 import { EntitySingleSelectStep } from '@/features/brew-log/components/quick-log/EntitySingleSelectStep'
 import type { QuickLogSingleSelectStepProps } from '@/features/brew-log/components/quick-log/quickLogTypes'
 import { useBrewers } from '@/features/equipment/hooks/useBrewers'
+import type { QuickLogUsageCountDto } from '@/lib/api/schemas'
 
 type BrewerStepProps = QuickLogSingleSelectStepProps & {
   preferredId?: string
+  usageCounts?: QuickLogUsageCountDto[] | null
 }
 
 export function BrewerStep({
@@ -17,16 +19,18 @@ export function BrewerStep({
   onSelect,
   disabled = false,
   preferredId,
+  usageCounts,
 }: BrewerStepProps) {
   const selectedBrewerId = useWatch({ control: form.control, name: 'brewerId' }) ?? ''
   const { data: brewers = [] } = useBrewers()
   const options = useMemo(
     () =>
-      sortOptionsByPreferredId(
+      sortOptionsByUsage(
         toIdNameOptions(brewers, 'Unnamed brewer'),
+        usageCounts,
         preferredId,
       ),
-    [brewers, preferredId],
+    [brewers, preferredId, usageCounts],
   )
 
   return (

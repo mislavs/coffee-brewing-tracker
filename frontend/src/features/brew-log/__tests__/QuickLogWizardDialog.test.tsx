@@ -7,6 +7,7 @@ import { useBeans } from '@/features/beans/hooks/useBeans'
 import { useSetBeanAvailability } from '@/features/beans/hooks/useSetBeanAvailability'
 import { useCreateBrewLog } from '@/features/brew-log/hooks/useCreateBrewLog'
 import { useLatestBrewLogForBean } from '@/features/brew-log/hooks/useLatestBrewLogForBean'
+import { useQuickLogUsage } from '@/features/brew-log/hooks/useQuickLogUsage'
 import { useAccessories } from '@/features/equipment/hooks/useAccessories'
 import { useBrewers } from '@/features/equipment/hooks/useBrewers'
 import { useGrinders } from '@/features/equipment/hooks/useGrinders'
@@ -45,15 +46,23 @@ vi.mock('@/features/brew-log/hooks/useLatestBrewLogForBean', () => ({
   useLatestBrewLogForBean: vi.fn(),
 }))
 
+vi.mock('@/features/brew-log/hooks/useQuickLogUsage', () => ({
+  useQuickLogUsage: vi.fn(),
+}))
+
 vi.mock('@/features/beans/hooks/useSetBeanAvailability', () => ({
   useSetBeanAvailability: vi.fn(),
 }))
 
 const beanId = '11111111-1111-1111-1111-111111111111'
+const beanBId = '10101010-1010-1010-1010-101010101010'
 const brewerAId = '22222222-2222-2222-2222-222222222222'
 const brewerBId = '33333333-3333-3333-3333-333333333333'
+const brewerCId = '23232323-2323-2323-2323-232323232323'
 const recipeAId = '44444444-4444-4444-4444-444444444444'
 const recipeBId = '55555555-5555-5555-5555-555555555555'
+const recipeCId = '45454545-4545-4545-4545-454545454545'
+const recipeDId = '56565656-5656-5656-5656-565656565656'
 const grinderId = '66666666-6666-6666-6666-666666666666'
 const grinderBId = '88888888-8888-8888-8888-888888888888'
 const accessoryId = '77777777-7777-7777-7777-777777777777'
@@ -176,6 +185,11 @@ describe('QuickLogWizardDialog', () => {
     vi.mocked(useLatestBrewLogForBean).mockReturnValue(
       createQueryResult(null) as ReturnType<typeof useLatestBrewLogForBean>,
     )
+    vi.mocked(useQuickLogUsage).mockReturnValue(
+      createQueryResult({ brewers: [], recipes: [] }) as unknown as ReturnType<
+        typeof useQuickLogUsage
+      >,
+    )
     vi.mocked(useBeanReview).mockReturnValue({
       data: {
         id: beanId,
@@ -211,6 +225,111 @@ describe('QuickLogWizardDialog', () => {
     await user.click(screen.getByRole('radio', { name: 'Bean One' }))
 
     expect(await findCurrentStepButton('Brewer')).toBeTruthy()
+  })
+
+  it('pins latest selections and frequency-ranks the remaining brewer and recipe options', async () => {
+    const user = userEvent.setup()
+    const latestBrew: BrewLogDto = {
+      id: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+      beanId,
+      brewerId: brewerBId,
+      recipeId: recipeBId,
+      grinderId,
+      accessories: [],
+      dose: 18,
+      waterAmount: 300,
+      brewedAt: '2026-07-28T08:00:00Z',
+    }
+    vi.mocked(useLatestBrewLogForBean).mockReturnValue(
+      createQueryResult(latestBrew) as ReturnType<typeof useLatestBrewLogForBean>,
+    )
+    vi.mocked(useQuickLogUsage).mockReturnValue(
+      createQueryResult({
+        brewers: [
+          { id: brewerAId, usageCount: 8 },
+          { id: brewerCId, usageCount: 4 },
+          { id: brewerBId, usageCount: 1 },
+        ],
+        recipes: [
+          { id: recipeCId, usageCount: 7 },
+          { id: recipeDId, usageCount: 3 },
+          { id: recipeBId, usageCount: 1 },
+        ],
+      }) as unknown as ReturnType<typeof useQuickLogUsage>,
+    )
+    vi.mocked(useBrewers).mockReturnValue(
+      createQueryResult([
+        { id: brewerAId, name: 'Brewer A' },
+        { id: brewerBId, name: 'Brewer B' },
+        { id: brewerCId, name: 'Brewer C' },
+      ]) as ReturnType<typeof useBrewers>,
+    )
+    vi.mocked(useRecipes).mockReturnValue(
+      createQueryResult([
+        { id: recipeBId, name: 'Recipe B' },
+        { id: recipeCId, name: 'Recipe C' },
+        { id: recipeDId, name: 'Recipe D' },
+      ]) as ReturnType<typeof useRecipes>,
+    )
+    renderDialog()
+
+    await user.click(screen.getByRole('radio', { name: 'Bean One' }))
+    await findCurrentStepButton('Brewer')
+
+    const brewerOptions = screen.getAllByRole('radio')
+    expect(brewerOptions.map((option) => option.textContent)).toEqual([
+      'Brewer B',
+      'Brewer A',
+      'Brewer C',
+    ])
+    expect(brewerOptions[0].getAttribute('aria-checked')).toBe('true')
+
+    await user.click(screen.getByRole('button', { name: 'Next' }))
+    await findCurrentStepButton('Recipe')
+
+    const recipeOptions = screen.getAllByRole('radio')
+    expect(recipeOptions.map((option) => option.textContent)).toEqual([
+      'Recipe B',
+      'Recipe C',
+      'Recipe D',
+    ])
+    expect(recipeOptions[0].getAttribute('aria-checked')).toBe('true')
+  })
+
+  it('uses the selected bean usage data when ranking brewers', async () => {
+    const user = userEvent.setup()
+    vi.mocked(useBeans).mockReturnValue(
+      createQueryResult([
+        { id: beanId, name: 'Bean One' },
+        { id: beanBId, name: 'Bean Two' },
+      ]) as ReturnType<typeof useBeans>,
+    )
+    vi.mocked(useQuickLogUsage).mockImplementation(
+      ((selectedBeanId?: string) =>
+        createQueryResult({
+          brewers:
+            selectedBeanId === beanBId
+              ? [
+                  { id: brewerBId, usageCount: 5 },
+                  { id: brewerAId, usageCount: 1 },
+                ]
+              : [
+                  { id: brewerAId, usageCount: 5 },
+                  { id: brewerBId, usageCount: 1 },
+                ],
+          recipes: [],
+        })) as unknown as typeof useQuickLogUsage,
+    )
+    renderDialog()
+
+    await user.click(screen.getByRole('radio', { name: 'Bean One' }))
+    await findCurrentStepButton('Brewer')
+    expect(screen.getAllByRole('radio')[0].textContent).toBe('Brewer A')
+
+    await user.click(getReachedStepButton('Bean'))
+    await user.click(screen.getByRole('radio', { name: 'Bean Two' }))
+    await findCurrentStepButton('Brewer')
+    expect(screen.getAllByRole('radio')[0].textContent).toBe('Brewer B')
   })
 
   it('skips the accessories step when no accessories are defined', async () => {

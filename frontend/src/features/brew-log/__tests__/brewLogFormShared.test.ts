@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest'
-import { isAccessoryCompatibleWithBrewer } from '@/features/brew-log/components/brewLogFormShared'
+import {
+  isAccessoryCompatibleWithBrewer,
+  sortOptionsByUsage,
+} from '@/features/brew-log/components/brewLogFormShared'
 import type { AccessoryDto } from '@/lib/api/schemas'
 
 const brewerId = '22222222-2222-2222-2222-222222222222'
@@ -48,5 +51,65 @@ describe('isAccessoryCompatibleWithBrewer', () => {
   it('treats null and undefined compatible brewers as universal', () => {
     expect(isAccessoryCompatibleWithBrewer(createAccessory(null), brewerId)).toBe(true)
     expect(isAccessoryCompatibleWithBrewer(createAccessory(undefined), brewerId)).toBe(true)
+  })
+})
+
+describe('sortOptionsByUsage', () => {
+  const options = [
+    { id: 'option-c', name: 'Chemex' },
+    { id: 'option-a', name: 'Aeropress' },
+    { id: 'option-v', name: 'V60' },
+    { id: 'option-k', name: 'Kalita' },
+  ]
+
+  it('pins the preferred option before frequency-ranked options', () => {
+    const result = sortOptionsByUsage(
+      options,
+      [
+        { id: 'option-a', usageCount: 8 },
+        { id: 'option-c', usageCount: 5 },
+        { id: 'option-v', usageCount: 1 },
+      ],
+      'option-v',
+    )
+
+    expect(result.map((option) => option.id)).toEqual([
+      'option-v',
+      'option-a',
+      'option-c',
+      'option-k',
+    ])
+  })
+
+  it('uses name and then id to break equal-frequency ties', () => {
+    const result = sortOptionsByUsage(
+      [
+        { id: 'option-b', name: 'V60' },
+        { id: 'option-a', name: 'V60' },
+        { id: 'option-c', name: 'Aeropress' },
+      ],
+      [
+        { id: 'option-a', usageCount: 2 },
+        { id: 'option-b', usageCount: 2 },
+        { id: 'option-c', usageCount: 2 },
+      ],
+    )
+
+    expect(result.map((option) => option.id)).toEqual([
+      'option-c',
+      'option-a',
+      'option-b',
+    ])
+  })
+
+  it('falls back to alphabetical ordering when usage data is unavailable', () => {
+    const result = sortOptionsByUsage(options, undefined)
+
+    expect(result.map((option) => option.name)).toEqual([
+      'Aeropress',
+      'Chemex',
+      'Kalita',
+      'V60',
+    ])
   })
 })

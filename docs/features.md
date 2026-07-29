@@ -36,6 +36,8 @@ Users can create, view, edit, delete, filter, and paginate brew log entries. A b
 
 Users can start a quick log flow from the brew log list, repeat a previous brew as a new brew template, and repeat a previous bean as a new bean purchase template. Repeat flows copy setup fields while leaving session-specific results for the new entry.
 
+After a bean is selected, quick log ranks brewer and recipe choices by their usage with that bean during the previous 90 days. The setup from the bean's latest brew remains preselected and pinned ahead of the frequency-ranked choices.
+
 ### Voice Brew Log Parsing
 
 When transcription and extraction providers are configured, users can dictate a brew description and review parsed form values before saving. Feature availability is server-gated so the UI can hide voice entry when dependencies are missing.

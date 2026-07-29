@@ -2,15 +2,17 @@ import { useMemo } from 'react'
 import { useWatch } from 'react-hook-form'
 import { FieldErrorText } from '@/features/brew-log/components/BrewLogFormUi'
 import {
-  sortOptionsByPreferredId,
+  sortOptionsByUsage,
   toIdNameOptions,
 } from '@/features/brew-log/components/brewLogFormShared'
 import { EntitySingleSelectStep } from '@/features/brew-log/components/quick-log/EntitySingleSelectStep'
 import type { QuickLogSingleSelectStepProps } from '@/features/brew-log/components/quick-log/quickLogTypes'
 import { useRecipes } from '@/features/recipes/hooks/useRecipes'
+import type { QuickLogUsageCountDto } from '@/lib/api/schemas'
 
 type RecipeStepProps = QuickLogSingleSelectStepProps & {
   preferredId?: string
+  usageCounts?: QuickLogUsageCountDto[] | null
 }
 
 export function RecipeStep({
@@ -18,6 +20,7 @@ export function RecipeStep({
   onSelect,
   disabled = false,
   preferredId,
+  usageCounts,
 }: RecipeStepProps) {
   const selectedBrewerId = useWatch({ control: form.control, name: 'brewerId' }) ?? ''
   const selectedRecipeId = useWatch({ control: form.control, name: 'recipeId' }) ?? ''
@@ -27,11 +30,12 @@ export function RecipeStep({
       return []
     }
 
-    return sortOptionsByPreferredId(
+    return sortOptionsByUsage(
       toIdNameOptions(recipes, 'Unnamed recipe'),
+      usageCounts,
       preferredId,
     )
-  }, [preferredId, recipes, selectedBrewerId])
+  }, [preferredId, recipes, selectedBrewerId, usageCounts])
 
   if (!selectedBrewerId) {
     return (

@@ -10,6 +10,11 @@ export type IdNameOption = {
   name: string
 }
 
+type UsageCountSource = {
+  id?: string | null
+  usageCount?: number | null
+}
+
 export function toIdNameOptions<T extends OptionSource>(
   items: T[],
   fallbackName: string,
@@ -58,6 +63,39 @@ export function sortOptionsByPreferredIds(
     ...preferredOptions,
     ...options.filter((option) => !preferredIdSet.has(option.id)),
   ]
+}
+
+export function sortOptionsByUsage(
+  options: IdNameOption[],
+  usageCounts: UsageCountSource[] | null | undefined,
+  preferredId?: string,
+) {
+  const usageById = new Map(
+    usageCounts?.flatMap((entry) =>
+      entry.id ? [[entry.id, entry.usageCount ?? 0] as const] : [],
+    ) ?? [],
+  )
+
+  return [...options].sort((left, right) => {
+    if (left.id === preferredId && right.id !== preferredId) {
+      return -1
+    }
+
+    if (right.id === preferredId && left.id !== preferredId) {
+      return 1
+    }
+
+    const usageDifference =
+      (usageById.get(right.id) ?? 0) - (usageById.get(left.id) ?? 0)
+    if (usageDifference !== 0) {
+      return usageDifference
+    }
+
+    const nameDifference = left.name.localeCompare(right.name, undefined, {
+      sensitivity: 'base',
+    })
+    return nameDifference || left.id.localeCompare(right.id)
+  })
 }
 
 export function isAccessoryCompatibleWithBrewer(
