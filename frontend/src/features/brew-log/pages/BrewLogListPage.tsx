@@ -73,10 +73,12 @@ export function BrewLogListPage() {
   const [searchParams, setSearchParams] = useSearchParams()
   const beanId = searchParams.get('beanId') ?? ''
   const recipeId = searchParams.get('recipeId') ?? ''
-  const hideUnavailable = searchParams.get('hideUnavailable') === 'true'
+  const hideUnavailable = searchParams.get('hideUnavailable') !== 'false'
   const includeUnavailableBeans = !hideUnavailable
   const [isFiltersOpen, setIsFiltersOpen] = useState(
-    Boolean(beanId) || Boolean(recipeId) || hideUnavailable,
+    Boolean(beanId) ||
+      Boolean(recipeId) ||
+      searchParams.has('hideUnavailable'),
   )
   const page = parsePageParam(searchParams.get('page'))
   const setFilterSearchParams = useCallback(
@@ -162,12 +164,12 @@ export function BrewLogListPage() {
       (previous) => {
         const next = new URLSearchParams(previous)
         if (checked) {
-          next.set('hideUnavailable', 'true')
+          next.delete('hideUnavailable')
           if (selectedBean?.isAvailable === false) {
             next.delete('beanId')
           }
         } else {
-          next.delete('hideUnavailable')
+          next.set('hideUnavailable', 'false')
         }
 
         return next
@@ -214,7 +216,7 @@ export function BrewLogListPage() {
   const filterSummaryParts = [
     beanId ? (selectedBean?.name ?? 'Selected bean') : null,
     recipeId ? (selectedRecipe?.name ?? 'Selected recipe') : null,
-    hideUnavailable ? 'Available beans only' : null,
+    includeUnavailableBeans ? 'Unavailable beans included' : null,
   ].filter((part): part is string => Boolean(part))
   const resultCountLabel =
     totalCount === 0

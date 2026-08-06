@@ -101,23 +101,32 @@ describe('BrewLogListPage', () => {
     )
   })
 
-  it('includes unavailable beans by default', () => {
+  it('hides unavailable beans by default', async () => {
+    const user = userEvent.setup()
     renderPage()
 
-    expect(useBeans).toHaveBeenLastCalledWith(undefined, true)
+    expect(useBeans).toHaveBeenLastCalledWith(undefined, false)
     expect(useBrewLogs).toHaveBeenLastCalledWith(
       undefined,
       undefined,
       undefined,
-      true,
+      false,
       undefined,
       1,
       12,
       undefined,
     )
+
+    await user.click(screen.getByRole('button', { name: 'Show filters' }))
+
+    expect(
+      screen
+        .getByRole('switch', { name: 'Hide unavailable beans' })
+        .getAttribute('aria-checked'),
+    ).toBe('true')
   })
 
-  it('can hide unavailable beans from the availability filter', async () => {
+  it('can show unavailable beans from the availability filter', async () => {
     const user = userEvent.setup()
     renderPage()
 
@@ -125,24 +134,26 @@ describe('BrewLogListPage', () => {
     await user.click(screen.getByRole('switch', { name: 'Hide unavailable beans' }))
 
     await waitFor(() => {
-      expect(useBeans).toHaveBeenLastCalledWith(undefined, false)
+      expect(useBeans).toHaveBeenLastCalledWith(undefined, true)
       expect(useBrewLogs).toHaveBeenLastCalledWith(
         undefined,
         undefined,
         undefined,
-        false,
+        true,
         undefined,
         1,
         12,
         undefined,
       )
     })
-    expect(screen.getByTestId('location-search').textContent).toBe('?hideUnavailable=true')
+    expect(screen.getByTestId('location-search').textContent).toBe('?hideUnavailable=false')
   })
 
   it('clears an unavailable bean selection when unavailable beans are hidden', async () => {
     const user = userEvent.setup()
-    renderPage(`/brew-log?beanId=${unavailableBeanId}`)
+    renderPage(
+      `/brew-log?beanId=${unavailableBeanId}&hideUnavailable=false`,
+    )
 
     await user.click(screen.getByRole('switch', { name: 'Hide unavailable beans' }))
 
@@ -158,6 +169,6 @@ describe('BrewLogListPage', () => {
         undefined,
       )
     })
-    expect(screen.getByTestId('location-search').textContent).toBe('?hideUnavailable=true')
+    expect(screen.getByTestId('location-search').textContent).toBe('')
   })
 })
