@@ -128,6 +128,23 @@ describe('BrewLogCard', () => {
     } as unknown as ReturnType<typeof useUpdateBrewLog>)
   })
 
+  it('omits the brew time row when no brew time is recorded', () => {
+    // Act
+    renderCard(createBrewLog({ brewTimeSeconds: undefined }))
+
+    // Assert
+    expect(screen.queryByText('Brew time')).toBeNull()
+  })
+
+  it('shows the brew time row when a brew time is recorded', () => {
+    // Act
+    renderCard(createBrewLog({ brewTimeSeconds: 210 }))
+
+    // Assert
+    expect(screen.getByText('Brew time')).toBeTruthy()
+    expect(screen.getByText('3:30')).toBeTruthy()
+  })
+
   it('hides the rate button when the brew already has a rating', () => {
     // Arrange
     const brewLog = createBrewLog({ rating: 4 })

@@ -43,6 +43,7 @@ export function BrewLogCard({ brewLog }: BrewLogCardProps) {
   const beanDisplayName = roasterName ? `${beanName} (${roasterName})` : beanName
   const brewLogId = brewLog.id
   const shouldShowRateButton = Boolean(brewLogId && brewLog.rating == null)
+  const hasBrewTime = brewLog.brewTimeSeconds != null
   const brewerName = brewLog.brewerName || '—'
   const recipeName = brewLog.recipeName?.trim() || '—'
   const brewerAndRecipe = `${brewerName} / ${recipeName}`
@@ -125,10 +126,14 @@ export function BrewLogCard({ brewLog }: BrewLogCardProps) {
               {grinderAndSetting}
             </dd>
 
-            <dt className="text-muted-foreground">Brew time</dt>
-            <dd className="min-w-0 break-words font-medium text-foreground">
-              {formatBrewTime(brewLog.brewTimeSeconds)}
-            </dd>
+            {hasBrewTime ? (
+              <>
+                <dt className="text-muted-foreground">Brew time</dt>
+                <dd className="min-w-0 break-words font-medium text-foreground">
+                  {formatBrewTime(brewLog.brewTimeSeconds)}
+                </dd>
+              </>
+            ) : null}
 
             <dt className="text-muted-foreground">Rating</dt>
             <dd className="min-w-0 break-words font-medium text-foreground">
