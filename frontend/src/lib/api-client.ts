@@ -57,6 +57,7 @@ import {
   getUploadRoasterLogoUrl,
 } from '@/lib/api/generated/roasters/roasters'
 import {
+  getGetCoffeeConsumptionUrl,
   getGetCountryMapStatsUrl,
   getGetDashboardStatsUrl,
 } from '@/lib/api/generated/stats/stats'
@@ -85,11 +86,13 @@ import type {
   CreateRoasterRequest,
   CreateRoasterResponse,
   CountryMapStatsDto,
+  CoffeeConsumptionSeriesDto,
   DashboardStatsDto,
   FlavorNoteDto,
   FeaturesDto,
   GetBeansParams,
   GetBrewLogsParams,
+  GetCoffeeConsumptionParams,
   GetRecipesParams,
   GrinderDto,
   GrinderSummaryDto,
@@ -444,6 +447,15 @@ export const apiClient = {
           requestJson<CountryMapStatsDto[]>(getGetCountryMapStatsUrl(), {
             method: 'GET',
           }),
+      },
+      coffeeConsumption: {
+        get: (queryParameters: GetCoffeeConsumptionParams) =>
+          requestJson<CoffeeConsumptionSeriesDto>(
+            getGetCoffeeConsumptionUrl(queryParameters),
+            {
+              method: 'GET',
+            },
+          ),
       },
     },
   },

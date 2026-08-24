@@ -44,7 +44,9 @@ When transcription and extraction providers are configured, users can dictate a 
 
 ### Stats And Maps
 
-The app exposes dashboard statistics and country map data so users can see aggregate brewing and bean-origin information. A top-level Stats page is available from the main navigation and currently serves as the home for future analysis features.
+The app exposes dashboard statistics and country map data so users can see aggregate brewing and bean-origin information. A top-level Stats page is available from the main navigation and serves as the home for analysis features.
+
+The Graphs section includes a coffee-consumption chart with daily, ISO-weekly, and monthly views over a selectable date range. Consumption totals, brew counts, calendar buckets, empty periods, and partial-period markers are calculated by the backend in the user’s browser-reported time zone; the frontend renders the returned series without aggregating brew logs.
 
 ### Deployment And Operations
 

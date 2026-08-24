@@ -1501,6 +1501,62 @@
           }
         }
       }
+    },
+    "/api/stats/coffee-consumption": {
+      "get": {
+        "tags": [
+          "Stats"
+        ],
+        "operationId": "GetCoffeeConsumption",
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "granularity",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/CoffeeConsumptionGranularity"
+            }
+          },
+          {
+            "name": "timeZone",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CoffeeConsumptionSeriesDto"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1958,6 +2014,76 @@
           },
           "name": {
             "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CoffeeConsumptionBucketDto": {
+        "type": "object",
+        "properties": {
+          "startDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "consumedGrams": {
+            "type": "number",
+            "format": "double"
+          },
+          "brewCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "isPartial": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CoffeeConsumptionGranularity": {
+        "enum": [
+          0,
+          1,
+          2
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
+      "CoffeeConsumptionSeriesDto": {
+        "type": "object",
+        "properties": {
+          "from": {
+            "type": "string",
+            "format": "date"
+          },
+          "to": {
+            "type": "string",
+            "format": "date"
+          },
+          "granularity": {
+            "$ref": "#/components/schemas/CoffeeConsumptionGranularity"
+          },
+          "timeZone": {
+            "type": "string",
+            "nullable": true
+          },
+          "totalConsumedGrams": {
+            "type": "number",
+            "format": "double"
+          },
+          "totalBrews": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "buckets": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CoffeeConsumptionBucketDto"
+            },
             "nullable": true
           }
         },

@@ -11,15 +11,12 @@ import { EquipmentPage } from '@/features/equipment/pages/EquipmentPage'
 import { RecipeListPage } from '@/features/recipes/pages/RecipeListPage'
 import { RoasterListPage } from '@/features/roasters/pages/RoasterListPage'
 import {
-  GraphsPlaceholder,
+  GraphsPage,
   StatsOverview,
   StatsPage,
 } from '@/features/stats/pages/StatsPage'
 import { queryClient } from '@/lib/queryClient'
-import {
-  defaultFeatureRoute,
-  lazyAppRoutes,
-} from '@/lib/routeRegistry'
+import { defaultFeatureRoute, lazyAppRoutes } from '@/lib/routeRegistry'
 
 function RouteFallback() {
   return (
@@ -54,7 +51,7 @@ function App() {
           <Route path="equipment" element={<EquipmentPage />} />
           <Route path="stats" element={<StatsPage />}>
             <Route index element={<StatsOverview />} />
-            <Route path="graphs" element={<GraphsPlaceholder />} />
+            <Route path="graphs" element={<GraphsPage />} />
           </Route>
           {lazyAppRoutes.map(({ path, component: Component }) => (
             <Route

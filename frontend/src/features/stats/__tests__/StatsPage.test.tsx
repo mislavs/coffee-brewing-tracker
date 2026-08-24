@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
-  GraphsPlaceholder,
+  GraphsPage,
   StatsOverview,
   StatsPage,
 } from '@/features/stats/pages/StatsPage'
@@ -11,6 +11,10 @@ import { useDashboardStats } from '@/hooks/useDashboardStats'
 
 vi.mock('@/hooks/useDashboardStats', () => ({
   useDashboardStats: vi.fn(),
+}))
+
+vi.mock('@/features/stats/components/CoffeeConsumptionGraph', () => ({
+  CoffeeConsumptionGraph: () => <h2>Coffee consumption</h2>,
 }))
 
 afterEach(cleanup)
@@ -21,7 +25,7 @@ function renderStatsPage(initialEntry = '/stats') {
       <Routes>
         <Route path="stats" element={<StatsPage />}>
           <Route index element={<StatsOverview />} />
-          <Route path="graphs" element={<GraphsPlaceholder />} />
+          <Route path="graphs" element={<GraphsPage />} />
         </Route>
       </Routes>
     </MemoryRouter>,
@@ -50,7 +54,9 @@ describe('StatsPage', () => {
     renderStatsPage()
 
     expect(screen.getByRole('heading', { name: 'My Stats' })).toBeTruthy()
-    expect(screen.getByRole('heading', { name: 'Brewing history' })).toBeTruthy()
+    expect(
+      screen.getByRole('heading', { name: 'Brewing history' }),
+    ).toBeTruthy()
     expect(screen.getByRole('heading', { name: 'Coffee supply' })).toBeTruthy()
     expect(screen.getByText('128')).toBeTruthy()
     expect(screen.getByText('750 g')).toBeTruthy()
@@ -60,16 +66,17 @@ describe('StatsPage', () => {
     expect(screen.getByText('at 31.5 g/day')).toBeTruthy()
   })
 
-  it('navigates to the graphs placeholder', async () => {
+  it('navigates to the coffee consumption graph', async () => {
     const user = userEvent.setup()
     renderStatsPage()
 
     await user.click(screen.getByRole('link', { name: 'Graphs' }))
 
-    expect(screen.getByRole('heading', { name: 'Graphs' })).toBeTruthy()
-    expect(screen.getByText('This is where the graphs will be.')).toBeTruthy()
-    expect(screen.getByRole('link', { name: 'Graphs' }).getAttribute('aria-current')).toBe(
-      'page',
-    )
+    expect(
+      await screen.findByRole('heading', { name: 'Coffee consumption' }),
+    ).toBeTruthy()
+    expect(
+      screen.getByRole('link', { name: 'Graphs' }).getAttribute('aria-current'),
+    ).toBe('page')
   })
 })

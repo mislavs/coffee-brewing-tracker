@@ -1,10 +1,16 @@
-import type { ReactNode } from 'react'
+import { lazy, Suspense, type ReactNode } from 'react'
 import { Clock3, Coffee, Compass, Droplets, Package } from 'lucide-react'
 import { NavLink, Outlet } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useDashboardStats } from '@/hooks/useDashboardStats'
 import { cn } from '@/lib/utils'
+
+const CoffeeConsumptionGraph = lazy(async () => {
+  const module =
+    await import('@/features/stats/components/CoffeeConsumptionGraph')
+  return { default: module.CoffeeConsumptionGraph }
+})
 
 const wholeNumberFormatter = new Intl.NumberFormat()
 const consumptionFormatter = new Intl.NumberFormat(undefined, {
@@ -28,7 +34,9 @@ function StatRow({ icon, label, description, value, detail }: StatRowProps) {
         </span>
         <span className="min-w-0">
           <span className="block font-medium">{label}</span>
-          <span className="text-muted-foreground mt-0.5 block text-sm">{description}</span>
+          <span className="text-muted-foreground mt-0.5 block text-sm">
+            {description}
+          </span>
         </span>
       </dt>
       <dd className="shrink-0 text-right">
@@ -52,16 +60,21 @@ function StatsLoading() {
         <section key={groupIndex} className="space-y-3">
           <Skeleton className="h-6 w-32" />
           <div className="divide-y overflow-hidden rounded-xl border bg-card">
-            {Array.from({ length: groupIndex === 0 ? 2 : 3 }).map((__, rowIndex) => (
-              <div key={rowIndex} className="flex items-center gap-4 px-4 py-5 sm:px-6">
-                <Skeleton className="size-10 shrink-0 rounded-lg" />
-                <div className="flex-1 space-y-2">
-                  <Skeleton className="h-4 w-28" />
-                  <Skeleton className="h-3 w-44 max-w-full" />
+            {Array.from({ length: groupIndex === 0 ? 2 : 3 }).map(
+              (__, rowIndex) => (
+                <div
+                  key={rowIndex}
+                  className="flex items-center gap-4 px-4 py-5 sm:px-6"
+                >
+                  <Skeleton className="size-10 shrink-0 rounded-lg" />
+                  <div className="flex-1 space-y-2">
+                    <Skeleton className="h-4 w-28" />
+                    <Skeleton className="h-3 w-44 max-w-full" />
+                  </div>
+                  <Skeleton className="h-7 w-16" />
                 </div>
-                <Skeleton className="h-7 w-16" />
-              </div>
-            ))}
+              ),
+            )}
           </div>
         </section>
       ))}
@@ -107,7 +120,10 @@ export function StatsOverview() {
     <div className="grid gap-8 lg:grid-cols-2">
       <section aria-labelledby="brewing-history-heading" className="space-y-3">
         <div>
-          <h2 id="brewing-history-heading" className="text-lg font-semibold tracking-tight">
+          <h2
+            id="brewing-history-heading"
+            className="text-lg font-semibold tracking-tight"
+          >
             Brewing history
           </h2>
           <p className="text-muted-foreground mt-1 text-sm">
@@ -132,7 +148,10 @@ export function StatsOverview() {
 
       <section aria-labelledby="coffee-supply-heading" className="space-y-3">
         <div>
-          <h2 id="coffee-supply-heading" className="text-lg font-semibold tracking-tight">
+          <h2
+            id="coffee-supply-heading"
+            className="text-lg font-semibold tracking-tight"
+          >
             Coffee supply
           </h2>
           <p className="text-muted-foreground mt-1 text-sm">
@@ -171,20 +190,27 @@ export function StatsOverview() {
   )
 }
 
-export function GraphsPlaceholder() {
+export function GraphsPage() {
   return (
-    <section aria-labelledby="graphs-heading" className="rounded-xl border bg-card p-6 sm:p-8">
-      <h2 id="graphs-heading" className="text-lg font-semibold tracking-tight">
-        Graphs
-      </h2>
-      <p className="text-muted-foreground mt-2">This is where the graphs will be.</p>
-    </section>
+    <Suspense
+      fallback={
+        <div className="overflow-hidden rounded-xl border bg-card p-4 sm:p-6">
+          <Skeleton className="h-8 w-48" />
+          <Skeleton className="mt-5 h-80 w-full rounded-lg" />
+        </div>
+      }
+    >
+      <CoffeeConsumptionGraph />
+    </Suspense>
   )
 }
 
 export function StatsPage() {
   return (
-    <section aria-labelledby="my-stats-heading" className="mx-auto w-full max-w-6xl space-y-8">
+    <section
+      aria-labelledby="my-stats-heading"
+      className="mx-auto w-full max-w-6xl space-y-8"
+    >
       <header className="space-y-2">
         <h1 id="my-stats-heading" className="text-2xl font-bold tracking-tight">
           My Stats
