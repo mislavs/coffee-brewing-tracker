@@ -32,7 +32,7 @@ RUN dotnet publish "src/CoffeeTracker.Api/CoffeeTracker.Api.csproj" \
     --no-restore \
     /p:UseAppHost=false
 
-FROM mcr.microsoft.com/dotnet/aspnet:10.0-noble-chiseled AS runtime
+FROM mcr.microsoft.com/dotnet/aspnet:10.0-noble-chiseled-extra AS runtime
 WORKDIR /app
 
 ENV ASPNETCORE_URLS=http://+:8080
