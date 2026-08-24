@@ -12,6 +12,7 @@ export const featureRoutes: FeatureRoute[] = [
   { path: 'equipment', href: '/equipment', title: 'Equipment' },
   { path: 'recipes', href: '/recipes', title: 'Recipes' },
   { path: 'roasters', href: '/roasters', title: 'Roasters' },
+  { path: 'stats', href: '/stats', title: 'My Stats' },
 ]
 
 export const defaultFeatureRoute = '/brew-log'

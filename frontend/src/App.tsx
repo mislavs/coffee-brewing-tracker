@@ -10,6 +10,7 @@ import { BrewLogListPage } from '@/features/brew-log/pages/BrewLogListPage'
 import { EquipmentPage } from '@/features/equipment/pages/EquipmentPage'
 import { RecipeListPage } from '@/features/recipes/pages/RecipeListPage'
 import { RoasterListPage } from '@/features/roasters/pages/RoasterListPage'
+import { StatsPage } from '@/features/stats/pages/StatsPage'
 import { queryClient } from '@/lib/queryClient'
 import {
   defaultFeatureRoute,
@@ -47,6 +48,7 @@ function App() {
           <Route path="beans" element={<BeanListPage />} />
           <Route path="recipes" element={<RecipeListPage />} />
           <Route path="equipment" element={<EquipmentPage />} />
+          <Route path="stats" element={<StatsPage />} />
           {lazyAppRoutes.map(({ path, component: Component }) => (
             <Route
               key={path}

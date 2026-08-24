@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import type { LucideIcon } from 'lucide-react'
 import {
   BookOpen,
+  ChartNoAxesCombined,
   Coffee,
   Globe,
   Icon as LucideLabIcon,
@@ -54,6 +55,7 @@ const navIcons: Record<string, LucideIcon> = {
   equipment: Wrench,
   recipes: BookOpen,
   roasters: Store,
+  stats: ChartNoAxesCombined,
 }
 
 export function AppLayout() {

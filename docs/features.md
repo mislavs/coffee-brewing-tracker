@@ -44,7 +44,7 @@ When transcription and extraction providers are configured, users can dictate a 
 
 ### Stats And Maps
 
-The app exposes dashboard statistics and country map data so users can see aggregate brewing and bean-origin information.
+The app exposes dashboard statistics and country map data so users can see aggregate brewing and bean-origin information. A top-level Stats page is available from the main navigation and currently serves as the home for future analysis features.
 
 ### Deployment And Operations
 
